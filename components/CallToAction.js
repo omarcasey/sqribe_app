@@ -5,7 +5,7 @@ const CallToAction = () => {
     <section className="py-12 bg-black sm:pb-16 lg:pb-20 xl:pb-24">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         <div className="grid items-center grid-cols-1 gap-y-12 mb-24">
-          <h1 className="text-center text-4xl font-normal text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="text-center text-4xl font-normal text-white sm:text-5xl lg:text-6xl xl:text-7xl mb-12">
             Get Proven Results
           </h1>
           <div className="grid grid-cols-3 items-center text-center relative gap-x-28">
@@ -32,15 +32,15 @@ const CallToAction = () => {
             <div className="absolute -bottom-12 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 to-purple-500"></div>
           </div>
           <h1 className="text-center text-4xl font-normal text-white px-32 mt-12">
-            We have very limited seats for booking calls. If you don't want to miss a chance, get a seat right now.
+            We have very limited seats for booking calls. If you don&apos;t want to miss a chance, get a seat right now.
           </h1>
           <div className='w-full flex justify-center'>
-            <div class="relative inline-flex items-center justify-center group w-48">
-              <div class="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-              <a href="#" title="" class="relative inline-flex items-center justify-center px-8 py-3 text-base font-normal text-white border border-transparent rounded-full" role="button"> Get your free seat </a>
+            <div className="relative inline-flex items-center justify-center group w-48">
+              <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
+              <a href="#" title="" className="relative inline-flex items-center justify-center px-8 py-3 text-base font-normal text-white border border-transparent rounded-full" role="button"> Get your free seat </a>
             </div>
           </div>
-
+          <div className=''></div>
         </div>
       </div>
     </section>
