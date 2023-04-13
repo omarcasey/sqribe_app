@@ -1,5 +1,8 @@
 import React from 'react'
 
+
+// retardation and fags
+
 const Hero = () => {
     return (
         <section class="py-12 bg-black sm:pb-16 lg:pb-20 xl:pb-24">
