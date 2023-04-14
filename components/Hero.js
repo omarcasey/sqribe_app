@@ -33,11 +33,12 @@ const Hero = () => {
                     <div className="flex items-center">
                         <motion.div
                             animate={{ y: [-10, 10] }}
-                            transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}>
+                            transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+                            className='w-full'>
                             <Image
                                 width={1024}
                                 height={1024}
-                                className="w-full mx-auto rotate-90"
+                                className="w-full mx-auto rotate-90 filter contrast-125 hover:-hue-rotate-90 transition-all ease-in-out duration-1000"
                                 src="/abstract.png"
                                 alt="" />
                         </motion.div>
