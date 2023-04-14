@@ -3,7 +3,7 @@ import React from 'react';
 const CallToAction = () => {
   return (
     <section className="py-12 bg-black sm:pb-16 lg:pb-20 xl:pb-24">
-      <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+      <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl xl:max-w-[100rem]">
         <div className="grid items-center grid-cols-1 gap-y-12">
           <h1 className="text-center text-4xl font-light text-white sm:text-5xl lg:text-6xl xl:text-7xl mb-12">
             Get Proven Results

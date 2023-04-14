@@ -3,7 +3,7 @@ import Image from "next/image"
 const LifetimeDeal = () => {
     return (
         <section className="py-12 bg-black sm:pb-16 lg:pb-20 xl:pb-24">
-            <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl xl:max-w-[60%]"> {/* add later --- xl:max-w-[70%] */}
+            <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl xl:max-w-[100rem]">
                 <div className="flex flex-col gap-y-8 relative">
                     <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase text-xl w-fit">
                         Choose a subscription
@@ -92,7 +92,7 @@ const LifetimeDeal = () => {
                             <div className="flex flex-col items-center gap-y-4 w-full">
                                 <h1 className="text-6xl tracking-wide">$99</h1>
                                 <p className="text-gray-500">Lifetime Account</p>
-                                <button className="bg-gradient-to-r from-cyan-500 to-purple-500 rounded-md flex items-center justify-center w-[70%] py-4 text-lg">Buy now</button>
+                                <button className="bg-gradient-to-r from-cyan-500 to-purple-500 rounded-md flex items-center justify-center w-[70%] py-4 text-lg transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/50">Buy now</button>
                                 <p className="text-gray-500">30 Days Money-back Guarantee</p>
                             </div>
                         </div>

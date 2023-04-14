@@ -6,11 +6,11 @@ import Image from 'next/image'
 const Newsletter = () => {
     return (
         <section class="py-12 bg-black sm:pb-16 lg:pb-20 xl:pb-24">
-            <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+            <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl ">
                 <div class="flex">
                     <div class="w-1/2 pr-1">
                         <p class="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>
-                        <h1 class="mt-6 text-4xl font-normal text-white sm:mt-10 sm:text-5xl lg:text-6xl">Join the Waitlist for Early Access!</h1>
+                        <h1 class="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Join the waitlist for early access!</h1>
                         <form action="#" method="POST" class="relative mt-8 rounded-full sm:mt-12">
                             <div class="relative">
                                 <div class="absolute rounded-full -inset-px bg-white"></div>
@@ -83,7 +83,7 @@ const Newsletter = () => {
                             <Image
                                 width={1024}
                                 height={1024}
-                                className="w-full mx-auto filter contrast-125 saturate-150"
+                                className="w-full mx-auto filter saturate-150"
                                 src="/new logo transparent.png"
                                 alt=""
                             />
