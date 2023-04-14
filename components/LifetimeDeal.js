@@ -2,7 +2,7 @@ import Image from "next/image"
 
 const LifetimeDeal = () => {
     return (
-        <section className="py-12 bg-black sm:pb-16 lg:pb-20 xl:pb-24">
+        <section className="py-12 sm:pb-16 lg:pb-20 xl:pb-24">
             <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl xl:max-w-[100rem]">
                 <div className="flex flex-col gap-y-8 relative">
                     <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase text-xl w-fit">
@@ -23,7 +23,7 @@ const LifetimeDeal = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-xl mb-1">Automated Captions</p>
+                                    <p className="text-xl text-white mb-1">Automated Captions</p>
                                     <p className="text-gray-500">Accurate AI-generated captions for videos</p>
                                 </div>
                             </div>
@@ -35,7 +35,7 @@ const LifetimeDeal = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-xl mb-1">Multilingual Translations</p>
+                                    <p className="text-xl text-white mb-1">Multilingual Translations</p>
                                     <p className="text-gray-500">Translate content into multiple languages</p>
                                 </div>
                             </div>
@@ -47,7 +47,7 @@ const LifetimeDeal = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-xl mb-1">Realistic Voice Overs</p>
+                                    <p className="text-xl text-white mb-1">Realistic Voice Overs</p>
                                     <p className="text-gray-500">AI-driven voice overs in various languages</p>
                                 </div>
                             </div>
@@ -59,7 +59,7 @@ const LifetimeDeal = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-xl mb-1">Seamless Dubbing</p>
+                                    <p className="text-xl text-white mb-1">Seamless Dubbing</p>
                                     <p className="text-gray-500">Synced multilingual audio for global reach</p>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@ const LifetimeDeal = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-xl mb-1">Accessibility Features</p>
+                                    <p className="text-xl text-white mb-1">Accessibility Features</p>
                                     <p className="text-gray-500">Improve accessibility for diverse audiences</p>
                                 </div>
                             </div>
@@ -83,14 +83,14 @@ const LifetimeDeal = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    <p className="text-xl mb-1">Time and Cost Savings</p>
+                                    <p className="text-xl text-white mb-1">Time and Cost Savings</p>
                                     <p className="text-gray-500">Efficient content production with AI</p>
                                 </div>
                             </div>
                         </div>
                         <div className="w-1/3 border-l border-gray-400 border-opacity-20 flex justify-center items-center ml-2">
                             <div className="flex flex-col items-center gap-y-4 w-full">
-                                <h1 className="text-6xl tracking-wide">$99</h1>
+                                <h1 className="text-6xl text-white tracking-wide">$99</h1>
                                 <p className="text-gray-500">Lifetime Account</p>
                                 <button className="bg-gradient-to-r from-cyan-500 to-purple-500 rounded-md flex items-center justify-center w-[70%] py-4 text-lg transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/50">Buy now</button>
                                 <p className="text-gray-500">30 Days Money-back Guarantee</p>
