@@ -64,7 +64,7 @@ const Navbar = () => {
 
                         <a href="#" title="" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white hover-underline`}> Use Cases </a>
 
-                        <a href="/pricing" title="" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white hover-underline`}> Pricing </a>
+                        <Link href="/pricing" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white ${router.pathname === '/pricing' ? "gradient-underline" : "hover-underline"}`}> Pricing </Link>
 
                         <a href="#" title="" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white hover-underline`}> Blog </a>
                     </nav>
