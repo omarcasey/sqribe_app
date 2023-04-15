@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0e1015]">
+    <main className="min-h-screen bg-[#0e1015] font-mont">
       <Navbar />
       {/* <Hero />
       <CallToAction />

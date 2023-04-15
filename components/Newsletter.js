@@ -6,7 +6,7 @@ import Image from 'next/image'
 const Newsletter = () => {
     return (
         <section class="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-hidden sm:overflow-visible" id='newsletter'>
-            <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl ">
+            <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
                 <div class="flex">
                     <div class="w-1/2 pr-1">
                         <p class="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>

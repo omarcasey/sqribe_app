@@ -12,7 +12,7 @@ const Features = () => {
                         Revolutionize your YouTube videos with AI-generated captions, voice overs, translations, and dubbing in multiple languages.
                     </p>
                     <div className="grid grid-cols-3 items-center text-center relative gap-x-10">
-                    <div className="bg-[#14171f] hover:bg-[#14171f]/50 transition-all ease-in-out duration-300 rounded-xl p-16 h-[34rem] flex flex-col items-center">
+                    <div className="bg-[#090914] hover:bg-[#090914]/50 transition-all ease-in-out duration-300 rounded-xl p-16 h-full flex flex-col items-center">
                             <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-4 text-xl">Unlimited Resources</p>
                             <h1 className="text-3xl text-white font-light xl:text-4xl mb-7">Captions & Subtitles</h1>
                             <p className="text-gray-400 text-base">
@@ -20,7 +20,7 @@ const Features = () => {
                             </p>
                             <Image className="h-60 w-auto" src='/new logo transparent.png' width={1024} height={1024} />
                         </div>
-                        <div className="bg-[#14171f] hover:bg-[#14171f]/50 transition-all ease-in-out duration-300 rounded-xl p-16 h-[34rem] flex flex-col items-center">
+                        <div className="bg-[#090914] hover:bg-[#090914]/50 transition-all ease-in-out duration-300 rounded-xl p-16 h-full flex flex-col items-center">
                             <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-4 text-xl">Unlimited Growth</p>
                             <h1 className="text-3xl text-white font-light xl:text-4xl mb-7">Translating & Dubbing</h1>
                             <p className="text-gray-400 text-base">
@@ -28,7 +28,7 @@ const Features = () => {
                             </p>
                             <Image className="h-60 w-auto" src='/new logo transparent.png' width={1024} height={1024} />
                         </div>
-                        <div className="bg-[#14171f] hover:bg-[#14171f]/50 transition-all ease-in-out duration-300 rounded-xl p-16 h-[34rem] flex flex-col items-center">
+                        <div className="bg-[#090914] hover:bg-[#090914]/50 transition-all ease-in-out duration-300 rounded-xl p-16 h-full flex flex-col items-center">
                             <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-4 text-xl">Unlimited Content</p>
                             <h1 className="text-3xl text-white font-light xl:text-4xl mb-7">Voice Overs</h1>
                             <p className="text-gray-400 text-base">

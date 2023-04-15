@@ -13,7 +13,7 @@ const Hero = () => {
                         <p class="max-w-lg mt-4 text-xl font-normal text-gray-400 sm:mt-8 text-center lg:text-left">Revolutionize your YouTube videos with AI-generated captions, voice overs, translations, and dubbing in multiple languages.</p>
                         <div class="relative inline-flex items-center justify-center mt-8 sm:mt-12 group">
                             <div class="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-                            <a href="#" title="" class="relative inline-flex items-center justify-center px-8 py-3 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join the Waitlist for Early Access </a>
+                            <a onClick={() => document.getElementById('newsletter').scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-8 py-3 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join the Waitlist for Early Access </a>
                         </div>
                         <div>
                             <div class="inline-flex items-center pt-6 mt-8 border-t border-gray-800 sm:pt-10 sm:mt-14">
