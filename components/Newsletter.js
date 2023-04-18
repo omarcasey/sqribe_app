@@ -5,30 +5,30 @@ import Image from 'next/image'
 
 const Newsletter = () => {
     return (
-        <section class="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-hidden sm:overflow-visible" id='newsletter'>
-            <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-                <div class="flex">
-                    <div class="w-1/2 pr-1">
-                        <p class="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>
-                        <h1 class="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Join the waitlist for early access!</h1>
-                        <form action="#" method="POST" class="relative mt-8 rounded-full sm:mt-12">
-                            <div class="relative">
-                                <div class="absolute rounded-full -inset-px bg-white"></div>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-6">
+        <section className="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-hidden sm:overflow-visible" id='newsletter'>
+            <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+                <div className="flex">
+                    <div className="w-1/2 pr-1">
+                        <p className="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>
+                        <h1 className="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Join the waitlist for early access!</h1>
+                        <form action="#" method="POST" className="relative mt-8 rounded-full sm:mt-12">
+                            <div className="relative">
+                                <div className="absolute rounded-full -inset-px bg-white"></div>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 flex items-center pl-6">
                                         <Image className='w-5 h-5 invert opacity-30' src='/email-icon.svg' width={20} height={20} />
                                     </div>
-                                    <input type="email" name="" id="" placeholder="Enter your email" class="block w-full py-4 pr-6 text-white placeholder-gray-500 bg-black border border-transparent rounded-full pl-14 sm:py-5 focus:border-transparent focus:ring-0" />
+                                    <input type="email" name="" id="" placeholder="Enter your email" className="block w-full py-4 pr-6 text-white placeholder-gray-500 bg-black border border-transparent rounded-full pl-14 sm:py-5 focus:border-transparent focus:ring-0" />
                                 </div>
                             </div>
-                            <div class="sm:absolute flex sm:right-1.5 sm:inset-y-1.5 mt-4 sm:mt-0">
-                                <button type="submit" class="inline-flex items-center justify-center w-full px-5 py-5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-200 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full sm:w-auto sm:py-3 hover:opacity-90">Get Notified</button>
+                            <div className="sm:absolute flex sm:right-1.5 sm:inset-y-1.5 mt-4 sm:mt-0">
+                                <button type="submit" className="inline-flex items-center justify-center w-full px-5 py-5 text-sm font-semibold tracking-widest text-white uppercase transition-all duration-200 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full sm:w-auto sm:py-3 hover:opacity-90">Get Notified</button>
                             </div>
                         </form>
                         <div>
-                            <div class="inline-flex items-center pt-6 mt-8 border-t border-gray-800 sm:pt-10 sm:mt-14">
-                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M13 7.00003H21M21 7.00003V15M21 7.00003L13 15L9 11L3 17" stroke="url(#a)" stroke-linecap="round" stroke-linejoin="round" />
+                            <div className="inline-flex items-center pt-6 mt-8 border-t border-gray-800 sm:pt-10 sm:mt-14">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13 7.00003H21M21 7.00003V15M21 7.00003L13 15L9 11L3 17" stroke="url(#a)" strokeLinecap="round" strokeLinejoin="round" />
                                     <defs>
                                         <linearGradient id="a" x1="3" y1="7.00003" x2="22.2956" y2="12.0274" gradientUnits="userSpaceOnUse">
                                             <stop offset="0%" style={{ stopColor: '#06B6D4' }} />
@@ -36,14 +36,14 @@ const Newsletter = () => {
                                         </linearGradient>
                                     </defs>
                                 </svg>
-                                <span class="ml-2 text-base font-normal text-white"> Exclusive Discounts for Early Adopters </span>
+                                <span className="ml-2 text-base font-normal text-white"> Exclusive Discounts for Early Adopters </span>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center w-1/2 px-12 relative">
                         <div className="absolute inset-0">
                             <svg
-                                class="blur-3xl filter opacity-70"
+                                className="blur-3xl filter opacity-70"
                                 style={{ filter: "blur(64px)" }}
                                 width="444"
                                 height="536"

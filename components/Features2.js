@@ -9,8 +9,8 @@ const Features2 = () => {
                         <p className="text-sm text-gray-400 tracking-widest">
                             Level up with
                         </p>
-                        <h1 class="mt-6 mb-14 text-4xl text-white sm:mt-10 sm:text-5xl lg:text-6xl xl:text-8xl text-center lg:text-left">
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 relative z-10">Connect apps</span>
+                        <h1 className="mt-6 mb-14 text-4xl text-white sm:mt-10 sm:text-5xl lg:text-6xl xl:text-8xl text-center lg:text-left">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 relative z-10">Connect apps</span>
                             with Sqribe
                         </h1>
                         <div className="flex">
@@ -28,8 +28,8 @@ const Features2 = () => {
                             </div>
                         </div>
                         <div className="w-full mt-12 h-[2px] bg-gray-400/20"></div>
-                        <div class="relative inline-flex items-center justify-center mt-8 sm:mt-12 group">
-                            <div class="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
+                        <div className="relative inline-flex items-center justify-center mt-8 sm:mt-12 group">
+                            <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
                             <a onClick={() => document.getElementById('newsletter').scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-8 py-3 text-base font-normal text-white bg-black border border-transparent rounded-full" role="button"> Explore More </a>
                         </div>
                     </div>
