@@ -1,24 +1,40 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
+import { db } from '../firebase'
+import { collection, addDoc } from "firebase/firestore"; 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 
 const Newsletter = () => {
+    const [email, setEmail] = useState('')
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        try {
+            await addDoc(collection(db, "emails"), { email });
+            setEmail('')
+            alert('Email successfully captured')
+        } catch (err) {
+            console.error('Error capturing email: ', err)
+        }
+    }
+
     return (
-        <section className="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-hidden sm:overflow-visible" id='newsletter'>
-            <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-                <div className="flex">
-                    <div className="w-1/2 pr-1">
-                        <p className="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>
-                        <h1 className="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Join the waitlist for early access!</h1>
-                        <form action="#" method="POST" className="relative mt-8 rounded-full sm:mt-12">
-                            <div className="relative">
-                                <div className="absolute rounded-full -inset-px bg-white"></div>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-6">
+        <section class="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-hidden sm:overflow-visible" id='newsletter'>
+            <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+                <div class="flex">
+                    <div class="w-1/2 pr-1">
+                        <p class="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>
+                        <h1 class="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Join the waitlist for early access!</h1>
+                        <form onSubmit={handleSubmit} class="relative mt-8 rounded-full sm:mt-12">
+                            <div class="relative">
+                                <div class="absolute rounded-full -inset-px bg-white"></div>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-6">
                                         <Image className='w-5 h-5 invert opacity-30' src='/email-icon.svg' width={20} height={20} />
                                     </div>
-                                    <input type="email" name="" id="" placeholder="Enter your email" className="block w-full py-4 pr-6 text-white placeholder-gray-500 bg-black border border-transparent rounded-full pl-14 sm:py-5 focus:border-transparent focus:ring-0" />
+                                    <input type="email" name="" id="" placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} class="block w-full py-4 pr-6 text-white placeholder-gray-500 bg-black border border-transparent rounded-full pl-14 sm:py-5 focus:border-transparent focus:ring-0" />
                                 </div>
                             </div>
                             <div className="sm:absolute flex sm:right-1.5 sm:inset-y-1.5 mt-4 sm:mt-0">
