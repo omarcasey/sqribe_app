@@ -9,7 +9,7 @@ import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Pricing() {
+export default function Home() {
   return (
     <main className="min-h-screen bg-[#0e1015] font-mont">
       <Navbar />

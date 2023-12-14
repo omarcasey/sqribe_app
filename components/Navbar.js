@@ -67,11 +67,14 @@ const Navbar = () => {
                         <Link href="/pricing" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white ${router.pathname === '/pricing' ? "gradient-underline" : "hover-underline"}`}> Pricing </Link>
 
                         <a href="#" title="" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white hover-underline`}> Blog </a>
+
+                        <Link href="/dashboard" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white ${router.pathname === '/dashboard' ? "gradient-underline" : "hover-underline"}`}> Dashboard </Link>
+                        <Link href="/makespeech" className={`text-lg font-semibold ${scrolling ? "text-white" : "text-gray-400"} transition-all duration-200 hover:text-white ${router.pathname === '/makespeech' ? "gradient-underline" : "hover-underline"}`}> MakeSpeech </Link>
                     </nav>
 
                     <div className="relative hidden md:items-center md:justify-center md:inline-flex group">
                         <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-                        <a onClick={() => document.getElementById('newsletter').scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join Waitlist </a>
+                        <a onClick={() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join Waitlist </a>
                     </div>
                 </div>
 

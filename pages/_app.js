@@ -1,3 +1,4 @@
+import { NextUIProvider } from '@nextui-org/react'
 import '@/styles/globals.css'
 import { Montserrat, Playfair_Display } from 'next/font/google'
 
@@ -15,8 +16,10 @@ const playfair = Playfair_Display({
 
 export default function App({ Component, pageProps }) {
   return (
-    <main className={`${montserrat.variable} ${playfair.variable}`}>
-      <Component {...pageProps} />
+    <main className={`${montserrat.variable} ${playfair.variable} dark font-mont`}>
+      <NextUIProvider>
+        <Component {...pageProps} />
+      </NextUIProvider>
     </main>
   )
 }
