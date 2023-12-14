@@ -35,6 +35,8 @@ import { NextIcon } from "@/components/NextIcon";
 import { getTranslateCode } from "@/helpers/getFlag";
 import { languageOptions } from "@/helpers/languages";
 import Navbar from "@/components/Navbar";
+import withAuth from "@/components/withAuth";
+import AppShell from "@/components/AppShell";
 
 const Dashboard = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -134,7 +136,7 @@ const Dashboard = () => {
               },
               body: JSON.stringify({
                 audioPath: filePath,
-                audioLanguage: getTranslateCode(originalLanguage)
+                audioLanguage: getTranslateCode(originalLanguage),
               }),
             });
 
@@ -235,7 +237,6 @@ const Dashboard = () => {
     }
   };
 
-
   const openFileInput = () => {
     const fileInput = document.getElementById("fileInput");
     fileInput.click();
@@ -276,219 +277,225 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-[#0e1015]">
-      <Navbar />
-      <div className="flex min-h-screen flex-col items-center pb-24 pt-10">
-        <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-12 flex-wrap">
-          {projects.length >= 0 && (
-            <div
-              className="border border-dashed border-white w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-neutral-800 transition-all"
-              onClick={onOpen}
-            >
-              <p className="text-3xl">+</p>
-              <p className="font-semibold text-xl pb-4">Upload video</p>
-            </div>
-          )}
-          {projects.map((project) => (
-            <Link
-              key={project.id}
-              href={`/project/${project.id}`}
-              className="w-96 h-56 border border-white rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-400 hover:transform hover:scale-[1.03] transition-transform scale"
-            >
-              <Card className="w-full h-full">
-                <CardHeader className="flex gap-3">
-                  <Image
-                    alt="nextui logo"
-                    height={40}
-                    radius="sm"
-                    src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-                    width={40}
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-md">{project.projectName}</p>
-                    <p className="text-small text-default-500">
-                      {project.date && project.date.toDate().toLocaleDateString()}
+    <AppShell>
+      <div className="bg-[#0e1015] w-full">
+        {/* <Navbar /> */}
+        <div className="flex flex-col items-center pb-24 pt-10">
+          <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-12 flex-wrap">
+            {projects.length >= 0 && (
+              <div
+                className="border border-dashed border-white w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-neutral-800 transition-all"
+                onClick={onOpen}
+              >
+                <p className="text-3xl">+</p>
+                <p className="font-semibold text-xl pb-4">Upload video</p>
+              </div>
+            )}
+            {projects.map((project) => (
+              <Link
+                key={project.id}
+                href={`/project/${project.id}`}
+                className="w-96 h-56 border border-white rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 hover:transform hover:scale-[1.03] transition-transform scale"
+              >
+                <Card className="w-full h-full">
+                  <CardHeader className="flex gap-3">
+                    <Image
+                      alt="nextui logo"
+                      height={40}
+                      radius="sm"
+                      src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
+                      width={40}
+                    />
+                    <div className="flex flex-col">
+                      <p className="text-md">{project.projectName}</p>
+                      <p className="text-small text-default-500">
+                        {project.date &&
+                          project.date.toDate().toLocaleDateString()}
+                      </p>
+                    </div>
+                  </CardHeader>
+                  <Divider />
+                  <CardBody className="flex items-center justify-center">
+                    <div className="bg-neutral-600 rounded-full p-3">
+                      <NextIcon size={40} />
+                    </div>
+                  </CardBody>
+                  <Divider />
+                  <CardFooter>
+                    <p className="text-sm text-default-500">
+                      {project.fileName}
                     </p>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody className="flex items-center justify-center">
-                  <div className="bg-neutral-600 rounded-full p-3">
-                    <NextIcon size={40} />
-                  </div>
-                </CardBody>
-                <Divider />
-                <CardFooter>
-                  <p className="text-sm text-default-500">{project.fileName}</p>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                  </CardFooter>
+                </Card>
+              </Link>
+            ))}
+          </div>
 
-        <>
-          <Modal
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-            onClose={handleModalClose}
-            className="bg-neutral-900"
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    Upload video or audio to translate
-                  </ModalHeader>
-                  <ModalBody>
-                    <div className="flex flex-col items-center">
-                      <input
-                        type="file"
-                        id="fileInput"
-                        accept=".mp4, .mov, .webm, .mkv, .mp3, .wav"
-                        style={{ display: "none" }}
-                        onChange={handleFileSelection}
-                      />
-                      <div
-                        className="border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-neutral-800 hover:cursor-pointer transition-all"
-                        onClick={openFileInput}
-                        onDragEnter={handleDragEnter}
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
-                      >
-                        {selectedFileName ? (
-                          <p className="text-sm text-gray-300 text-center">
-                            {selectedFileName}
-                          </p>
-                        ) : (
-                          <p className="text-sm text-gray-300 text-center">
-                            Click to choose a file or drag and drop it here <br />
-                            MP4, MOV, WEBM, MKV, MP3, WAV
-                          </p>
+          <>
+            <Modal
+              isOpen={isOpen}
+              onOpenChange={onOpenChange}
+              onClose={handleModalClose}
+              className="bg-neutral-900"
+            >
+              <ModalContent>
+                {(onClose) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Upload video or audio to translate
+                    </ModalHeader>
+                    <ModalBody>
+                      <div className="flex flex-col items-center">
+                        <input
+                          type="file"
+                          id="fileInput"
+                          accept=".mp4, .mov, .webm, .mkv, .mp3, .wav"
+                          style={{ display: "none" }}
+                          onChange={handleFileSelection}
+                        />
+                        <div
+                          className="border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-neutral-800 hover:cursor-pointer transition-all"
+                          onClick={openFileInput}
+                          onDragEnter={handleDragEnter}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          {selectedFileName ? (
+                            <p className="text-sm text-gray-300 text-center">
+                              {selectedFileName}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-gray-300 text-center">
+                              Click to choose a file or drag and drop it here{" "}
+                              <br />
+                              MP4, MOV, WEBM, MKV, MP3, WAV
+                            </p>
+                          )}
+                        </div>
+
+                        <p className="py-4">or</p>
+                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                          Paste Link
+                        </p>
+                        <Input
+                          placeholder={
+                            selectedFile
+                              ? "File Selected"
+                              : "Youtube or Google Drive Link"
+                          }
+                          color={selectedFile ? "danger" : "default"}
+                          size="sm"
+                          className="text-black pb-4"
+                          disabled={selectedFile ? true : false}
+                          value={selectedFile ? "" : pasteLink}
+                          onChange={handlePasteLinkChange}
+                        />
+
+                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                          Project Name
+                        </p>
+                        <Input
+                          placeholder="My First Project"
+                          color="default"
+                          size="sm"
+                          className="text-black pb-4"
+                          value={projectName}
+                          onChange={handleProjectNameChange}
+                        />
+
+                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                          Original Language
+                        </p>
+                        <Select
+                          size="sm"
+                          placeholder="Select a Language"
+                          className=" text-black pb-4"
+                          color="default"
+                          selectedKeys={[originalLanguage]}
+                          onChange={handleOriginalLanguage}
+                          aria-label="Translation Language"
+                          disallowEmptySelection
+                        >
+                          {languageOptions.map((option) => (
+                            <SelectItem
+                              key={option.label}
+                              startContent={
+                                <Avatar
+                                  alt={option.label}
+                                  className="w-6 h-6"
+                                  src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                />
+                              }
+                              className="text-black"
+                              value={option.label}
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                          Translate to
+                        </p>
+                        <Select
+                          size="sm"
+                          placeholder="Select a Language"
+                          className=" text-black pb-4"
+                          color="default"
+                          selectedKeys={[translationLanguage]}
+                          onChange={handleTranslationLanguage}
+                          aria-label="Translation Language"
+                          disallowEmptySelection
+                        >
+                          {languageOptions.map((option) => (
+                            <SelectItem
+                              key={option.label}
+                              startContent={
+                                <Avatar
+                                  alt={option.label}
+                                  className="w-6 h-6"
+                                  src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                />
+                              }
+                              className="text-black"
+                              value={option.label}
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                    </ModalBody>
+                    <ModalFooter>
+                      <div className="flex flex-col w-full">
+                        <Button
+                          className="w-full font-semibold text-base py-5"
+                          color="secondary"
+                          isLoading={isUploading}
+                          onPress={handleUpload}
+                        >
+                          Translate
+                        </Button>
+                        {isUploading && (
+                          <Progress
+                            aria-label="Uploading..."
+                            size="sm"
+                            value={uploadProgress}
+                            color="secondary"
+                            className="w-full mt-4"
+                          />
                         )}
                       </div>
-
-                      <p className="py-4">or</p>
-                      <p className="w-full text-left text-white font-semibold text-sm pb-2">
-                        Paste Link
-                      </p>
-                      <Input
-                        placeholder={
-                          selectedFile
-                            ? "File Selected"
-                            : "Youtube or Google Drive Link"
-                        }
-                        color={selectedFile ? "danger" : "default"}
-                        size="sm"
-                        className="text-black pb-4"
-                        disabled={selectedFile ? true : false}
-                        value={selectedFile ? "" : pasteLink}
-                        onChange={handlePasteLinkChange}
-                      />
-
-                      <p className="w-full text-left text-white font-semibold text-sm pb-2">
-                        Project Name
-                      </p>
-                      <Input
-                        placeholder="My First Project"
-                        color="default"
-                        size="sm"
-                        className="text-black pb-4"
-                        value={projectName}
-                        onChange={handleProjectNameChange}
-                      />
-
-                      <p className="w-full text-left text-white font-semibold text-sm pb-2">
-                        Original Language
-                      </p>
-                      <Select
-                        size="sm"
-                        placeholder="Select a Language"
-                        className=" text-black pb-4"
-                        color="default"
-                        selectedKeys={[originalLanguage]}
-                        onChange={handleOriginalLanguage}
-                        aria-label="Translation Language"
-                        disallowEmptySelection
-                      >
-                        {languageOptions.map((option) => (
-                          <SelectItem
-                            key={option.label}
-                            startContent={
-                              <Avatar
-                                alt={option.label}
-                                className="w-6 h-6"
-                                src={`https://flagcdn.com/${option.flagCode}.svg`}
-                              />
-                            }
-                            className="text-black"
-                            value={option.label}
-                          >
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                      <p className="w-full text-left text-white font-semibold text-sm pb-2">
-                        Translate to
-                      </p>
-                      <Select
-                        size="sm"
-                        placeholder="Select a Language"
-                        className=" text-black pb-4"
-                        color="default"
-                        selectedKeys={[translationLanguage]}
-                        onChange={handleTranslationLanguage}
-                        aria-label="Translation Language"
-                        disallowEmptySelection
-                      >
-                        {languageOptions.map((option) => (
-                          <SelectItem
-                            key={option.label}
-                            startContent={
-                              <Avatar
-                                alt={option.label}
-                                className="w-6 h-6"
-                                src={`https://flagcdn.com/${option.flagCode}.svg`}
-                              />
-                            }
-                            className="text-black"
-                            value={option.label}
-                          >
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                    </div>
-                  </ModalBody>
-                  <ModalFooter>
-                    <div className="flex flex-col w-full">
-                      <Button
-                        className="w-full font-semibold text-base py-5"
-                        color="secondary"
-                        isLoading={isUploading}
-                        onPress={handleUpload}
-                      >
-                        Translate
-                      </Button>
-                      {isUploading && (
-                        <Progress
-                          aria-label="Uploading..."
-                          size="sm"
-                          value={uploadProgress}
-                          color="secondary"
-                          className="w-full mt-4"
-                        />
-                      )}
-                    </div>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
-        </>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
+          </>
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 };
 
-export default Dashboard;
+export default withAuth(Dashboard);

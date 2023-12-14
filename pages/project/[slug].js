@@ -11,6 +11,7 @@ import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { getFlagCode } from "@/helpers/getFlag";
+import withAuth from "@/components/withAuth";
 
 const Page = () => {
   const router = useRouter();
@@ -155,4 +156,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default withAuth(Page);
