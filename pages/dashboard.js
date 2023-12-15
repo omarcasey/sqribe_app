@@ -29,16 +29,22 @@ import {
   Timestamp,
   getDocs,
   onSnapshot,
+  query,
+  where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/NextIcon";
 import { getTranslateCode } from "@/helpers/getFlag";
 import { languageOptions } from "@/helpers/languages";
-import Navbar from "@/components/Navbar";
 import withAuth from "@/components/withAuth";
 import AppShell from "@/components/AppShell";
+import { useAuth } from "@/components/authContext";
+import { useTheme } from "@/components/ThemeContext";
 
 const Dashboard = () => {
+  const { user, loading } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
+  
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
   const [selectedFile, setselectedFile] = useState("");
@@ -49,36 +55,55 @@ const Dashboard = () => {
   const [isUploading, setisUploading] = useState(false);
   const [projects, setProjects] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [drag, setDrag] = useState(false)
 
   useEffect(() => {
+    if (!user) {
+      // Ensure there is a user before fetching projects
+      return;
+    }
+  
     const projectsCollection = collection(db, "projects");
-
-    // Fetch projects initially
-    const fetchProjects = async () => {
+  
+    // Fetch projects initially for the current user
+    const fetchUserProjects = async () => {
       try {
-        const projectsSnapshot = await getDocs(projectsCollection);
+        const userProjectsQuery = query(
+          projectsCollection,
+          where("user", "==", user.uid) // Assuming "user" field is the UID of the user
+        );
+  
+        const projectsSnapshot = await getDocs(userProjectsQuery);
         const projectsData = projectsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setProjects(projectsData);
       } catch (error) {
-        console.error("Error fetching projects: ", error);
+        console.error("Error fetching user projects: ", error);
       }
     };
-
-    // Set up real-time updates
-    const unsubscribe = onSnapshot(projectsCollection, (snapshot) => {
+  
+    // Call fetchUserProjects to fetch projects initially
+    fetchUserProjects();
+  
+    // Set up real-time updates for the current user's projects
+    const userProjectsQuery = query(
+      projectsCollection,
+      where("user", "==", user.uid)
+    );
+    const unsubscribe = onSnapshot(userProjectsQuery, (snapshot) => {
       const updatedProjects = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setProjects(updatedProjects);
     });
-
+  
     // Cleanup function to unsubscribe from real-time updates
     return () => unsubscribe();
-  }, []);
+  }, [user]); // Ensure the effect re-runs when the user changes
+  
 
   const handleProjectNameChange = (e) => {
     setProjectName(e.target.value);
@@ -198,6 +223,7 @@ const Dashboard = () => {
             try {
               const docRef = await addDoc(collection(db, "projects"), {
                 projectName: projectName,
+                user: user.uid,
                 fileName: selectedFileName,
                 originalLanguage: originalLanguage,
                 translationLanguage: translationLanguage,
@@ -251,21 +277,25 @@ const Dashboard = () => {
   const handleDragEnter = (e) => {
     e.preventDefault();
     // Add visual feedback when dragging over the dropzone (e.g., change the border color).
+    setDrag(true)
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
     // Add visual feedback (e.g., change the border color) and allow drop events.
+    setDrag(true)
   };
 
   const handleDragLeave = (e) => {
     e.preventDefault();
+    setDrag(false)
     // Remove the visual feedback when leaving the dropzone.
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
+    setselectedFile(droppedFile)
     setSelectedFileName(droppedFile.name);
     // Do something with the dropped file, such as uploading or processing it.
     // For example, you can store it in state or call a function to handle the file.
@@ -278,13 +308,13 @@ const Dashboard = () => {
 
   return (
     <AppShell>
-      <div className="bg-[#0e1015] w-full">
+      <div className="w-full">
         {/* <Navbar /> */}
         <div className="flex flex-col items-center pb-24 pt-10">
           <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-12 flex-wrap">
             {projects.length >= 0 && (
               <div
-                className="border border-dashed border-white w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-neutral-800 transition-all"
+                className="border border-dashed border-foreground-400 text-foreground w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
                 onClick={onOpen}
               >
                 <p className="text-3xl">+</p>
@@ -295,7 +325,7 @@ const Dashboard = () => {
               <Link
                 key={project.id}
                 href={`/project/${project.id}`}
-                className="w-96 h-56 border border-white rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 hover:transform hover:scale-[1.03] transition-transform scale"
+                className="w-96 h-56 border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 hover:transform hover:scale-[1.03] transition-transform scale"
               >
                 <Card className="w-full h-full">
                   <CardHeader className="flex gap-3">
@@ -316,7 +346,7 @@ const Dashboard = () => {
                   </CardHeader>
                   <Divider />
                   <CardBody className="flex items-center justify-center">
-                    <div className="bg-neutral-600 rounded-full p-3">
+                    <div className="bg-foreground-200 rounded-full p-3">
                       <NextIcon size={40} />
                     </div>
                   </CardBody>
@@ -336,12 +366,12 @@ const Dashboard = () => {
               isOpen={isOpen}
               onOpenChange={onOpenChange}
               onClose={handleModalClose}
-              className="bg-neutral-900"
+              className={`${isDarkMode ? "dark" : "light"}`}
             >
               <ModalContent>
                 {(onClose) => (
                   <>
-                    <ModalHeader className="flex flex-col gap-1">
+                    <ModalHeader className="flex flex-col gap-1 text-foreground">
                       Upload video or audio to translate
                     </ModalHeader>
                     <ModalBody>
@@ -354,7 +384,7 @@ const Dashboard = () => {
                           onChange={handleFileSelection}
                         />
                         <div
-                          className="border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-neutral-800 hover:cursor-pointer transition-all"
+                          className={`border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-foreground-100 hover:cursor-pointer transition-all ${drag ? "border-purple-800 bg-foreground-100" : ""}`}
                           onClick={openFileInput}
                           onDragEnter={handleDragEnter}
                           onDragOver={handleDragOver}
@@ -362,11 +392,11 @@ const Dashboard = () => {
                           onDrop={handleDrop}
                         >
                           {selectedFileName ? (
-                            <p className="text-sm text-gray-300 text-center">
+                            <p className="text-sm text-default-500 text-center">
                               {selectedFileName}
                             </p>
                           ) : (
-                            <p className="text-sm text-gray-300 text-center">
+                            <p className="text-sm text-default-500 text-center">
                               Click to choose a file or drag and drop it here{" "}
                               <br />
                               MP4, MOV, WEBM, MKV, MP3, WAV
@@ -375,7 +405,7 @@ const Dashboard = () => {
                         </div>
 
                         <p className="py-4">or</p>
-                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                        <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Paste Link
                         </p>
                         <Input
@@ -392,7 +422,7 @@ const Dashboard = () => {
                           onChange={handlePasteLinkChange}
                         />
 
-                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                        <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Project Name
                         </p>
                         <Input
@@ -404,14 +434,14 @@ const Dashboard = () => {
                           onChange={handleProjectNameChange}
                         />
 
-                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                        <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Original Language
                         </p>
                         <Select
                           size="sm"
                           placeholder="Select a Language"
-                          className=" text-black pb-4"
                           color="default"
+                          className={`${isDarkMode ? "dark" : "light"} text-black pb-4`}
                           selectedKeys={[originalLanguage]}
                           onChange={handleOriginalLanguage}
                           aria-label="Translation Language"
@@ -434,7 +464,7 @@ const Dashboard = () => {
                             </SelectItem>
                           ))}
                         </Select>
-                        <p className="w-full text-left text-white font-semibold text-sm pb-2">
+                        <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Translate to
                         </p>
                         <Select

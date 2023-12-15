@@ -2,6 +2,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import "@/styles/globals.css";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/components/authContext";
+import { ThemeProvider } from "@/components/ThemeContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -18,11 +19,13 @@ const playfair = Playfair_Display({
 export default function App({ Component, pageProps }) {
   return (
     <main
-      className={`${montserrat.variable} ${playfair.variable} dark font-mont`}
+      className={`${montserrat.variable} ${playfair.variable} font-mont`}
     >
       <NextUIProvider>
         <AuthProvider>
-          <Component {...pageProps} />
+          <ThemeProvider>
+            <Component {...pageProps} />
+          </ThemeProvider>
         </AuthProvider>
       </NextUIProvider>
     </main>

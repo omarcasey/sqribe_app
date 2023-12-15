@@ -10,10 +10,14 @@ import {
 } from "@nextui-org/react";
 import { PlusIcon } from "./PlusIcon.jsx";
 import { IoMdArrowDropdown } from "react-icons/io";
-import Link from "next/link";
 import { auth } from "@/firebase";
+import { useTheme } from "./ThemeContext.js";
+import { useAuth } from "./authContext.js";
 
 export default function DropdownMenuIdk({ router }) {
+  const { isDarkMode, toggleTheme } = useTheme();
+  const { user } = useAuth()
+
   const signOut = async () => {
     try {
       await auth.signOut();
@@ -27,7 +31,7 @@ export default function DropdownMenuIdk({ router }) {
     <Dropdown
       showArrow
       radius="sm"
-      className="dark"
+      className={`${isDarkMode ? "dark" : "light"}`}
       classNames={{
         base: "before:bg-default-200", // change arrow background
         content: "p-0 border-small border-divider bg-background",
@@ -64,8 +68,8 @@ export default function DropdownMenuIdk({ router }) {
             className="h-14 gap-2 opacity-100"
           >
             <User
-              name="Junior Garcia"
-              description="@jrgarciadev"
+              name={user.email}
+              description="@dev"
               classNames={{
                 name: "text-default-600",
                 description: "text-default-500",

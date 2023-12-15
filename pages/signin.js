@@ -38,7 +38,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-start">
+    <div className="h-screen flex flex-col items-center justify-start dark">
       <Link className="flex flex-col items-center mb-14" href={"/"}>
         <Image
           src={"/abstract.png"}

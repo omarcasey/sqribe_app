@@ -82,7 +82,7 @@ const MakeSpeech = () => {
 
   return (
     <AppShell>
-      <div className="bg-[#0e1015] w-full">
+      <div className="w-full">
         {/* <Navbar /> */}
         <main className="flex min-h-screen flex-col items-center py-24">
           <div className="mx-auto max-w-3xl">

@@ -12,10 +12,12 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { getFlagCode } from "@/helpers/getFlag";
 import withAuth from "@/components/withAuth";
+import { useTheme } from "@/components/ThemeContext";
 
 const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
+  const { isDarkMode, toggleTheme } = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,9 +34,13 @@ const Page = () => {
   }, [router.query.slug]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center pb-24 bg-background">
-      <div className="w-full flex justify-between px-5 border-b-1 border-neutral-600 py-4">
-        <div className="flex items-center justify-center">
+    <div
+      className={`flex min-h-screen flex-col items-center pb-24 bg-default-100 ${
+        isDarkMode ? "dark" : "light"
+      }`}
+    >
+      <div className="w-full flex justify-between px-5 border-b-1 border-neutral-600 py-4 dark:bg-neutral-900 bg-white">
+        <div className="flex items-center justify-center text-foreground">
           <Link href="/dashboard">
             <IoIosArrowBack size={25} className="mr-3" />
           </Link>
@@ -42,7 +48,7 @@ const Page = () => {
         </div>
         <div className="flex item justify-center gap-4">
           <Button
-            className="px-3"
+            className="px-3 text-white"
             startContent={<IoInformationCircleOutline size={25} />}
             color="primary"
           >
@@ -68,7 +74,9 @@ const Page = () => {
                     project.originalLanguage
                   )}.svg`}
                 />
-                <p className="font-medium">{project.originalLanguage}</p>
+                <p className="font-medium text-foreground">
+                  {project.originalLanguage}
+                </p>
               </div>
               <div className="w-1/2 border border-t-0 border-r-0 border-neutral-600 flex items-center h-14 px-5 justify-between">
                 <div className="flex items-center justify-center">
@@ -79,17 +87,20 @@ const Page = () => {
                       project.translationLanguage
                     )}.svg`}
                   />
-                  <p className="font-medium">{project.translationLanguage}</p>
+                  <p className="font-medium text-foreground">
+                    {project.translationLanguage}
+                  </p>
                 </div>
                 <Button
+                  color="default"
                   variant="light"
                   className="flex items-center justify-center group hover:cursor-pointer"
                 >
                   <GoPlus
                     size={20}
-                    className="mr-1 text-gray-400 group-hover:text-white transition-all"
+                    className="mr-1 text-foreground-500 group-hover:text-foreground transition-all"
                   />
-                  <p className="text-xs text-gray-400 font-medium group-hover:text-white transition-all">
+                  <p className="text-xs text-foreground-500 font-medium group-hover:text-foreground transition-all">
                     Translate to a different language
                   </p>
                 </Button>
