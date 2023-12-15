@@ -1,33 +1,40 @@
-// pages/signin.js
+// pages/signup.js
 import { useState } from "react";
 import { auth } from "@/firebase";
 import { Input, Button } from "@nextui-org/react";
 import { FaGoogle } from "react-icons/fa";
 import Image from "next/image";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase";
 
-const SignIn = () => {
+const SignUp = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signInWithEmail = async (e) => {
+  const signUp = async (e) => {
     e.preventDefault(); // Prevents the default form submission behavior
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
       const user = userCredential.user;
       console.log(user);
+       // Add user information to Firestore
+       await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        // Add more user details as needed
+      });
+      console.log("Signed up and add")
 
-      toast.success("Signed in successfully!");
       router.push("/dashboard");
     } catch (error) {
       const errorCode = error.code;
@@ -50,9 +57,9 @@ const SignIn = () => {
           Sqribe
         </p>
       </Link>
-      <h1 className="text-3xl font-bold mb-10">Log In</h1>
+      <h1 className="text-3xl font-bold mb-10">Sign Up</h1>
       <form
-        onSubmit={signInWithEmail}
+        onSubmit={signUp}
         className="bg-neutral-800 rounded-lg p-10 flex flex-col w-[28rem]"
       >
         <Input
@@ -84,7 +91,6 @@ const SignIn = () => {
           <FaGoogle size={20} className="text-white mr-10" />
           <p className="text-white font-bold">Continue with Google</p>
         </Button>
-        <Link className="text-center mt-4" href={"/signup"}>Signup</Link>
       </form>
       <ToastContainer
         position="top-center"
@@ -103,4 +109,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;

@@ -8,14 +8,6 @@ const withAuth = (WrappedComponent) => {
     const router = useRouter();
     const { user, loading } = useAuth();
 
-    useEffect(() => {
-      console.log('Checking auth state:', user);
-      if (!loading && !user) {
-        console.log('User not authenticated, redirecting to /signin');
-        router.push('/signin');
-      }
-    }, [router, user, loading]);
-
     if (loading) {
       console.log('Loading authentication state, showing loading spinner');
       return (
@@ -25,15 +17,14 @@ const withAuth = (WrappedComponent) => {
       );
     }
 
+    // If user is not authenticated, redirect
     if (!user) {
       console.log('User not authenticated, redirecting to /signin');
-      return (
-        <div className="h-screen flex items-center justify-center">
-          <Spinner size="lg" />
-        </div>
-      );
+      router.push('/signin');
+      return null; // You may choose to return null or another component here
     }
 
+    // Render the WrappedComponent when authenticated
     console.log('User authenticated, rendering WrappedComponent');
     return <WrappedComponent {...props} />;
   };
