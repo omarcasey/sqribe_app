@@ -70,7 +70,7 @@ const AppShell = ({ children }) => {
               </p>
             </Link>
             <Link
-              href="/dashboard"
+              href="/projects"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
               <FaFolder className="mr-2" />
