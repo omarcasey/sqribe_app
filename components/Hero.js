@@ -38,7 +38,7 @@ const Hero = () => {
                             <Image
                                 width={1024}
                                 height={1024}
-                                className="w-full mx-auto rotate-90 filter contrast-125 hover:-hue-rotate-90 transition-all ease-in-out duration-1000"
+                                className="w-full mx-auto rotate-90 filter contrast-125 hover:-hue-rotate-90 transition-all ease-in-out !duration-1000"
                                 src="/new logo transparent.png"
                                 alt="" />
                         </motion.div>
