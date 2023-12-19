@@ -21,6 +21,8 @@ import {
   CardFooter,
   Divider,
   Image,
+  CheckboxGroup,
+  Checkbox,
 } from "@nextui-org/react";
 import { db, storage } from "@/firebase";
 import {
@@ -40,11 +42,14 @@ import withAuth from "@/components/withAuth";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/components/authContext";
 import { useTheme } from "@/components/ThemeContext";
+import { IoSparkles } from "react-icons/io5";
+import { useRouter } from "next/router";
 
-const Projects = () => {
+const Projects = ({ openModal }) => {
   const { user, loading } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
-  
+  const router = useRouter();
+
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
   const [selectedFile, setselectedFile] = useState("");
@@ -55,16 +60,16 @@ const Projects = () => {
   const [isUploading, setisUploading] = useState(false);
   const [projects, setProjects] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [drag, setDrag] = useState(false)
+  const [drag, setDrag] = useState(false);
 
   useEffect(() => {
     if (!user) {
       // Ensure there is a user before fetching projects
       return;
     }
-  
+
     const projectsCollection = collection(db, "projects");
-  
+
     // Fetch projects initially for the current user
     const fetchUserProjects = async () => {
       try {
@@ -72,7 +77,7 @@ const Projects = () => {
           projectsCollection,
           where("user", "==", user.uid) // Assuming "user" field is the UID of the user
         );
-  
+
         const projectsSnapshot = await getDocs(userProjectsQuery);
         const projectsData = projectsSnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -83,10 +88,10 @@ const Projects = () => {
         console.error("Error fetching user projects: ", error);
       }
     };
-  
+
     // Call fetchUserProjects to fetch projects initially
     fetchUserProjects();
-  
+
     // Set up real-time updates for the current user's projects
     const userProjectsQuery = query(
       projectsCollection,
@@ -99,11 +104,19 @@ const Projects = () => {
       }));
       setProjects(updatedProjects);
     });
-  
+
     // Cleanup function to unsubscribe from real-time updates
     return () => unsubscribe();
   }, [user]); // Ensure the effect re-runs when the user changes
-  
+
+  useEffect(() => {
+    // Check if the openModal query parameter is true and open the modal
+    const openModalQueryParam = router.query.openModal === 'true';
+    if (openModalQueryParam) {
+      onOpen();
+      console.log("ok")
+    }
+  }, [router.query.openModal]);
 
   const handleProjectNameChange = (e) => {
     setProjectName(e.target.value);
@@ -277,25 +290,25 @@ const Projects = () => {
   const handleDragEnter = (e) => {
     e.preventDefault();
     // Add visual feedback when dragging over the dropzone (e.g., change the border color).
-    setDrag(true)
+    setDrag(true);
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
     // Add visual feedback (e.g., change the border color) and allow drop events.
-    setDrag(true)
+    setDrag(true);
   };
 
   const handleDragLeave = (e) => {
     e.preventDefault();
-    setDrag(false)
+    setDrag(false);
     // Remove the visual feedback when leaving the dropzone.
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
-    setselectedFile(droppedFile)
+    setselectedFile(droppedFile);
     setSelectedFileName(droppedFile.name);
     // Do something with the dropped file, such as uploading or processing it.
     // For example, you can store it in state or call a function to handle the file.
@@ -384,7 +397,9 @@ const Projects = () => {
                           onChange={handleFileSelection}
                         />
                         <div
-                          className={`border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-foreground-100 hover:cursor-pointer transition-all ${drag ? "border-purple-800 bg-foreground-100" : ""}`}
+                          className={`border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-foreground-100 hover:cursor-pointer transition-all ${
+                            drag ? "border-purple-800 bg-foreground-100" : ""
+                          }`}
                           onClick={openFileInput}
                           onDragEnter={handleDragEnter}
                           onDragOver={handleDragOver}
@@ -420,6 +435,7 @@ const Projects = () => {
                           disabled={selectedFile ? true : false}
                           value={selectedFile ? "" : pasteLink}
                           onChange={handlePasteLinkChange}
+                          isDisabled={isUploading}
                         />
 
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
@@ -432,6 +448,7 @@ const Projects = () => {
                           className="text-black pb-4"
                           value={projectName}
                           onChange={handleProjectNameChange}
+                          isDisabled={isUploading}
                         />
 
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
@@ -441,11 +458,14 @@ const Projects = () => {
                           size="sm"
                           placeholder="Select a Language"
                           color="default"
-                          className={`${isDarkMode ? "dark" : "light"} text-black pb-4`}
+                          className={`${
+                            isDarkMode ? "dark" : "light"
+                          } text-black pb-4`}
                           selectedKeys={[originalLanguage]}
                           onChange={handleOriginalLanguage}
                           aria-label="Translation Language"
                           disallowEmptySelection
+                          isDisabled={isUploading}
                         >
                           {languageOptions.map((option) => (
                             <SelectItem
@@ -476,6 +496,7 @@ const Projects = () => {
                           onChange={handleTranslationLanguage}
                           aria-label="Translation Language"
                           disallowEmptySelection
+                          isDisabled={isUploading}
                         >
                           {languageOptions.map((option) => (
                             <SelectItem
@@ -494,6 +515,26 @@ const Projects = () => {
                             </SelectItem>
                           ))}
                         </Select>
+                        <div className="w-full mt-2 mb-2">
+                          <CheckboxGroup
+                            orientation="horizontal"
+                            color="danger"
+                            isDisabled={isUploading}
+                          >
+                            <Checkbox value="summary">
+                              <div className="flex items-center">
+                                <IoSparkles className="text-sky-300" />
+                                <p className="ml-1 mr-4 font-medium text-sm">AI Summary</p>
+                              </div>
+                            </Checkbox>
+                            <Checkbox value="thumbnail">
+                              <div className="flex items-center">
+                                <IoSparkles className="text-sky-300" />
+                                <p className="ml-1 font-medium text-sm">AI Thumbnail</p>
+                              </div>
+                            </Checkbox>
+                          </CheckboxGroup>
+                        </div>
                       </div>
                     </ModalBody>
                     <ModalFooter>

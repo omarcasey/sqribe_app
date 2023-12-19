@@ -87,12 +87,12 @@ const MakeSpeech = () => {
         <main className="flex min-h-screen flex-col items-center py-24">
           <div className="mx-auto max-w-3xl">
             <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-              <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-200 ring-1 ring-gray-200/10 hover:ring-gray-200/30 transition-all">
+              <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-foreground-600 ring-1 ring-foreground-600/10 hover:ring-foreground-600/30 transition-all">
                 Explore the power of Artifical Intelligence. &nbsp;
               </div>
             </div>
             <div className="flex flex-col items-center text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl pb-12">
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl pb-12">
                 Demo
               </h1>
               <div className="flex items-center justify-center w-full pb-6 gap-4">
@@ -134,7 +134,7 @@ const MakeSpeech = () => {
                   </Card>
                 ))}
               </div>
-              <p className="mt-20 text-lg leading-8 text-gray-200">
+              <p className="mt-20 text-lg leading-8 text-foreground-600">
                 AI-Powered Multilingual Content Solutions <br />
                 <Divider className="my-4" /> Sqribe.ai streamlines your video
                 production with automated captions, voice overs, translations,
