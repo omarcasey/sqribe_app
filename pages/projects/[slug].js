@@ -41,7 +41,7 @@ const Page = () => {
     >
       <div className="w-full flex justify-between px-5 border-b-1 border-neutral-600 py-4 dark:bg-neutral-900 bg-white">
         <div className="flex items-center justify-center text-foreground">
-          <Link href="/dashboard">
+          <Link href="/projects">
             <IoIosArrowBack size={25} className="mr-3" />
           </Link>
           <p className="font-medium">{project && project.projectName}</p>
