@@ -9,8 +9,10 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from 'react-redux';
 
 const SignIn = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,8 +26,14 @@ const SignIn = () => {
         email,
         password
       );
-      const user = userCredential.user;
-      console.log(user);
+      const userData = userCredential.user.email;
+      console.log(userData);
+
+      // Dispatch an action to set user data in Redux
+      dispatch({
+        type: 'SET_USER_DATA',
+        payload: userData,
+      });
 
       toast.success("Signed in successfully!");
       router.push("/dashboard");

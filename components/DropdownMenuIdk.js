@@ -16,7 +16,7 @@ import { useAuth } from "./authContext.js";
 
 export default function DropdownMenuIdk({ router }) {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   const signOut = async () => {
     try {
@@ -88,10 +88,20 @@ export default function DropdownMenuIdk({ router }) {
           >
             Dashboard
           </DropdownItem>
-          <DropdownItem key="settings">Settings</DropdownItem>
+          <DropdownItem
+            key="settings"
+            onPress={() => {
+              router.push("/settings");
+            }}
+          >
+            Settings
+          </DropdownItem>
           <DropdownItem
             key="new_project"
             endContent={<PlusIcon className="text-large" />}
+            onPress={() => {
+              router.push('/projects?openModal=true');
+            }}
           >
             New Project
           </DropdownItem>

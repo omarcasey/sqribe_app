@@ -6,7 +6,19 @@ import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 import ReusableAudioPlayer from "@/components/ReusableAudioPlayer";
-import { Tabs, Tab, Spinner, Button, Avatar } from "@nextui-org/react";
+import {
+  Tabs,
+  Tab,
+  Spinner,
+  Button,
+  Avatar,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
@@ -18,6 +30,7 @@ const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +64,7 @@ const Page = () => {
             className="px-3 text-white"
             startContent={<IoInformationCircleOutline size={25} />}
             color="primary"
+            onPress={onOpen}
           >
             Project Info
           </Button>
@@ -107,19 +121,19 @@ const Page = () => {
               </div>
             </div>
             <div className="w-full mt-4">
-              <p className="text-center text-gray-400">
+              <p className="text-center text-foreground-400">
                 00:00:00,008 — 00:00:47,500
               </p>
             </div>
             <div className="flex px-6 gap-x-12 mt-4">
               <div className="w-1/2">
-                <p className="text-gray-300">
+                <p className="text-foreground-600">
                   {project?.transcription?.transcript}
                 </p>
               </div>
               <div className="w-1/2">
                 <p
-                  className={`text-gray-300 ${
+                  className={`text-foreground-600 ${
                     project.translationLanguage === "Arabic" ? "text-end" : ""
                   }`}
                 >
@@ -163,6 +177,37 @@ const Page = () => {
       ) : (
         <Spinner size="lg" className="mt-32" />
       )}
+      <Modal
+        size={"2xl"}
+        isOpen={isOpen}
+        onClose={onClose}
+        className={`${isDarkMode ? "dark" : "light"}`}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Project Details
+              </ModalHeader>
+              <ModalBody>
+                <p>Project Name:</p>
+                <p>Original Language:</p>
+                <p>Translated Languages:</p>
+                <p>Credits Used Dubbing:</p>
+                <p>Credits Used:</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Action
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

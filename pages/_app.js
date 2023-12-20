@@ -3,6 +3,8 @@ import "@/styles/globals.css";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/components/authContext";
 import { ThemeProvider } from "@/components/ThemeContext";
+import { Provider } from "react-redux";
+import store from "@/store";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -18,16 +20,16 @@ const playfair = Playfair_Display({
 
 export default function App({ Component, pageProps }) {
   return (
-    <main
-      className={`${montserrat.variable} ${playfair.variable} font-mont`}
-    >
-      <NextUIProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </AuthProvider>
-      </NextUIProvider>
+    <main className={`${montserrat.variable} ${playfair.variable} font-mont`}>
+      <Provider store={store}>
+        <NextUIProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </AuthProvider>
+        </NextUIProvider>
+      </Provider>
     </main>
   );
 }
