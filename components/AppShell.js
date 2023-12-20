@@ -1,9 +1,8 @@
 // components/AppShell.js
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Button, Switch } from "@nextui-org/react";
-import { auth } from "@/firebase";
+import { Button, Spinner, Switch } from "@nextui-org/react";
 import Image from "next/image";
 import { RiLayoutMasonryFill } from "react-icons/ri";
 import { SiAudiomack } from "react-icons/si";
@@ -17,7 +16,11 @@ const AppShell = ({ children }) => {
   const { isDarkMode, toggleTheme } = useTheme();
 
   return (
-    <div className={`flex flex-col h-screen ${isDarkMode ? "dark" : "light"} bg-default-100`}>
+    <div
+      className={`flex flex-col h-screen ${
+        isDarkMode ? "dark" : "light"
+      } bg-default-100`}
+    >
       <nav className="dark:bg-neutral-900 bg-white px-6 py-3">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center">

@@ -44,7 +44,7 @@ const getRandomColor = () => {
 
 const Dashboard = () => {
   const router = useRouter();
-  const userData = useSelector((state) => state.user.userData);
+  const userData = useSelector((state) => state.user.data);
 
   const data = {
     labels: [
@@ -213,7 +213,7 @@ const Dashboard = () => {
               <h1 className="text-2xl mb-4">User Profile</h1>
               <div className="flex items-center">
                 <Avatar size="lg" />
-                <p className="text-lg ml-3">Himothy</p>
+                <p className="text-lg ml-3">{userData?.email}</p>
               </div>
             </Card>
           </div>

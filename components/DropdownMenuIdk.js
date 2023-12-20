@@ -13,15 +13,27 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import { auth } from "@/firebase";
 import { useTheme } from "./ThemeContext.js";
 import { useAuth } from "./authContext.js";
+import { useDispatch } from "react-redux";
+import { clearUserData } from "@/reducers/userSlice.js";
 
 export default function DropdownMenuIdk({ router }) {
   const { isDarkMode, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const dispatch = useDispatch();
 
   const signOut = async () => {
     try {
+      router.push("/signin");
       await auth.signOut();
-      // router.push("/signin");
+      // Dispatch the fetchUserData action
+      dispatch(clearUserData())
+        .then(() => {
+          console.log("User Data Cleared");
+        })
+        .catch((error) => {
+          console.error("Error Clearing User Data:", error);
+        });
+      
     } catch (error) {
       console.error("Error signing out:", error.message);
     }
@@ -100,7 +112,7 @@ export default function DropdownMenuIdk({ router }) {
             key="new_project"
             endContent={<PlusIcon className="text-large" />}
             onPress={() => {
-              router.push('/projects?openModal=true');
+              router.push("/projects?openModal=true");
             }}
           >
             New Project

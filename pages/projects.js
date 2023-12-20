@@ -44,11 +44,13 @@ import { useAuth } from "@/components/authContext";
 import { useTheme } from "@/components/ThemeContext";
 import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
 const Projects = ({ openModal }) => {
   const { user, loading } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const router = useRouter();
+  const projectsInitial = useSelector((state) => state.user.projects);
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
@@ -58,7 +60,7 @@ const Projects = ({ openModal }) => {
   const [translationLanguage, settranslationLanguage] = useState("Spanish");
   const [projectName, setProjectName] = useState("");
   const [isUploading, setisUploading] = useState(false);
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(projectsInitial);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [drag, setDrag] = useState(false);
 
@@ -111,10 +113,9 @@ const Projects = ({ openModal }) => {
 
   useEffect(() => {
     // Check if the openModal query parameter is true and open the modal
-    const openModalQueryParam = router.query.openModal === 'true';
+    const openModalQueryParam = router.query.openModal === "true";
     if (openModalQueryParam) {
       onOpen();
-      console.log("ok")
     }
   }, [router.query.openModal]);
 
@@ -325,16 +326,14 @@ const Projects = ({ openModal }) => {
         {/* <Navbar /> */}
         <div className="flex flex-col items-center pb-24 pt-10">
           <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-12 flex-wrap">
-            {projects.length >= 0 && (
-              <div
-                className="border border-dashed border-foreground-400 text-foreground w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
-                onClick={onOpen}
-              >
-                <p className="text-3xl">+</p>
-                <p className="font-semibold text-xl pb-4">Upload video</p>
-              </div>
-            )}
-            {projects.map((project) => (
+            <div
+              className="border border-dashed border-foreground-400 text-foreground w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
+              onClick={onOpen}
+            >
+              <p className="text-3xl">+</p>
+              <p className="font-semibold text-xl pb-4">Upload video</p>
+            </div>
+            {projects?.map((project) => (
               <Link
                 key={project.id}
                 href={`/projects/${project.id}`}
@@ -524,13 +523,17 @@ const Projects = ({ openModal }) => {
                             <Checkbox value="summary">
                               <div className="flex items-center">
                                 <IoSparkles className="text-sky-300" />
-                                <p className="ml-1 mr-4 font-medium text-sm">AI Summary</p>
+                                <p className="ml-1 mr-4 font-medium text-sm">
+                                  AI Summary
+                                </p>
                               </div>
                             </Checkbox>
                             <Checkbox value="thumbnail">
                               <div className="flex items-center">
                                 <IoSparkles className="text-sky-300" />
-                                <p className="ml-1 font-medium text-sm">AI Thumbnail</p>
+                                <p className="ml-1 font-medium text-sm">
+                                  AI Thumbnail
+                                </p>
                               </div>
                             </Checkbox>
                           </CheckboxGroup>
