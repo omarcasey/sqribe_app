@@ -15,6 +15,13 @@ import {
   Progress,
 } from "@nextui-org/react";
 import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  cn,
+} from "@nextui-org/react";
+import {
   Card,
   CardHeader,
   CardBody,
@@ -45,6 +52,7 @@ import { useTheme } from "@/components/ThemeContext";
 import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import { IoEllipsisHorizontalSharp } from "react-icons/io5";
 
 const Projects = ({ openModal }) => {
   const { user, loading } = useAuth();
@@ -64,52 +72,13 @@ const Projects = ({ openModal }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [drag, setDrag] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      // Ensure there is a user before fetching projects
-      return;
-    }
+  const [dropdownStates, setDropdownStates] = useState(
+    projects.map(() => false)
+  );
 
-    const projectsCollection = collection(db, "projects");
-
-    // Fetch projects initially for the current user
-    const fetchUserProjects = async () => {
-      try {
-        const userProjectsQuery = query(
-          projectsCollection,
-          where("user", "==", user.uid) // Assuming "user" field is the UID of the user
-        );
-
-        const projectsSnapshot = await getDocs(userProjectsQuery);
-        const projectsData = projectsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProjects(projectsData);
-      } catch (error) {
-        console.error("Error fetching user projects: ", error);
-      }
-    };
-
-    // Call fetchUserProjects to fetch projects initially
-    fetchUserProjects();
-
-    // Set up real-time updates for the current user's projects
-    const userProjectsQuery = query(
-      projectsCollection,
-      where("user", "==", user.uid)
-    );
-    const unsubscribe = onSnapshot(userProjectsQuery, (snapshot) => {
-      const updatedProjects = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProjects(updatedProjects);
-    });
-
-    // Cleanup function to unsubscribe from real-time updates
-    return () => unsubscribe();
-  }, [user]); // Ensure the effect re-runs when the user changes
+  const handleDropDownState = (index, state) => {
+    dropdownStates[index] = state;
+  };
 
   useEffect(() => {
     // Check if the openModal query parameter is true and open the modal
@@ -333,32 +302,79 @@ const Projects = ({ openModal }) => {
               <p className="text-3xl">+</p>
               <p className="font-semibold text-xl pb-4">Upload video</p>
             </div>
-            {projects?.map((project) => (
+            {projects?.map((project, index) => (
               <Link
                 key={project.id}
                 href={`/projects/${project.id}`}
-                className="w-96 h-56 border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 hover:transform hover:scale-[1.03] transition-transform scale"
+                className="w-96 h-56 border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
               >
-                <Card className="w-full h-full">
-                  <CardHeader className="flex gap-3">
-                    <Image
-                      alt="nextui logo"
-                      height={40}
-                      radius="sm"
-                      src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-                      width={40}
-                    />
-                    <div className="flex flex-col">
-                      <p className="text-md">{project.projectName}</p>
-                      <p className="text-small text-default-500">
-                        {project.date &&
-                          project.date.toDate().toLocaleDateString()}
-                      </p>
+                <Card className="w-full h-full dark:hover:bg-foreground-100 group">
+                  <CardHeader className="flex justify-between">
+                    <div className="flex gap-3">
+                      <Image
+                        alt="nextui logo"
+                        height={40}
+                        radius="sm"
+                        src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
+                        width={40}
+                      />
+                      <div className="flex flex-col">
+                        <p className="text-md">{project.projectName}</p>
+                        <p className="text-small text-default-500">
+                          {project.date &&
+                            project.date.toDate().toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
+                    <Dropdown className="dark">
+                      <DropdownTrigger>
+                        <Button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDropDownState(index, true);
+                          }}
+                          variant="light"
+                        >
+                          <IoEllipsisHorizontalSharp size={20} />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        variant="faded"
+                        aria-label="Dropdown menu with icons"
+                      >
+                        <DropdownItem
+                          key="new"
+                          startContent={<IoEllipsisHorizontalSharp />}
+                          onClick={() => console.log(dropdownStates)}
+                        >
+                          New file
+                        </DropdownItem>
+                        <DropdownItem
+                          key="copy"
+                          startContent={<IoEllipsisHorizontalSharp />}
+                        >
+                          Copy link
+                        </DropdownItem>
+                        <DropdownItem
+                          key="edit"
+                          startContent={<IoEllipsisHorizontalSharp />}
+                        >
+                          Edit file
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          className="text-danger"
+                          color="danger"
+                          startContent={<IoEllipsisHorizontalSharp />}
+                        >
+                          Delete file
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
                   </CardHeader>
                   <Divider />
                   <CardBody className="flex items-center justify-center">
-                    <div className="bg-foreground-200 rounded-full p-3">
+                    <div className="bg-foreground-200 rounded-full p-3 group-hover:scale-[1] transition-all !duration-500 scale-0">
                       <NextIcon size={40} />
                     </div>
                   </CardBody>

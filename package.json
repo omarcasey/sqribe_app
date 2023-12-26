@@ -13,6 +13,7 @@
     "@google-cloud/translate": "^8.0.2",
     "@nextui-org/react": "^2.2.9",
     "@reduxjs/toolkit": "^2.0.1",
+    "@vercel/speed-insights": "^1.0.2",
     "autoprefixer": "10.4.14",
     "chart.js": "^4.4.1",
     "elevenlabs-node": "^2.0.1",
