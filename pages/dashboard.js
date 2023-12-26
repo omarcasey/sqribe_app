@@ -213,7 +213,7 @@ const Dashboard = () => {
               <h1 className="text-2xl mb-4">User Profile</h1>
               <div className="flex items-center">
                 <Avatar size="lg" />
-                <p className="text-lg ml-3">{userData?.email}</p>
+                <p className="text-lg ml-3">{userData.email}</p>
               </div>
             </Card>
           </div>
