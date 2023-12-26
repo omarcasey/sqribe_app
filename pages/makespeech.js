@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useState, useEffect } from "react";
-import { Input, Button, Card, CardBody, Divider } from "@nextui-org/react";
+import { Input, Button, Card, CardBody, Divider, Spinner } from "@nextui-org/react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import withAuth from "@/components/withAuth";

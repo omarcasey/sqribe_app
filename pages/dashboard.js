@@ -25,78 +25,41 @@ import { IoMdSettings } from "react-icons/io";
 import { useRouter } from "next/router";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const generateRandomValues = (count) => {
-  const values = [];
-  for (let i = 0; i < count; i++) {
-    values.push(Math.floor(Math.random() * 100));
-  }
-  return values;
-};
-
-const getRandomColor = () => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
 const Dashboard = () => {
   const router = useRouter();
   const userData = useSelector((state) => state.user.data);
 
   const data = {
-    labels: [
-      "Category 1",
-      "Category 2",
-      "Category 3",
-      "Category 4",
-      "Category 5",
-    ],
+    labels: ["Used Credits", "Remaining Credits"],
     datasets: [
       {
-        data: generateRandomValues(5),
-        backgroundColor: [
-          getRandomColor(),
-          getRandomColor(),
-          getRandomColor(),
-          getRandomColor(),
-          getRandomColor(),
-        ],
-        borderColor: Array(5).fill("transparent"),
-      },
-    ],
-  };
-
-  const data2 = {
-    labels: [
-      "Category 1",
-      "Category 2",
-      "Category 3",
-      "Category 4",
-      "Category 5",
-    ],
-    datasets: [
-      {
-        data: generateRandomValues(5),
-        backgroundColor: [
-          getRandomColor(),
-          getRandomColor(),
-          getRandomColor(),
-          getRandomColor(),
-          getRandomColor(),
-        ],
-        borderColor: Array(5).fill("transparent"),
+        data: [userData.usedCredits, userData.remainingCredits],
+        backgroundColor: ["rgb(125 211 252)", "rgb(14 165 233)"],
+        borderWidth: 0,
+        borderColor: "rgb(14 165 233)",
+        hoverOffset: 20,
+        borderDash: [2, 2],
       },
     ],
   };
 
   const options = {
-    cutout: "60%", // Adjust the cutout percentage for a solid doughnut
+    cutout: "50%", // Adjust the cutout percentage for a solid doughnut
     plugins: {
       legend: {
         display: false,
+        position: "bottom",
+      },
+      tooltip: {
+        enabled: false, // Disable tooltips on hover
+      },
+    },
+    layout: {
+      padding: {
+        top: 10, // Adjust as needed
+        right: 10,
+        bottom: 10,
+        left: 10,
       },
     },
   };
@@ -185,8 +148,22 @@ const Dashboard = () => {
           <div className="flex gap-4">
             <Card className="p-4 w-full flex items-center">
               <p className="text-2xl mb-6 mt-2">Usage Statistics</p>
-              <div className="w-44 h-44 mb-3">
-                <Doughnut data={data} options={options} />
+              <div className="flex flex-row mb-3 gap-4">
+                <div className="w-52 h-52">
+                  <Doughnut data={data} options={options} />
+                </div>
+                <div className="flex flex-col justify-center gap-8">
+                  <div className="flex flex-col items-center justify-center text-sm">
+                    <div className="bg-sky-300 w-6 h-3 mb-1"></div>
+                    <p>Used Credits:</p>
+                    <p className="font-bold text-base text-warning">{userData.usedCredits}</p>
+                  </div>
+                  <div className="flex flex-col items-center justify-center text-sm">
+                    <div className="bg-sky-500 w-6 h-3 mb-1"></div>
+                    <p>Remaining Credits:</p>
+                    <p className="font-bold text-base text-success">{userData.remainingCredits}</p>
+                  </div>
+                </div>
               </div>
             </Card>
             <Card className="p-4 w-full flex items-center justify-around">
@@ -202,7 +179,7 @@ const Dashboard = () => {
             <Card className="p-4 w-full flex items-center">
               <p className="text-2xl mb-6 mt-2">Billing Cycle</p>
               <div className="w-44 h-44">
-                <Doughnut data={data2} options={options} />
+                <Doughnut data={data} options={options} />
               </div>
             </Card>
           </div>
@@ -218,7 +195,7 @@ const Dashboard = () => {
             </Card>
           </div>
           <div className="w-[12.5%]">
-            <Button className="h-full w-full px-0 rounded-2xl">
+            <Button className="h-full w-full px-0 rounded-2xl" onPress={() => (router.push("/settings"))}>
               <Card className="p-4 w-full flex items-center justify-center">
                 <h1 className="text-xl mb-3">Settings</h1>
                 <IoMdSettings className="w-16 h-16 mb-3" />

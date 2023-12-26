@@ -4,6 +4,7 @@ import { Spinner } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchUserData, fetchUserProjects } from "@/reducers/userSlice";
+import RealtimeListener from "@/helpers/realtimeListeners";
 
 const withAuth = (WrappedComponent) => {
   const WithAuth = (props) => {
@@ -12,8 +13,12 @@ const withAuth = (WrappedComponent) => {
     const dispatch = useDispatch();
     const userData = useSelector((state) => state.user.data);
 
+    // if (user) {
+    //   RealtimeListener(user.uid);
+    // }
+
     useEffect(() => {
-      // Check if userData is empty, and fetch data if needed
+      // Check if userData (redux store) is empty, and fetch data if needed
       if (!userData && user) {
         // Assuming you have a way to get the userId from your authentication state
         const userUID = user.uid; // Replace with your logic to get the userId

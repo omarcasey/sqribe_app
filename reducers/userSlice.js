@@ -52,7 +52,11 @@ const userSlice = createSlice({
     loading: "idle",
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setUserData: (state, action) => {
+      state.data = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserData.pending, (state) => {
@@ -80,8 +84,10 @@ const userSlice = createSlice({
       // Add a case to handle clearing user data
       .addCase(clearUserData.fulfilled, (state, action) => {
         state.data = null;
+        state.projects = null;
       });
   },
 });
 
+export const { setUserData } = userSlice.actions;
 export default userSlice.reducer;

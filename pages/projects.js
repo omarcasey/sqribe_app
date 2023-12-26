@@ -40,6 +40,9 @@ import {
   onSnapshot,
   query,
   where,
+  getDoc,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/NextIcon";
@@ -53,6 +56,10 @@ import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { IoEllipsisHorizontalSharp } from "react-icons/io5";
+import { HiTrash } from "react-icons/hi2";
+import { MdSimCardDownload } from "react-icons/md";
+import { MdEditSquare } from "react-icons/md";
+import { FaEye } from "react-icons/fa";
 
 const Projects = ({ openModal }) => {
   const { user, loading } = useAuth();
@@ -73,11 +80,16 @@ const Projects = ({ openModal }) => {
   const [drag, setDrag] = useState(false);
 
   const [dropdownStates, setDropdownStates] = useState(
-    projects.map(() => false)
+    projects?.map(() => false)
   );
 
   const handleDropDownState = (index, state) => {
-    dropdownStates[index] = state;
+    if (state == "both") {
+      dropdownStates[index] = !dropdownStates[index];
+    } else {
+      dropdownStates[index] = state;
+    }
+    setDropdownStates([...dropdownStates]);
   };
 
   useEffect(() => {
@@ -223,6 +235,17 @@ const Projects = ({ openModal }) => {
                 translatedFileURL: audioUrl,
               });
               console.log("Document written with ID: ", docRef.id);
+              try {
+                const userRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userRef);
+                const currentData = docSnap.data();
+                await updateDoc(userRef, {
+                  usedCredits: currentData.usedCredits + 20,
+                  remainingCredits: currentData.remainingCredits - 20,
+                });
+              } catch (e) {
+                console.error("Error updating credits: ", e);
+              }
             } catch (e) {
               console.error("Error adding document: ", e);
             }
@@ -254,7 +277,7 @@ const Projects = ({ openModal }) => {
   const handleFileSelection = (e) => {
     const selectedFile = e.target.files[0];
     setselectedFile(selectedFile);
-    setSelectedFileName(selectedFile.name);
+    setSelectedFileName(selectedFile?.name);
   };
 
   const handleDragEnter = (e) => {
@@ -294,7 +317,7 @@ const Projects = ({ openModal }) => {
       <div className="w-full">
         {/* <Navbar /> */}
         <div className="flex flex-col items-center pb-24 pt-10">
-          <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-12 flex-wrap">
+          <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-6 flex-wrap">
             <div
               className="border border-dashed border-foreground-400 text-foreground w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
               onClick={onOpen}
@@ -304,6 +327,9 @@ const Projects = ({ openModal }) => {
             </div>
             {projects?.map((project, index) => (
               <Link
+                onMouseLeave={() => {
+                  handleDropDownState(index, false);
+                }}
                 key={project.id}
                 href={`/projects/${project.id}`}
                 className="w-96 h-56 border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
@@ -326,12 +352,20 @@ const Projects = ({ openModal }) => {
                         </p>
                       </div>
                     </div>
-                    <Dropdown className="dark">
+                    <Dropdown
+                      isOpen={dropdownStates[index]}
+                      className={`${
+                        isDarkMode ? "dark bg-foreground-100" : "light"
+                      } !w-44 !min-w-0`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                    >
                       <DropdownTrigger>
                         <Button
                           onClick={(e) => {
                             e.preventDefault();
-                            handleDropDownState(index, true);
+                            handleDropDownState(index, "both");
                           }}
                           variant="light"
                         >
@@ -341,31 +375,53 @@ const Projects = ({ openModal }) => {
                       <DropdownMenu
                         variant="faded"
                         aria-label="Dropdown menu with icons"
+                        className=" text-foreground"
                       >
                         <DropdownItem
-                          key="new"
-                          startContent={<IoEllipsisHorizontalSharp />}
-                          onClick={() => console.log(dropdownStates)}
+                          key="view"
+                          startContent={
+                            <FaEye className="text-gray-400" size={15} />
+                          }
+                          onPress={() => {
+                            handleDropDownState(index, false);
+                            router.push(`/projects/${project.id}`);
+                          }}
                         >
-                          New file
+                          View file
                         </DropdownItem>
                         <DropdownItem
-                          key="copy"
-                          startContent={<IoEllipsisHorizontalSharp />}
+                          key="rename"
+                          startContent={
+                            <MdEditSquare className="text-gray-400" size={15} />
+                          }
+                          onPress={() => {
+                            handleDropDownState(index, false);
+                          }}
                         >
-                          Copy link
+                          Rename file
                         </DropdownItem>
                         <DropdownItem
-                          key="edit"
-                          startContent={<IoEllipsisHorizontalSharp />}
+                          key="download"
+                          startContent={
+                            <MdSimCardDownload
+                              className="text-gray-400"
+                              size={15}
+                            />
+                          }
+                          onPress={() => {
+                            handleDropDownState(index, false);
+                          }}
                         >
-                          Edit file
+                          Download file
                         </DropdownItem>
                         <DropdownItem
                           key="delete"
                           className="text-danger"
                           color="danger"
-                          startContent={<IoEllipsisHorizontalSharp />}
+                          startContent={<HiTrash size={15} />}
+                          onPress={() => {
+                            handleDropDownState(index, false);
+                          }}
                         >
                           Delete file
                         </DropdownItem>
@@ -561,6 +617,7 @@ const Projects = ({ openModal }) => {
                         <Button
                           className="w-full font-semibold text-base py-5"
                           color="secondary"
+                          isDisabled={!selectedFile || !projectName}
                           isLoading={isUploading}
                           onPress={handleUpload}
                         >
