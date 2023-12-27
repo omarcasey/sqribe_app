@@ -266,6 +266,22 @@ const Projects = ({ openModal }) => {
     }
   };
 
+  const handleDownload = async (fileUrl, fileName) => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   const openFileInput = () => {
     const fileInput = document.getElementById("fileInput");
     fileInput.click();
@@ -407,6 +423,7 @@ const Projects = ({ openModal }) => {
                           }
                           onPress={() => {
                             handleDropDownState(index, false);
+                            handleDownload(project.fileURL, project.fileName)
                           }}
                         >
                           Download file
