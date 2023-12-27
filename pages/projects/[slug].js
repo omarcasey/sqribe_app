@@ -24,12 +24,11 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { getFlagCode } from "@/helpers/getFlag";
 import withAuth from "@/components/withAuth";
-import { useTheme } from "@/components/ThemeContext";
 
 const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
-  const { isDarkMode, toggleTheme } = useTheme();
+  const isDarkMode = useSelector((state) => state.user.data.darkMode);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {

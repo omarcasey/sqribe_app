@@ -51,7 +51,6 @@ import { languageOptions } from "@/helpers/languages";
 import withAuth from "@/components/withAuth";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/components/authContext";
-import { useTheme } from "@/components/ThemeContext";
 import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
@@ -62,10 +61,9 @@ import { MdEditSquare } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
 
 const Projects = ({ openModal }) => {
-  const { user, loading } = useAuth();
-  const { isDarkMode, toggleTheme } = useTheme();
+  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const projects = useSelector((state) => state.user.projects);
   const router = useRouter();
-  const projectsInitial = useSelector((state) => state.user.projects);
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
@@ -75,7 +73,6 @@ const Projects = ({ openModal }) => {
   const [translationLanguage, settranslationLanguage] = useState("Spanish");
   const [projectName, setProjectName] = useState("");
   const [isUploading, setisUploading] = useState(false);
-  const [projects, setProjects] = useState(projectsInitial);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [drag, setDrag] = useState(false);
 

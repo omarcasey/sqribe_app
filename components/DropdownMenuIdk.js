@@ -11,14 +11,16 @@ import {
 import { PlusIcon } from "./PlusIcon.jsx";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { auth } from "@/firebase";
-import { useTheme } from "./ThemeContext.js";
-import { useAuth } from "./authContext.js";
-import { useDispatch } from "react-redux";
-import { clearUserData } from "@/reducers/userSlice.js";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearUserData,
+  setAuthData,
+  setAuthLoading,
+} from "@/reducers/userSlice.js";
 
 export default function DropdownMenuIdk({ router }) {
-  const { isDarkMode, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const user = useSelector((state) => state.user.auth);
   const dispatch = useDispatch();
 
   const signOut = async () => {
@@ -33,7 +35,6 @@ export default function DropdownMenuIdk({ router }) {
         .catch((error) => {
           console.error("Error Clearing User Data:", error);
         });
-      
     } catch (error) {
       console.error("Error signing out:", error.message);
     }

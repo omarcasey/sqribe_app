@@ -9,11 +9,27 @@ import { SiAudiomack } from "react-icons/si";
 import { FaFolder } from "react-icons/fa";
 import DropdownMenuIdk from "./DropdownMenuIdk";
 import { IoIosHelpCircleOutline } from "react-icons/io";
-import { useTheme } from "./ThemeContext";
+import { useSelector } from "react-redux";
+import { db } from "@/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
-  const { isDarkMode, toggleTheme } = useTheme();
+  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const uid = useSelector((state) => state.user.auth.uid);
+
+  const toggleTheme = async () => {
+    try {
+      const userRef = doc(db, "users", uid);
+      const docSnap = await getDoc(userRef);
+      const currentData = docSnap.data();
+      await updateDoc(userRef, {
+        darkMode: !currentData.darkMode,
+      });
+    } catch (e) {
+      console.error("Error updating darkMode: ", e);
+    }
+  }
 
   return (
     <div

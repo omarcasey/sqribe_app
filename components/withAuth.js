@@ -1,81 +1,104 @@
-import { useRouter } from "next/router";
-import { useAuth } from "./authContext";
-import { Spinner } from "@nextui-org/react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { fetchUserData, fetchUserProjects } from "@/reducers/userSlice";
-import RealtimeListener from "@/helpers/realtimeListeners";
+import { useRouter } from "next/router";
+import {
+  fetchUserData,
+  clearUserData,
+  fetchUserProjects,
+} from "@/reducers/userSlice";
+import { onSnapshot, doc, collection, query, where } from "firebase/firestore";
+import { db, auth } from "../firebase";
+import { Spinner } from "@nextui-org/react";
 
 const withAuth = (WrappedComponent) => {
-  const WithAuth = (props) => {
-    const router = useRouter();
-    const { user, loading } = useAuth();
+  const Wrapper = (props) => {
     const dispatch = useDispatch();
-    const userData = useSelector((state) => state.user.data);
-
-    // if (user) {
-    //   RealtimeListener(user.uid);
-    // }
+    const router = useRouter();
+    const user = useSelector((state) => state.user.data);
+    const loading = useSelector((state) => state.user.loading);
+    const authLoading = useSelector((state) => state.user.authLoading);
 
     useEffect(() => {
-      // Check if userData (redux store) is empty, and fetch data if needed
-      if (!userData && user) {
-        // Assuming you have a way to get the userId from your authentication state
-        const userUID = user.uid; // Replace with your logic to get the userId
-        console.log("Fetching User Data");
+      const checkAuth = async () => {
+        console.log("checking auth");
+        try {
+          // Check if the user is authenticated
+          const currentUser = await auth.currentUser;
 
-        // Dispatch the fetchUserData action
-        dispatch(fetchUserData(userUID))
-          .then(() => {
-            console.log("User Data Successfully Fetched");
-          })
-          .catch((error) => {
-            console.error("Error Fetching User Data:", error);
-          });
+          if (currentUser) {
+            // If user is authenticated, fetch user data if not already in Redux
+            if (!user) {
+              await dispatch(fetchUserData(currentUser.uid));
+              await dispatch(fetchUserProjects(currentUser.uid));
+              console.log("fetched data into redux");
+            }
 
-        // Dispatch the fetchUserData action
-        dispatch(fetchUserProjects(userUID))
-          .then(() => {
-            console.log("User Projects Successfully Fetched");
-          })
-          .catch((error) => {
-            console.error("Error Fetching User Data:", error);
-          });
+            // Set up real-time listener for user data in Firestore
+            const userDocRef = doc(db, "users", currentUser.uid);
+            const unsubscribeUserData = onSnapshot(userDocRef, (doc) => {
+              if (doc.exists()) {
+                // Update user data in Redux when Firestore data changes
+                dispatch({ type: "user/setUserData", payload: doc.data() });
+                console.log("updated user data");
+              }
+            });
+            console.log("setup realtime listener for user data");
+
+            // Set up real-time listener for user projects in Firestore
+            const projectsCollection = collection(db, "projects");
+            const userProjectsQuery = query(
+              projectsCollection,
+              where("user", "==", currentUser.uid)
+            );
+            const unsubscribeUserProjects = onSnapshot(
+              userProjectsQuery,
+              (snapshot) => {
+                const projectsData = snapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }));
+                // Dispatch an action to update user projects in Redux
+                dispatch({
+                  type: "user/setUserProjects",
+                  payload: projectsData,
+                });
+                console.log("updated user projects");
+              }
+            );
+            console.log("setup realtime listener for user projects");
+
+            // Cleanup the Firestore listeners on component unmount
+            return () => {
+              unsubscribeUserData();
+              unsubscribeUserProjects();
+            };
+          } else {
+            // If not authenticated, redirect to the login page
+            console.log("not authenticated, pushing to signin page");
+            router.push("/signin");
+          }
+        } catch (error) {
+          console.error("Error checking authentication:", error);
+        }
+      };
+
+      // Only check authentication if not already loading
+      if (loading === "idle" && authLoading === false) {
+        checkAuth();
       }
-    }, [user]);
+    }, [authLoading]);
 
-    // If user is not authenticated, redirect
-    if (!user && !loading) {
-      console.log("User not authenticated, redirecting to /signin");
-      router.push("/signin");
-    } else {
-      if (loading) {
-        console.log("Loading authentication state, showing loading spinner");
-      } else if (!userData && user) {
-        console.log("Loading user state, showing loading spinner");
-      }
-    }
-
-    // Render the WrappedComponent when authenticated
-    if (!loading && user && userData) {
-      console.log("User authenticated, rendering WrappedComponent");
-      return <WrappedComponent {...props} />;
-    }
-
-    return (
+    // Render the wrapped component if the user is authenticated and data is loaded
+    return user && loading === "succeeded" ? (
+      <WrappedComponent {...props} />
+    ) : (
       <div className="h-screen flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
   };
 
-  WithAuth.displayName = `withAuth(${getDisplayName(WrappedComponent)})`;
-
-  return WithAuth;
-};
-
-const getDisplayName = (WrappedComponent) => {
-  return WrappedComponent.displayName || WrappedComponent.name || "Component";
+  return Wrapper;
 };
 
 export default withAuth;

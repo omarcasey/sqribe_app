@@ -49,12 +49,23 @@ const userSlice = createSlice({
   initialState: {
     data: null,
     projects: null,
+    auth: null,
+    authLoading: true,
     loading: "idle",
     error: null,
   },
   reducers: {
     setUserData: (state, action) => {
       state.data = action.payload;
+    },
+    setUserProjects: (state, action) => {
+      state.projects = action.payload;
+    },
+    setAuthData: (state, action) => {
+      state.auth = action.payload;
+    },
+    setAuthLoading: (state, action) => {
+      state.authLoading = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -85,9 +96,12 @@ const userSlice = createSlice({
       .addCase(clearUserData.fulfilled, (state, action) => {
         state.data = null;
         state.projects = null;
+        state.loading = "idle";
+        state.auth = null;
+        state.authLoading = true;
       });
   },
 });
 
-export const { setUserData } = userSlice.actions;
+export const { setUserData, setAuthData, setAuthLoading } = userSlice.actions;
 export default userSlice.reducer;
