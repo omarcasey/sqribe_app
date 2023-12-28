@@ -51,7 +51,8 @@ const userSlice = createSlice({
     projects: null,
     auth: null,
     authLoading: true,
-    loading: "idle",
+    userLoading: "idle",
+    projectsLoading: "idle",
     error: null,
   },
   reducers: {
@@ -71,33 +72,34 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserData.pending, (state) => {
-        state.loading = "loading";
+        state.userLoading = "loading";
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
-        state.loading = "succeeded";
+        state.userLoading = "succeeded";
         state.data = action.payload;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
-        state.loading = "failed";
+        state.userLoading = "failed";
         state.error = action.error.message;
       })
       .addCase(fetchUserProjects.pending, (state) => {
-        state.loading = "loading";
+        state.projectsLoading = "loading";
       })
       .addCase(fetchUserProjects.fulfilled, (state, action) => {
-        state.loading = "succeeded";
+        state.projectsLoading = "succeeded";
         state.projects = action.payload;
       })
       .addCase(fetchUserProjects.rejected, (state, action) => {
-        state.loading = "failed";
+        state.projectsLoading = "failed";
         state.error = action.error.message;
       })
       // Add a case to handle clearing user data
       .addCase(clearUserData.fulfilled, (state, action) => {
+        state.auth = null;
         state.data = null;
         state.projects = null;
-        state.loading = "idle";
-        state.auth = null;
+        state.userLoading = "idle";
+        state.projectsLoading = "idle";
         state.authLoading = true;
       });
   },

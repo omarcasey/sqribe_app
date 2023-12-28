@@ -15,7 +15,7 @@ const withAuth = (WrappedComponent) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const user = useSelector((state) => state.user.data);
-    const loading = useSelector((state) => state.user.loading);
+    const loading = useSelector((state) => state.user.userLoading);
     const authLoading = useSelector((state) => state.user.authLoading);
 
     useEffect(() => {

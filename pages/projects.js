@@ -66,6 +66,18 @@ const Projects = ({ openModal }) => {
   const router = useRouter();
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenRenameModal,
+    onOpen: onOpenRenameModal,
+    onOpenChange: onOpenChangeRenameModal,
+    onClose: onCloseRenameModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDeleteModal,
+    onOpen: onOpenDeleteModal,
+    onOpenChange: onOpenChangeDeleteModal,
+    onClose: onCloseDeleteModal,
+  } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
   const [selectedFile, setselectedFile] = useState("");
   const [pasteLink, setPasteLink] = useState("");
@@ -271,14 +283,14 @@ const Projects = ({ openModal }) => {
       const response = await fetch(fileUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', fileName);
+      link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Error downloading file:', error);
+      console.error("Error downloading file:", error);
     }
   };
 
@@ -409,6 +421,7 @@ const Projects = ({ openModal }) => {
                           }
                           onPress={() => {
                             handleDropDownState(index, false);
+                            onOpenRenameModal();
                           }}
                         >
                           Rename file
@@ -423,7 +436,10 @@ const Projects = ({ openModal }) => {
                           }
                           onPress={() => {
                             handleDropDownState(index, false);
-                            handleDownload(project.fileURL, project.fileName)
+                            handleDownload(
+                              project.translatedFileURL,
+                              project.fileName
+                            );
                           }}
                         >
                           Download file
@@ -435,6 +451,7 @@ const Projects = ({ openModal }) => {
                           startContent={<HiTrash size={15} />}
                           onPress={() => {
                             handleDropDownState(index, false);
+                            onOpenDeleteModal();
                           }}
                         >
                           Delete file
@@ -530,7 +547,7 @@ const Projects = ({ openModal }) => {
                           placeholder="My First Project"
                           color="default"
                           size="sm"
-                          className="text-black pb-4"
+                          className="pb-4"
                           value={projectName}
                           onChange={handleProjectNameChange}
                           isDisabled={isUploading}
@@ -646,6 +663,80 @@ const Projects = ({ openModal }) => {
                             className="w-full mt-4"
                           />
                         )}
+                      </div>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
+            <Modal
+              isOpen={isOpenRenameModal}
+              onOpenChange={onOpenChangeRenameModal}
+              className={`${isDarkMode ? "dark" : "light"}`}
+            >
+              <ModalContent>
+                {(onCloseRenameModal) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1 text-foreground">
+                      Rename Project
+                    </ModalHeader>
+                    <ModalBody>
+                      <p className="text-foreground text-sm">Name</p>
+                      <Input size="sm" defaultValue={"drakey"} autoFocus />
+                    </ModalBody>
+                    <ModalFooter>
+                      <div className="flex flex-row gap-4 w-full">
+                        <Button
+                          color="danger"
+                          variant="light"
+                          className="w-full"
+                          onPress={onCloseRenameModal}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          color="primary"
+                          className="w-full"
+                          onPress={onCloseRenameModal}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
+            <Modal
+              isOpen={isOpenDeleteModal}
+              onOpenChange={onOpenChangeDeleteModal}
+              className={`${isDarkMode ? "dark" : "light"}`}
+            >
+              <ModalContent>
+                {(onCloseDeleteModal) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1 text-foreground">
+                    Would you like to permanently delete this project?
+                    </ModalHeader>
+                    <ModalBody>
+                      <p className="text-foreground-500 text-sm">Once deleted, this video will no longer be accessible.</p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <div className="flex flex-row gap-4 w-full">
+                        <Button
+                          variant="light"
+                          className="w-full"
+                          onPress={onCloseDeleteModal}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          color="danger"
+                          className="w-full bg-red-600"
+                          onPress={onCloseDeleteModal}
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </ModalFooter>
                   </>
