@@ -13,6 +13,7 @@ import {
   SelectItem,
   Avatar,
   Progress,
+  Spinner,
 } from "@nextui-org/react";
 import {
   Dropdown,
@@ -27,7 +28,6 @@ import {
   CardBody,
   CardFooter,
   Divider,
-  Image,
   CheckboxGroup,
   Checkbox,
 } from "@nextui-org/react";
@@ -43,10 +43,11 @@ import {
   getDoc,
   updateDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/NextIcon";
-import { getTranslateCode } from "@/helpers/getFlag";
+import { getFlagCode, getTranslateCode } from "@/helpers/getFlag";
 import { languageOptions } from "@/helpers/languages";
 import withAuth from "@/components/withAuth";
 import AppShell from "@/components/AppShell";
@@ -59,10 +60,12 @@ import { HiTrash } from "react-icons/hi2";
 import { MdSimCardDownload } from "react-icons/md";
 import { MdEditSquare } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
+import Image from "next/image";
 
 const Projects = ({ openModal }) => {
   const isDarkMode = useSelector((state) => state.user.data.darkMode);
   const projects = useSelector((state) => state.user.projects);
+  const uid = useSelector((state) => state.user.auth.uid);
   const router = useRouter();
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -87,9 +90,11 @@ const Projects = ({ openModal }) => {
   const [isUploading, setisUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [drag, setDrag] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const [dropdownStates, setDropdownStates] = useState(
-    projects?.map(() => false)
+    projects?.map(() => false) || []
   );
 
   const handleDropDownState = (index, state) => {
@@ -227,7 +232,7 @@ const Projects = ({ openModal }) => {
             try {
               const docRef = await addDoc(collection(db, "projects"), {
                 projectName: projectName,
-                user: user.uid,
+                user: uid,
                 fileName: selectedFileName,
                 originalLanguage: originalLanguage,
                 translationLanguage: translationLanguage,
@@ -245,7 +250,7 @@ const Projects = ({ openModal }) => {
               });
               console.log("Document written with ID: ", docRef.id);
               try {
-                const userRef = doc(db, "users", user.uid);
+                const userRef = doc(db, "users", uid);
                 const docSnap = await getDoc(userRef);
                 const currentData = docSnap.data();
                 await updateDoc(userRef, {
@@ -337,6 +342,38 @@ const Projects = ({ openModal }) => {
     setSelectedFileName("");
   };
 
+  const updateProjectName = async () => {
+    try {
+      const projectRef = doc(db, "projects", selectedProject.id); // Assuming "id" is the field that uniquely identifies a project
+      await updateDoc(projectRef, { projectName: newName });
+
+      // Optionally, you can update the local state or Redux store with the new project name
+      // This step depends on how you manage the state of projects in your application
+      // For example, if you use Redux:
+      // dispatch(updateProjectNameAction(selectedProject.id, newName));
+
+      onCloseRenameModal(); // Close the modal after successful update
+    } catch (error) {
+      console.error("Error updating project name:", error);
+    }
+  };
+
+  const deleteProject = async () => {
+    try {
+      const projectRef = doc(db, "projects", selectedProject.id); // Assuming "id" is the field that uniquely identifies a project
+      await deleteDoc(projectRef);
+
+      // Optionally, you can update the local state or Redux store to remove the deleted project
+      // This step depends on how you manage the state of projects in your application
+      // For example, if you use Redux:
+      // dispatch(deleteProjectAction(selectedProject.id));
+
+      onCloseDeleteModal(); // Close the modal after successful deletion
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
+  };
+
   return (
     <AppShell>
       <div className="w-full">
@@ -368,6 +405,7 @@ const Projects = ({ openModal }) => {
                         radius="sm"
                         src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
                         width={40}
+                        className="w-10 h-10"
                       />
                       <div className="flex flex-col">
                         <p className="text-md">{project.projectName}</p>
@@ -421,6 +459,8 @@ const Projects = ({ openModal }) => {
                           }
                           onPress={() => {
                             handleDropDownState(index, false);
+                            setSelectedProject(project);
+                            setNewName(project.projectName);
                             onOpenRenameModal();
                           }}
                         >
@@ -451,6 +491,7 @@ const Projects = ({ openModal }) => {
                           startContent={<HiTrash size={15} />}
                           onPress={() => {
                             handleDropDownState(index, false);
+                            setSelectedProject(project);
                             onOpenDeleteModal();
                           }}
                         >
@@ -565,9 +606,16 @@ const Projects = ({ openModal }) => {
                           } text-black pb-4`}
                           selectedKeys={[originalLanguage]}
                           onChange={handleOriginalLanguage}
-                          aria-label="Translation Language"
+                          aria-label="Original Language"
                           disallowEmptySelection
                           isDisabled={isUploading}
+                          startContent={
+                            <Avatar
+                              alt={originalLanguage}
+                              className="w-6 h-6 mr-1"
+                              src={`https://flagcdn.com/${getFlagCode(originalLanguage)}.svg`}
+                            />
+                          }
                         >
                           {languageOptions.map((option) => (
                             <SelectItem
@@ -575,7 +623,7 @@ const Projects = ({ openModal }) => {
                               startContent={
                                 <Avatar
                                   alt={option.label}
-                                  className="w-6 h-6"
+                                  className="w-6 h-6 mr-1"
                                   src={`https://flagcdn.com/${option.flagCode}.svg`}
                                 />
                               }
@@ -599,6 +647,13 @@ const Projects = ({ openModal }) => {
                           aria-label="Translation Language"
                           disallowEmptySelection
                           isDisabled={isUploading}
+                          startContent={
+                            <Avatar
+                              alt={originalLanguage}
+                              className="w-6 h-6 mr-1"
+                              src={`https://flagcdn.com/${getFlagCode(translationLanguage)}.svg`}
+                            />
+                          }
                         >
                           {languageOptions.map((option) => (
                             <SelectItem
@@ -606,7 +661,7 @@ const Projects = ({ openModal }) => {
                               startContent={
                                 <Avatar
                                   alt={option.label}
-                                  className="w-6 h-6"
+                                  className="w-6 h-6 mr-1"
                                   src={`https://flagcdn.com/${option.flagCode}.svg`}
                                 />
                               }
@@ -682,7 +737,12 @@ const Projects = ({ openModal }) => {
                     </ModalHeader>
                     <ModalBody>
                       <p className="text-foreground text-sm">Name</p>
-                      <Input size="sm" defaultValue={"drakey"} autoFocus />
+                      <Input
+                        size="sm"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        autoFocus
+                      />
                     </ModalBody>
                     <ModalFooter>
                       <div className="flex flex-row gap-4 w-full">
@@ -697,7 +757,7 @@ const Projects = ({ openModal }) => {
                         <Button
                           color="primary"
                           className="w-full"
-                          onPress={onCloseRenameModal}
+                          onPress={updateProjectName}
                         >
                           Save
                         </Button>
@@ -716,10 +776,12 @@ const Projects = ({ openModal }) => {
                 {(onCloseDeleteModal) => (
                   <>
                     <ModalHeader className="flex flex-col gap-1 text-foreground">
-                    Would you like to permanently delete this project?
+                      Would you like to permanently delete this project?
                     </ModalHeader>
                     <ModalBody>
-                      <p className="text-foreground-500 text-sm">Once deleted, this video will no longer be accessible.</p>
+                      <p className="text-foreground-500 text-sm">
+                        Once deleted, this video will no longer be accessible.
+                      </p>
                     </ModalBody>
                     <ModalFooter>
                       <div className="flex flex-row gap-4 w-full">
@@ -733,7 +795,7 @@ const Projects = ({ openModal }) => {
                         <Button
                           color="danger"
                           className="w-full bg-red-600"
-                          onPress={onCloseDeleteModal}
+                          onPress={deleteProject}
                         >
                           Delete
                         </Button>
