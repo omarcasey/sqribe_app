@@ -10,15 +10,19 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { text } = req.body;
+  const { text, voiceId } = req.body;
 
   if (!text) {
     return res.status(400).json({ error: "Missing 'text' parameter" });
   }
 
+  if (!voiceId) {
+    return res.status(400).json({ error: "Missing 'voiceId' parameter" });
+  }
+
   const voice = new ElevenLabs({
     apiKey: apiKey,
-    voiceId: "pNInz6obpgDQGcFmaJgB", // A Voice ID from Elevenlabs
+    voiceId: voiceId,
   });
 
   try {

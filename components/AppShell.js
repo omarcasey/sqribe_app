@@ -70,6 +70,13 @@ const AppShell = ({ children }) => {
               </p>
             </Link>
             <Link
+              href="/projects"
+              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+            >
+              <FaFolder className="mr-2" />
+              <p className="">Projects</p>
+            </Link>
+            <Link
               href="/makespeech"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
@@ -85,15 +92,15 @@ const AppShell = ({ children }) => {
                     : ""
                 }`}
               >
-                Text To Speech
+                Speech Synthesis
               </p>
             </Link>
             <Link
-              href="/projects"
+              href="/history"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
               <FaFolder className="mr-2" />
-              <p className="">Projects</p>
+              <p className="">History</p>
             </Link>
           </div>
           <div className="flex space-x-3 items-center">
