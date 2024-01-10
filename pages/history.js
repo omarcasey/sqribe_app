@@ -12,24 +12,24 @@ import {
 } from "@nextui-org/react";
 import {
     collection,
-    addDoc,
-    Timestamp,
-    getDocs,
     onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useState, useEffect, useRef } from "react";
-import { IoEllipsisHorizontalSharp } from "react-icons/io5";
 import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
 import { MdDownloadForOffline } from "react-icons/md";
+import { query, where } from "firebase/firestore";
+import { useSelector } from "react-redux";
 
 const History = () => {
+    const uid = useSelector((state) => state.user.auth.uid);
     const [audioFiles, setAudioFiles] = useState([]);
 
     useEffect(() => {
         // Fetch audio files and set up real-time listener
         const audioFilesCollectionRef = collection(db, "audio files");
-        const unsubscribe = onSnapshot(audioFilesCollectionRef, (querySnapshot) => {
+        const audioFilesQuery = query(audioFilesCollectionRef, where("user", "==", uid));
+        const unsubscribe = onSnapshot(audioFilesQuery, (querySnapshot) => {
             const updatedAudioFiles = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 voice: doc.data().voice,

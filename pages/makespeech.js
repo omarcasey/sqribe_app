@@ -27,8 +27,10 @@ import AppShell from "@/components/AppShell";
 import { FaCheckCircle, FaPlay } from "react-icons/fa";
 import { getVoices } from "@/helpers/voices";
 import { PiFlaskFill } from "react-icons/pi";
+import { useSelector } from "react-redux";
 
 const MakeSpeech = () => {
+  const uid = useSelector((state) => state.user.auth.uid);
   const [inputText, setInputText] = useState(""); // State to store the input text
   const [selectedTask, setSelectedTask] = useState("textToSpeech"); // State to store the selected card
   const [isLoading, setIsLoading] = useState(false); // State to store the loading state
@@ -87,6 +89,7 @@ const MakeSpeech = () => {
           voice: voiceName,
           date: Timestamp.fromDate(new Date()),
           fileURL: result.audioUrl,
+          user: uid,
         });
         console.log("Document written with ID: ", docRef.id);
       } catch (e) {
@@ -294,7 +297,7 @@ const MakeSpeech = () => {
                   <Select
                     label="Model"
                     labelPlacement="outside"
-                    isDisabled
+                    // isDisabled
                     selectedKeys={["elevenlabs"]}
                     className="text-black"
                     variant="bordered"
