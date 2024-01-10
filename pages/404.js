@@ -14,6 +14,7 @@ const Custom404 = () => {
             width={1024}
             height={1024}
             className="w-24 contrast-125"
+            alt=""
           />
           <p className="text-gray-400 font-bold text-xl tracking-widest group-hover:text-white transition-all">
             Back to Sqribe
