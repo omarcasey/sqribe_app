@@ -146,7 +146,7 @@ const Navbar = () => {
               {/* <a onClick={() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join Waitlist </a> */}
               <div className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full">
                 {" "}
-                Go To App{" "}
+                Sign In{" "}
               </div>
             </Link>
           ) : (

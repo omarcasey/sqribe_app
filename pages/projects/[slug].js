@@ -30,21 +30,40 @@ const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
   const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const userProjects = useSelector((state) => state.user.projects);
+  const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const fetchData = async () => {
       const slug = router.query.slug;
       if (slug) {
-        // Fetch Firestore document based on the slug
-        const docRef = doc(db, "projects", slug);
-        const docSnap = await getDoc(docRef);
-        setProject(docSnap.data());
+        // Check if the project belongs to the current user
+        const projectData = userProjects?.find(
+          (project) => project.id === slug
+        );
+
+        if (projectData) {
+          setProject(projectData);
+        } else {
+          // Redirect to the projects page if the project doesn't belong to the user
+          router.push("/projects");
+        }
       }
     };
 
-    fetchData();
-  }, [router.query.slug]);
+    if (loading === "succeeded") {
+      fetchData();
+    }
+  }, [router.query.slug, loading, userProjects]);
+
+  if (!project) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -57,7 +76,7 @@ const Page = () => {
           <Link href="/projects">
             <IoIosArrowBack size={25} className="mr-3" />
           </Link>
-          <p className="font-medium">{project && project.projectName}</p>
+          <p className="font-medium">{project.projectName}</p>
         </div>
         <div className="flex item justify-center gap-4">
           <Button

@@ -8,30 +8,61 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useState, useEffect } from "react";
-import { Input, Button, Card, CardBody, Divider, Spinner } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Card,
+  CardBody,
+  Divider,
+  Spinner,
+  Dropdown,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import withAuth from "@/components/withAuth";
 import AppShell from "@/components/AppShell";
+import { FaCheckCircle } from "react-icons/fa";
+import { getVoices } from "@/helpers/voices";
 
 const MakeSpeech = () => {
   const [inputText, setInputText] = useState(""); // State to store the input text
-  const [audioFiles, setAudioFiles] = useState([]);
+  const [selectedTask, setSelectedTask] = useState("textToSpeech"); // State to store the selected card
+  const [isLoading, setIsLoading] = useState(false); // State to store the loading state
+  const [voiceList, setVoiceList] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null); // State to store the selected voice ID
+
+  useEffect(() => {
+    const fetchVoices = async () => {
+      const voices = await getVoices();
+      setVoiceList(voices);
+    };
+
+    fetchVoices();
+  }, []);
 
   // Function to handle the text input change
   const handleTextInputChange = (e) => {
     setInputText(e.target.value);
   };
 
+  const handleSelectVoice = (e) => {
+    setSelectedVoice(e.target.value);
+  };
+
   // Function to handle text-to-speech generation
   const handleGenerateSpeech = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/text-to-speech", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: inputText }),
+        body: JSON.stringify({
+          text: inputText,
+          voiceId: selectedVoice,
+        }),
       });
 
       if (!response.ok) {
@@ -47,7 +78,7 @@ const MakeSpeech = () => {
       try {
         const docRef = await addDoc(collection(db, "audio files"), {
           text: inputText,
-          transcription: "",
+          voice: selectedVoice,
           date: Timestamp.fromDate(new Date()),
           fileURL: result.audioUrl,
         });
@@ -56,91 +87,155 @@ const MakeSpeech = () => {
         console.error("Error adding document: ", e);
       }
       setInputText("");
+      setIsLoading(false);
     } catch (error) {
       console.error("Error converting text to speech:", error);
     }
   };
 
-  useEffect(() => {
-    // Fetch audio files and set up real-time listener
-    const audioFilesCollectionRef = collection(db, "audio files");
-    const unsubscribe = onSnapshot(audioFilesCollectionRef, (querySnapshot) => {
-      const updatedAudioFiles = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        text: doc.data().text,
-        fileURL: doc.data().fileURL,
-      }));
+  const handleTaskSelect = (task) => {
+    setSelectedTask(task);
+  };
 
-      setAudioFiles(updatedAudioFiles);
-    });
-
-    // Clean up the listener when the component unmounts
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   return (
     <AppShell>
-      <div className="w-full">
-        {/* <Navbar /> */}
-        <main className="flex min-h-screen flex-col items-center py-24">
-          <div className="mx-auto max-w-3xl">
-            <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-              <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-foreground-600 ring-1 ring-foreground-600/10 hover:ring-foreground-600/30 transition-all">
-                Explore the power of Artifical Intelligence. &nbsp;
+      <div className="w-full px-4 sm:px-10">
+        <main className="flex flex-col items-center py-24 mx-auto max-w-7xl text-foreground">
+          <h1 className="w-full font-bold text-3xl mb-2">Speech Synthesis</h1>
+          <p className="w-full text-foreground-500 font-medium mb-10">
+            Unleash the power of our cutting-edge technology to generate
+            realistic, captivating speech in a wide range of languages.
+          </p>
+          <div className="border border-foreground-400 rounded-lg w-full">
+            <div>
+              <div className="flex flex-row py-4 px-8 gap-3">
+                <div className="w-40 flex font-medium">Task</div>
+                <div
+                  className={`border ${
+                    selectedTask === "textToSpeech"
+                      ? "border-2 border-foreground"
+                      : "border-foreground-400"
+                  } px-4 py-3 rounded-lg hover:cursor-pointer hover:border-foreground hover:shadow w-80`}
+                  onClick={() => handleTaskSelect("textToSpeech")}
+                >
+                  <div className="flex flex-row justify-between items-center mb-2">
+                    <p className="text-sm text-foreground font-medium" onClick={() => (console.log(selectedVoice))}>
+                      Text to Speech
+                    </p>
+                    {selectedTask === "textToSpeech" && (
+                      <FaCheckCircle size={15} />
+                    )}
+                  </div>
+                  <p className="text-tiny text-foreground-500 w-60">
+                    Convert text into lifelike speech using a voice of your
+                    choice.
+                  </p>
+                </div>
+                <div
+                  className={`border ${
+                    selectedTask === "speechToSpeech"
+                      ? "border-2 border-foreground"
+                      : "border-foreground-400"
+                  } px-4 py-3 rounded-lg hover:cursor-pointer hover:border-foreground hover:shadow w-80`}
+                  onClick={() => handleTaskSelect("speechToSpeech")}
+                >
+                  <div className="flex flex-row justify-between items-center mb-2">
+                    <p className="text-sm text-foreground font-medium">
+                      Speech to Speech
+                    </p>
+                    {selectedTask === "speechToSpeech" && (
+                      <FaCheckCircle size={15} />
+                    )}
+                  </div>
+                  <p className="text-tiny text-foreground-500 w-60">
+                    Create speech by combining the style and content of an audio
+                    file you upload with a voice of your choice.
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl pb-12">
-                Demo
-              </h1>
-              <div className="flex items-center justify-center w-full pb-6 gap-4">
-                <Input
-                  type="text"
-                  label="Text to Speech"
-                  size="sm"
-                  color="default"
-                  className="text-black"
-                  value={inputText}
-                  onChange={handleTextInputChange} // Handle input text change
-                />
+              <Divider />
+              <div className="flex flex-row py-4 px-8 gap-3">
+                <div className="w-40 flex font-medium">Settings</div>
+                <div className="flex flex-col flex-1">
+                  {voiceList && (
+                    <Select
+                      label="Select a voice"
+                      placeholder="Select a voice"
+                      labelPlacement="outside"
+                      className="flex-1 text-black mb-4"
+                      disallowEmptySelection
+                      selectionMode="single"
+                      variant="bordered"
+                      selectedKeys={[selectedVoice]}
+                      onChange={handleSelectVoice}
+                    >
+                      {voiceList.map((voice) => (
+                        <SelectItem
+                          key={voice.voice_id}
+                          textValue={voice.name}
+                          className="text-black"
+                          value={voice.voice_id}
+                        >
+                          {voice.name}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )}
+                  <Select
+                    label="Voice Settings"
+                    labelPlacement="outside"
+                    selectedKeys={["elevenlabs"]}
+                    className="text-black mb-4"
+                    variant="bordered"
+                  >
+                    <SelectItem
+                      key="elevenlabs"
+                      textValue="Voice Settings"
+                      className="text-black"
+                    >
+                      Voice Settings
+                    </SelectItem>
+                  </Select>
+                  <Select
+                    label="Model"
+                    labelPlacement="outside"
+                    isDisabled
+                    selectedKeys={["elevenlabs"]}
+                    className="text-black"
+                    variant="bordered"
+                  >
+                    <SelectItem
+                      key="elevenlabs"
+                      textValue="Eleven Multilingual v2"
+                      className="text-black"
+                    >
+                      Eleven Multilingual v2
+                    </SelectItem>
+                  </Select>
+                </div>
+              </div>
+              <Divider />
+              <div className="flex flex-row py-4 px-8 gap-2">
+                <div className="w-40 flex font-medium">Text</div>
+                <div className="border border-foreground-400 p-2 rounded-lg flex-grow">
+                  <textarea
+                    value={inputText}
+                    onChange={handleTextInputChange}
+                    className="w-full h-32 resize-none bg-transparent outline-none text-foreground"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row py-4 px-8 gap-2">
+                <div className="w-40"></div>
                 <Button
-                  className="px-10 py-6 text-white"
-                  color="success"
-                  onClick={handleGenerateSpeech} // Handle text-to-speech generation
+                  onPress={handleGenerateSpeech}
+                  className="bg-foreground text-foreground-50 flex-1 font-medium text-base"
+                  isLoading={isLoading}
                 >
                   Generate
                 </Button>
               </div>
-            </div>
-          </div>
-          <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col items-center">
-              <h1 className="py-4 text-lg font-semibold text-green-500">
-                List of Audio Files
-              </h1>
-              <div className="flex flex-col max-w-7xl px-5 space-y-4">
-                {audioFiles.map((audioFile) => (
-                  <Card key={audioFile.id} className="flex-1">
-                    <CardBody>
-                      <p className="mb-4">{audioFile.text}</p>
-                      <audio
-                        src={audioFile.fileURL}
-                        controls
-                        className="w-full"
-                      ></audio>
-                    </CardBody>
-                  </Card>
-                ))}
-              </div>
-              <p className="mt-20 text-lg leading-8 text-foreground-600">
-                AI-Powered Multilingual Content Solutions <br />
-                <Divider className="my-4" /> Sqribe.ai streamlines your video
-                production with automated captions, voice overs, translations,
-                and dubbing in multiple languages, powered by advanced AI
-                algorithms.
-              </p>
             </div>
           </div>
         </main>
