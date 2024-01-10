@@ -205,10 +205,11 @@ const MakeSpeech = () => {
                 <div className="flex flex-col flex-1">
                   {voiceList && (
                     <Select
+                      items={voiceList}
                       label="Select a voice"
                       placeholder="Select a voice"
                       labelPlacement="outside"
-                      className="flex-1 text-black mb-4"
+                      className="flex-1 mb-4 text-foreground-400"
                       disallowEmptySelection
                       selectionMode="single"
                       variant="bordered"
@@ -227,9 +228,10 @@ const MakeSpeech = () => {
                           .map((voice) => (
                             <SelectItem
                               key={voice.voice_id}
-                              textValue={voice.name}
                               className="text-black"
                               value={voice.voice_id}
+                              textValue={voice.name}
+                              
                             >
                               <div className="flex flex-row items-center justify-start gap-1 ml-2">
                                 <button
@@ -360,11 +362,15 @@ const MakeSpeech = () => {
                         aria-label="Stability"
                         value={stabilityValue}
                         onChange={setStabilityValue}
-
                         className="w-full px-3 mt-4"
                         tooltipProps={{
                           color: stabilityValue < 0.3 ? "danger" : "foreground",
-                          content: <p>{(stabilityValue * 100).toFixed(0)}% {stabilityValue < 0.3 ? "Unstable" : ""}</p>
+                          content: (
+                            <p>
+                              {(stabilityValue * 100).toFixed(0)}%{" "}
+                              {stabilityValue < 0.3 ? "Unstable" : ""}
+                            </p>
+                          ),
                         }}
                         renderThumb={(props) => (
                           <div
@@ -504,7 +510,12 @@ const MakeSpeech = () => {
                         onChange={setStyleValue}
                         tooltipProps={{
                           color: styleValue > 0.5 ? "danger" : "foreground",
-                          content: <p>{(styleValue * 100).toFixed(0)}% {styleValue > 0.5 ? "Unstable" : ""}</p>
+                          content: (
+                            <p>
+                              {(styleValue * 100).toFixed(0)}%{" "}
+                              {styleValue > 0.5 ? "Unstable" : ""}
+                            </p>
+                          ),
                         }}
                         renderThumb={(props) => (
                           <div
@@ -547,7 +558,12 @@ const MakeSpeech = () => {
                         </div>
                       </div>
                       <div className="flex flex-row items-center justify-start px-3 mb-6">
-                        <Checkbox color="default" isSelected={speakerBoost} onValueChange={setSpeakerBoost} size="sm">
+                        <Checkbox
+                          color="default"
+                          isSelected={speakerBoost}
+                          onValueChange={setSpeakerBoost}
+                          size="sm"
+                        >
                           Speaker Boost
                         </Checkbox>
                         <Tooltip
@@ -567,7 +583,9 @@ const MakeSpeech = () => {
                         </Tooltip>
                       </div>
                       <div className="px-3 mb-6">
-                        <Button size="sm" onPress={resetToDefault}>Reset To Default</Button>
+                        <Button size="sm" onPress={resetToDefault}>
+                          Reset To Default
+                        </Button>
                       </div>
                     </AccordionItem>
                   </Accordion>
@@ -578,7 +596,7 @@ const MakeSpeech = () => {
                     labelPlacement="outside"
                     // isDisabled
                     selectedKeys={["elevenlabs"]}
-                    className="text-black"
+                    className="text-foreground-400"
                     variant="bordered"
                   >
                     <SelectItem
@@ -594,13 +612,18 @@ const MakeSpeech = () => {
               <Divider />
               <div className="flex flex-row py-4 px-8">
                 <div className="w-40 flex font-medium">Text</div>
-                <div className="border border-foreground-400 p-2 rounded-lg flex-grow ml-3">
-                  <textarea
-                    value={inputText}
-                    onChange={handleTextInputChange}
-                    className="w-full h-32 resize-none bg-transparent outline-none text-foreground text-sm"
-                    placeholder="Enter text to convert to speech... (in any of our supported languages!)"
-                  />
+                <div className="flex-grow ml-3">
+                  <div className="border border-foreground-400 p-2 rounded-lg w-full">
+                    <textarea
+                      value={inputText}
+                      onChange={handleTextInputChange}
+                      className="w-full h-32 resize-none bg-transparent outline-none text-foreground text-sm"
+                      placeholder="Enter text to convert to speech... (in any of our supported languages!)"
+                    />
+                  </div>
+                  <div className="text-foreground-500 text-tiny mt-2 font-medium">
+                    {inputText.length} / 2500
+                  </div>
                 </div>
               </div>
               <div className="flex flex-row py-4 px-8 gap-2">

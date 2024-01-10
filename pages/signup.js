@@ -11,6 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase";
+import { Timestamp } from "firebase/firestore";
 
 const SignUp = () => {
   const router = useRouter();
@@ -31,6 +32,12 @@ const SignUp = () => {
        // Add user information to Firestore
        await setDoc(doc(db, "users", user.uid), {
         email: user.email,
+        darkMode: false,
+        subscription: "free",
+        usedCredits: 0,
+        remainingCredits: 100,
+        totalCredits: 100,
+        createdAt: new Timestamp.now(),
         // Add more user details as needed
       });
       console.log("Signed up and add")
@@ -52,6 +59,7 @@ const SignUp = () => {
           width={1024}
           height={1024}
           className="w-24 contrast-125 mt-10"
+          alt=""
         />
         <p className="text-gray-400 font-bold text-xl tracking-widest">
           Sqribe
