@@ -18,19 +18,22 @@ import {
   Dropdown,
   Select,
   SelectItem,
+  Chip,
+  SelectSection,
 } from "@nextui-org/react";
 import Link from "next/link";
 import withAuth from "@/components/withAuth";
 import AppShell from "@/components/AppShell";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaPlay } from "react-icons/fa";
 import { getVoices } from "@/helpers/voices";
+import { PiFlaskFill } from "react-icons/pi";
 
 const MakeSpeech = () => {
   const [inputText, setInputText] = useState(""); // State to store the input text
   const [selectedTask, setSelectedTask] = useState("textToSpeech"); // State to store the selected card
   const [isLoading, setIsLoading] = useState(false); // State to store the loading state
   const [voiceList, setVoiceList] = useState([]);
-  const [selectedVoice, setSelectedVoice] = useState(null); // State to store the selected voice ID
+  const [selectedVoice, setSelectedVoice] = useState("pNInz6obpgDQGcFmaJgB"); // State to store the selected voice ID
 
   useEffect(() => {
     const fetchVoices = async () => {
@@ -76,9 +79,12 @@ const MakeSpeech = () => {
 
       // Add the converted text to the audio files collection
       try {
+        const selectedVoiceObject = voiceList.find((voice) => voice.voice_id === selectedVoice);
+        const voiceName = selectedVoiceObject ? selectedVoiceObject.name : "";
+
         const docRef = await addDoc(collection(db, "audio files"), {
           text: inputText,
-          voice: selectedVoice,
+          voice: voiceName,
           date: Timestamp.fromDate(new Date()),
           fileURL: result.audioUrl,
         });
@@ -96,7 +102,6 @@ const MakeSpeech = () => {
   const handleTaskSelect = (task) => {
     setSelectedTask(task);
   };
-
 
   return (
     <AppShell>
@@ -120,7 +125,10 @@ const MakeSpeech = () => {
                   onClick={() => handleTaskSelect("textToSpeech")}
                 >
                   <div className="flex flex-row justify-between items-center mb-2">
-                    <p className="text-sm text-foreground font-medium" onClick={() => (console.log(selectedVoice))}>
+                    <p
+                      className="text-sm text-foreground font-medium"
+                      onClick={() => console.log(voiceList)}
+                    >
                       Text to Speech
                     </p>
                     {selectedTask === "textToSpeech" && (
@@ -170,16 +178,102 @@ const MakeSpeech = () => {
                       selectedKeys={[selectedVoice]}
                       onChange={handleSelectVoice}
                     >
-                      {voiceList.map((voice) => (
-                        <SelectItem
-                          key={voice.voice_id}
-                          textValue={voice.name}
-                          className="text-black"
-                          value={voice.voice_id}
-                        >
-                          {voice.name}
-                        </SelectItem>
-                      ))}
+                      <SelectSection title="Featured" classNames={{heading: "bg-neutral-200 flex w-full uppercase px-2 py-1 rounded-lg pl-4 tracking-wide"}}>
+                        {voiceList
+                          .filter(voice => voice.sharing !== null)
+                          .map((voice) => (
+                            <SelectItem
+                              key={voice.voice_id}
+                              textValue={voice.name}
+                              className="text-black"
+                              value={voice.voice_id}
+                            >
+                              <div className="flex flex-row items-center justify-start gap-1 ml-2">
+                                <FaPlay className="mr-3" size={12} />
+                                <p className="tracking-wide">{voice.name}</p>
+                                <PiFlaskFill className="text-gray-600 mr-2" size={16} />
+                                {voice.labels.age && (
+                                  <div className="bg-pink-200 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.age} {voice.labels.gender}
+                                  </div>
+                                )}
+                                {voice.labels.accent && (
+                                  <div className="bg-purple-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.accent}
+                                  </div>
+                                )}
+                                {voice.labels.descriptive && (
+                                  <div className="bg-yellow-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.descriptive}
+                                  </div>
+                                )}
+                                {voice.labels.description && (
+                                  <div className="bg-blue-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.description}
+                                  </div>
+                                )}
+                                {voice.labels.use_case && (
+                                  <div className="bg-gray-200 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.use_case}
+                                  </div>
+                                )}
+                                {voice.labels["use case"] && (
+                                  <div className="bg-red-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels["use case"]}
+                                  </div>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                      </SelectSection>
+                      <SelectSection title="Premade" classNames={{heading: "bg-neutral-200 flex w-full uppercase px-2 py-1 rounded-lg pl-4 tracking-wide"}}>
+                        {voiceList
+                          .filter(voice => voice.sharing === null)
+                          .map((voice) => (
+                            <SelectItem
+                              key={voice.voice_id}
+                              textValue={voice.name}
+                              className="text-black"
+                              value={voice.voice_id}
+                            >
+                              <div className="flex flex-row items-center justify-start gap-1 ml-2">
+                                <FaPlay className="mr-3" size={12} />
+                                <p className="tracking-wide">{voice.name}</p>
+                                <PiFlaskFill className="text-gray-600 mr-2" size={16} />
+                                {voice.labels.age && (
+                                  <div className="bg-pink-200 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.age} {voice.labels.gender}
+                                  </div>
+                                )}
+                                {voice.labels.accent && (
+                                  <div className="bg-purple-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.accent}
+                                  </div>
+                                )}
+                                {voice.labels.descriptive && (
+                                  <div className="bg-yellow-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.descriptive}
+                                  </div>
+                                )}
+                                {voice.labels.description && (
+                                  <div className="bg-blue-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.description}
+                                  </div>
+                                )}
+                                {voice.labels.use_case && (
+                                  <div className="bg-gray-200 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels.use_case}
+                                  </div>
+                                )}
+                                {voice.labels["use case"] && (
+                                  <div className="bg-red-100 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
+                                    {voice.labels["use case"]}
+                                  </div>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                      </SelectSection>
                     </Select>
                   )}
                   <Select

@@ -12,6 +12,7 @@ import { IoIosHelpCircleOutline } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { db } from "@/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { FaHistory } from "react-icons/fa";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
@@ -80,7 +81,7 @@ const AppShell = ({ children }) => {
               href="/makespeech"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
-              <SiAudiomack
+              <SiAudiomack size={20}
                 className={`mr-2 ${
                   router.pathname === "/makespeech" ? "text-cyan-300" : ""
                 }`}
@@ -99,7 +100,7 @@ const AppShell = ({ children }) => {
               href="/history"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
-              <FaFolder className="mr-2" />
+              <FaHistory className="mr-2" />
               <p className="">History</p>
             </Link>
           </div>

@@ -16,13 +16,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing 'text' parameter" });
   }
 
-  if (!voiceId) {
-    return res.status(400).json({ error: "Missing 'voiceId' parameter" });
-  }
+  // if (!voiceId) {
+  //   return res.status(400).json({ error: "Missing 'voiceId' parameter" });
+  // }
 
   const voice = new ElevenLabs({
     apiKey: apiKey,
-    voiceId: voiceId,
+    voiceId: voiceId || "pNInz6obpgDQGcFmaJgB",
   });
 
   try {

@@ -97,8 +97,8 @@ const History = () => {
                         selectionMode="multiple"
                     >
                         <TableHeader>
-                            <TableColumn className="font-bold w-24">Voice</TableColumn>
-                            <TableColumn className="font-bold w-28">Date</TableColumn>
+                            <TableColumn className="font-bold">Voice</TableColumn>
+                            <TableColumn className="font-bold">Date</TableColumn>
                             <TableColumn className="font-bold">Status</TableColumn>
                             <TableColumn className="font-bold">Text</TableColumn>
                             <TableColumn className="font-bold">Actions</TableColumn>
@@ -108,9 +108,9 @@ const History = () => {
                                 <TableRow key={audioFile.id}>
                                     <TableCell>
                                         <div className="flex flex-row items-center justify-between">
-                                            <p className="mr-2">{audioFile.voice}</p>
+                                            <p className="mr-2 w-28">{audioFile.voice}</p>
                                             <FaCircleInfo
-                                                className="text-foreground-700"
+                                                className="text-foreground-700 ml-2"
                                                 size={12}
                                                 onClick={() => console.log(audioFiles)}
                                             />

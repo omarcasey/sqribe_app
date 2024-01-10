@@ -612,7 +612,7 @@ const Projects = ({ openModal }) => {
                           startContent={
                             <Avatar
                               alt={originalLanguage}
-                              className="w-6 h-6 mr-1"
+                              className="w-7 h-6 mr-1"
                               src={`https://flagcdn.com/${getFlagCode(originalLanguage)}.svg`}
                             />
                           }
@@ -650,7 +650,7 @@ const Projects = ({ openModal }) => {
                           startContent={
                             <Avatar
                               alt={originalLanguage}
-                              className="w-6 h-6 mr-1"
+                              className="w-7 h-6 mr-1"
                               src={`https://flagcdn.com/${getFlagCode(translationLanguage)}.svg`}
                             />
                           }
