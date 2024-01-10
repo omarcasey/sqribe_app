@@ -20,6 +20,14 @@ import {
   SelectItem,
   Chip,
   SelectSection,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Accordion,
+  AccordionItem,
+  Slider,
+  Checkbox,
+  Tooltip,
 } from "@nextui-org/react";
 import Link from "next/link";
 import withAuth from "@/components/withAuth";
@@ -28,14 +36,20 @@ import { FaCheckCircle, FaPlay } from "react-icons/fa";
 import { getVoices } from "@/helpers/voices";
 import { PiFlaskFill } from "react-icons/pi";
 import { useSelector } from "react-redux";
+import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
 
 const MakeSpeech = () => {
   const uid = useSelector((state) => state.user.auth.uid);
+  const isDarkMode = useSelector((state) => state.user.data.darkMode);
   const [inputText, setInputText] = useState(""); // State to store the input text
   const [selectedTask, setSelectedTask] = useState("textToSpeech"); // State to store the selected card
   const [isLoading, setIsLoading] = useState(false); // State to store the loading state
   const [voiceList, setVoiceList] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("pNInz6obpgDQGcFmaJgB"); // State to store the selected voice ID
+  const [stabilityValue, setStabilityValue] = useState(0.5);
+  const [styleValue, setStyleValue] = useState(0);
+  const [similarityValue, setSimilarityValue] = useState(0.75);
+  const [speakerBoost, setSpeakerBoost] = useState(true);
 
   useEffect(() => {
     const fetchVoices = async () => {
@@ -46,6 +60,14 @@ const MakeSpeech = () => {
     fetchVoices();
   }, []);
 
+  // Function to reset stability, style, enhancement, and speakerboost to their defaults
+  const resetToDefault = () => {
+    setStabilityValue(0.5);
+    setStyleValue(0);
+    setSimilarityValue(0.75);
+    setSpeakerBoost(true);
+  };
+
   // Function to handle the text input change
   const handleTextInputChange = (e) => {
     setInputText(e.target.value);
@@ -53,6 +75,12 @@ const MakeSpeech = () => {
 
   const handleSelectVoice = (e) => {
     setSelectedVoice(e.target.value);
+  };
+
+  // Function to play the audio
+  const playAudio = (audioUrl) => {
+    const audio = new Audio(audioUrl);
+    audio.play();
   };
 
   // Function to handle text-to-speech generation
@@ -66,6 +94,10 @@ const MakeSpeech = () => {
         },
         body: JSON.stringify({
           text: inputText,
+          stabilityValue: stabilityValue,
+          similarityValue: similarityValue,
+          styleValue: styleValue,
+          speakerBoostValue: speakerBoost,
           voiceId: selectedVoice,
         }),
       });
@@ -81,7 +113,9 @@ const MakeSpeech = () => {
 
       // Add the converted text to the audio files collection
       try {
-        const selectedVoiceObject = voiceList.find((voice) => voice.voice_id === selectedVoice);
+        const selectedVoiceObject = voiceList.find(
+          (voice) => voice.voice_id === selectedVoice
+        );
         const voiceName = selectedVoiceObject ? selectedVoiceObject.name : "";
 
         const docRef = await addDoc(collection(db, "audio files"), {
@@ -181,9 +215,15 @@ const MakeSpeech = () => {
                       selectedKeys={[selectedVoice]}
                       onChange={handleSelectVoice}
                     >
-                      <SelectSection title="Featured" classNames={{heading: "bg-neutral-200 flex w-full uppercase px-2 py-1 rounded-lg pl-4 tracking-wide"}}>
+                      <SelectSection
+                        title="Featured"
+                        classNames={{
+                          heading:
+                            "bg-neutral-200 flex w-full uppercase px-2 py-1 rounded-lg pl-4 tracking-wide",
+                        }}
+                      >
                         {voiceList
-                          .filter(voice => voice.sharing !== null)
+                          .filter((voice) => voice.sharing !== null)
                           .map((voice) => (
                             <SelectItem
                               key={voice.voice_id}
@@ -192,9 +232,17 @@ const MakeSpeech = () => {
                               value={voice.voice_id}
                             >
                               <div className="flex flex-row items-center justify-start gap-1 ml-2">
-                                <FaPlay className="mr-3" size={12} />
+                                <button
+                                  className="mr-3"
+                                  onClick={() => playAudio(voice.preview_url)}
+                                >
+                                  <FaPlay size={12} />
+                                </button>
                                 <p className="tracking-wide">{voice.name}</p>
-                                <PiFlaskFill className="text-gray-600 mr-2" size={16} />
+                                <PiFlaskFill
+                                  className="text-gray-600 mr-2"
+                                  size={16}
+                                />
                                 {voice.labels.age && (
                                   <div className="bg-pink-200 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
                                     {voice.labels.age} {voice.labels.gender}
@@ -229,9 +277,15 @@ const MakeSpeech = () => {
                             </SelectItem>
                           ))}
                       </SelectSection>
-                      <SelectSection title="Premade" classNames={{heading: "bg-neutral-200 flex w-full uppercase px-2 py-1 rounded-lg pl-4 tracking-wide"}}>
+                      <SelectSection
+                        title="Premade"
+                        classNames={{
+                          heading:
+                            "bg-neutral-200 flex w-full uppercase px-2 py-1 rounded-lg pl-4 tracking-wide",
+                        }}
+                      >
                         {voiceList
-                          .filter(voice => voice.sharing === null)
+                          .filter((voice) => voice.sharing === null)
                           .map((voice) => (
                             <SelectItem
                               key={voice.voice_id}
@@ -242,7 +296,10 @@ const MakeSpeech = () => {
                               <div className="flex flex-row items-center justify-start gap-1 ml-2">
                                 <FaPlay className="mr-3" size={12} />
                                 <p className="tracking-wide">{voice.name}</p>
-                                <PiFlaskFill className="text-gray-600 mr-2" size={16} />
+                                <PiFlaskFill
+                                  className="text-gray-600 mr-2"
+                                  size={16}
+                                />
                                 {voice.labels.age && (
                                   <div className="bg-pink-200 text-tiny text-foreground-500 px-3 py-1 pt-0 rounded-full">
                                     {voice.labels.age} {voice.labels.gender}
@@ -279,21 +336,243 @@ const MakeSpeech = () => {
                       </SelectSection>
                     </Select>
                   )}
-                  <Select
-                    label="Voice Settings"
-                    labelPlacement="outside"
-                    selectedKeys={["elevenlabs"]}
-                    className="text-black mb-4"
-                    variant="bordered"
-                  >
-                    <SelectItem
-                      key="elevenlabs"
-                      textValue="Voice Settings"
-                      className="text-black"
+
+                  <Accordion variant="bordered" isCompact>
+                    <AccordionItem
+                      key="1"
+                      aria-label="Accordion 1"
+                      title={
+                        <p className="text-sm text-foreground-500">
+                          Voice Settings
+                        </p>
+                      }
                     >
-                      Voice Settings
-                    </SelectItem>
-                  </Select>
+                      <Divider />
+                      <Slider
+                        size="sm"
+                        label="Stability"
+                        color="foreground"
+                        showTooltip={true}
+                        step={0.01}
+                        maxValue={1}
+                        minValue={0}
+                        formatOptions={{ style: "percent" }}
+                        aria-label="Stability"
+                        value={stabilityValue}
+                        onChange={setStabilityValue}
+
+                        className="w-full px-3 mt-4"
+                        tooltipProps={{
+                          color: stabilityValue < 0.3 ? "danger" : "foreground",
+                          content: <p>{(stabilityValue * 100).toFixed(0)}% {stabilityValue < 0.3 ? "Unstable" : ""}</p>
+                        }}
+                        renderThumb={(props) => (
+                          <div
+                            {...props}
+                            className="group p-1 top-1/2 bg-background border-small border-default-200 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+                          >
+                            <span className="transition-transform dark:bg-white bg-black rounded-full w-1 h-3 block group-data-[dragging=true]:scale-80" />
+                          </div>
+                        )}
+                      />
+                      <div className="flex flex-row justify-between mt-1 px-3 mb-6">
+                        <div className="flex flex-row items-center justify-center">
+                          <p className="text-tiny text-foreground-500 mr-2">
+                            More variable
+                          </p>
+                          <Tooltip
+                            className={`${
+                              isDarkMode ? "light" : "dark"
+                            } max-w-[16rem]`}
+                            content={
+                              <p className="text-foreground">
+                                Increasing variability can make speech more
+                                expressive with output varying between
+                                re-generations. It can also lead to
+                                instabilities.
+                              </p>
+                            }
+                          >
+                            <div>
+                              <FaCircleInfo size={12} />
+                            </div>
+                          </Tooltip>
+                        </div>
+                        <div className="flex flex-row items-center justify-center">
+                          <p className="text-tiny text-foreground-500 mr-2">
+                            More Stable
+                          </p>
+                          <Tooltip
+                            className={`${
+                              isDarkMode ? "light" : "dark"
+                            } max-w-[16rem]`}
+                            content={
+                              <p className="text-foreground">
+                                Increasing stability will make the voice more
+                                consistent between re-generations, but it can
+                                also make it sounds a bit monotone. On longer
+                                text fragments we recommend lowering this value.
+                              </p>
+                            }
+                          >
+                            <div>
+                              <FaCircleInfo size={12} />
+                            </div>
+                          </Tooltip>
+                        </div>
+                      </div>
+
+                      <Slider
+                        size="sm"
+                        label="Clarity + Similarity Enhancement"
+                        color="foreground"
+                        showTooltip={true}
+                        step={0.01}
+                        maxValue={1}
+                        minValue={0}
+                        formatOptions={{ style: "percent" }}
+                        aria-label="Clarity + Similarity Enhancement"
+                        value={similarityValue}
+                        onChange={setSimilarityValue}
+                        className="w-full px-3"
+                        renderThumb={(props) => (
+                          <div
+                            {...props}
+                            className="group p-1 top-1/2 bg-background border-small border-default-200 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+                          >
+                            <span className="transition-transform dark:bg-white bg-black rounded-full w-1 h-3 block group-data-[dragging=true]:scale-80" />
+                          </div>
+                        )}
+                      />
+                      <div className="flex flex-row justify-between mt-1 px-3 mb-6">
+                        <div className="flex flex-row items-center justify-center">
+                          <p className="text-tiny text-foreground-500 mr-2">
+                            Low
+                          </p>
+                          <Tooltip
+                            className={`${
+                              isDarkMode ? "light" : "dark"
+                            } max-w-[16rem]`}
+                            content={
+                              <p className="text-foreground">
+                                Low values are recommended if background
+                                artifacts are present in generated speech.
+                              </p>
+                            }
+                          >
+                            <div>
+                              <FaCircleInfo size={12} />
+                            </div>
+                          </Tooltip>
+                        </div>
+                        <div className="flex flex-row items-center justify-center">
+                          <p className="text-tiny text-foreground-500 mr-2">
+                            High
+                          </p>
+                          <Tooltip
+                            className={`${
+                              isDarkMode ? "light" : "dark"
+                            } max-w-[16rem]`}
+                            content={
+                              <p className="text-foreground">
+                                High enhancement boosts overall voice clarity
+                                and target speaker similarity. Very high values
+                                can cause artifacts, so adjusting this setting
+                                to find the optimal value is encouraged.
+                              </p>
+                            }
+                          >
+                            <div>
+                              <FaCircleInfo size={12} />
+                            </div>
+                          </Tooltip>
+                        </div>
+                      </div>
+
+                      <Slider
+                        size="sm"
+                        label="Style Exaggeration"
+                        color="foreground"
+                        showTooltip={true}
+                        step={0.01}
+                        maxValue={1}
+                        minValue={0}
+                        formatOptions={{ style: "percent" }}
+                        aria-label="Style Exaggeration"
+                        className="w-full px-3"
+                        value={styleValue}
+                        onChange={setStyleValue}
+                        tooltipProps={{
+                          color: styleValue > 0.5 ? "danger" : "foreground",
+                          content: <p>{(styleValue * 100).toFixed(0)}% {styleValue > 0.5 ? "Unstable" : ""}</p>
+                        }}
+                        renderThumb={(props) => (
+                          <div
+                            {...props}
+                            className="group p-1 top-1/2 bg-background border-small border-default-200 dark:border-default-400/50 shadow-medium rounded-full cursor-grab data-[dragging=true]:cursor-grabbing"
+                          >
+                            <span className="transition-transform dark:bg-white bg-black rounded-full w-1 h-3 block group-data-[dragging=true]:scale-80" />
+                          </div>
+                        )}
+                      />
+                      <div className="flex flex-row justify-between mt-1 px-3 mb-6">
+                        <div className="flex flex-row items-center justify-center">
+                          <p className="text-tiny text-foreground-500 mr-2">
+                            None (Fastest)
+                          </p>
+                        </div>
+                        <div className="flex flex-row items-center justify-center">
+                          <p className="text-tiny text-foreground-500 mr-2">
+                            Exaggerated
+                          </p>
+                          <Tooltip
+                            className={`${
+                              isDarkMode ? "light" : "dark"
+                            } max-w-[16rem]`}
+                            content={
+                              <p className="text-foreground">
+                                High values are recommended if the style of the
+                                speech should be exaggerated compared to the
+                                uploaded audio. Higher values can lead to more
+                                instability in the generated speech. Setting
+                                this to 0.0 will greatly increase generation
+                                speed and is the default setting.
+                              </p>
+                            }
+                          >
+                            <div>
+                              <FaCircleInfo size={12} />
+                            </div>
+                          </Tooltip>
+                        </div>
+                      </div>
+                      <div className="flex flex-row items-center justify-start px-3 mb-6">
+                        <Checkbox color="default" isSelected={speakerBoost} onValueChange={setSpeakerBoost} size="sm">
+                          Speaker Boost
+                        </Checkbox>
+                        <Tooltip
+                          className={`${
+                            isDarkMode ? "light" : "dark"
+                          } max-w-[16rem]`}
+                          content={
+                            <p className="text-foreground">
+                              Boost the similarity of the synthesized speech and
+                              the voice at the cost of some generation speed.
+                            </p>
+                          }
+                        >
+                          <div>
+                            <FaCircleInfo size={12} className="ml-2" />
+                          </div>
+                        </Tooltip>
+                      </div>
+                      <div className="px-3 mb-6">
+                        <Button size="sm" onPress={resetToDefault}>Reset To Default</Button>
+                      </div>
+                    </AccordionItem>
+                  </Accordion>
+                  <div className="mb-4"></div>
+
                   <Select
                     label="Model"
                     labelPlacement="outside"
@@ -313,13 +592,14 @@ const MakeSpeech = () => {
                 </div>
               </div>
               <Divider />
-              <div className="flex flex-row py-4 px-8 gap-2">
+              <div className="flex flex-row py-4 px-8">
                 <div className="w-40 flex font-medium">Text</div>
-                <div className="border border-foreground-400 p-2 rounded-lg flex-grow">
+                <div className="border border-foreground-400 p-2 rounded-lg flex-grow ml-3">
                   <textarea
                     value={inputText}
                     onChange={handleTextInputChange}
-                    className="w-full h-32 resize-none bg-transparent outline-none text-foreground"
+                    className="w-full h-32 resize-none bg-transparent outline-none text-foreground text-sm"
+                    placeholder="Enter text to convert to speech... (in any of our supported languages!)"
                   />
                 </div>
               </div>

@@ -50,7 +50,7 @@ const AppShell = ({ children }) => {
             />
             <h1 className="text-foreground font-bold text-lg">Sqribe</h1>
           </Link>
-          <div className="flex space-x-10">
+          <div className="flex flex-1 max-w-2xl justify-evenly">
             <Link
               href="/dashboard"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"

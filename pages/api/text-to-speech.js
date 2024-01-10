@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { text, voiceId } = req.body;
+  const { text, voiceId, stabilityValue, similarityValue, styleValue, speakerBoostValue } = req.body;
 
   if (!text) {
     return res.status(400).json({ error: "Missing 'text' parameter" });
@@ -32,7 +32,10 @@ export default async function handler(req, res) {
       textInput: text,
       responseType: "stream",
       modelId: "eleven_multilingual_v2",
-      speakerBoost: true,
+      stability: stabilityValue,
+      similarityBoost: similarityValue,
+      style: styleValue,
+      speakerBoost: speakerBoostValue,
     });
 
     response.on("data", (chunk) => chunks.push(chunk));
