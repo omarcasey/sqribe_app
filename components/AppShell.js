@@ -30,7 +30,7 @@ const AppShell = ({ children }) => {
     } catch (e) {
       console.error("Error updating darkMode: ", e);
     }
-  }
+  };
 
   return (
     <div
@@ -81,7 +81,8 @@ const AppShell = ({ children }) => {
               href="/makespeech"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
-              <SiAudiomack size={20}
+              <SiAudiomack
+                size={20}
                 className={`mr-2 ${
                   router.pathname === "/makespeech" ? "text-cyan-300" : ""
                 }`}
@@ -125,6 +126,9 @@ const AppShell = ({ children }) => {
         </div>
       </nav>
       <main className="flex flex-1 bg-default-100">{children}</main>
+      <div className={`fixed bottom-0 left-0 w-full ${isDarkMode ? 'bg-black' : 'bg-white'} bg-opacity-50 h-[6.7rem] backdrop-filter backdrop-blur-sm`}>
+        {/* Content for the semi-transparent bar */}
+      </div>
     </div>
   );
 };
