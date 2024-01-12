@@ -201,11 +201,32 @@ const AppShell = ({ children }) => {
         </div>
       </nav>
       <main className="flex flex-1 bg-default-100">{children}</main>
-      {audioPlayerVisible && audioFile && (
+      {audioFile && (
+        <div
+          className={`fixed bottom-0 right-0 z-50 w-10 h-10 mr-6 mb-4 rounded-full ${
+            isDarkMode ? "bg-white" : "bg-black"
+          } bg-opacity-80 backdrop-filter backdrop-blur-sm hover:cursor-pointer hover:bg-opacity-100 ${
+            audioPlayerVisible ? "hidden" : "visible"
+          } transition-all}`}
+        >
+          <div className="w-full h-full flex items-center justify-center">
+            <BsChevronDown
+              className="text-foreground-50 hover:cursor-pointer rotate-180"
+              size={20}
+              onClick={() => {
+                dispatch(setAudioPlayerVisible(true));
+              }}
+            />
+          </div>
+        </div>
+      )}
+      {audioFile && (
         <div
           className={`fixed bottom-0 left-0 z-50 w-full ${
             isDarkMode ? "bg-black" : "bg-white"
-          } bg-opacity-50 h-[6.7rem] backdrop-filter backdrop-blur-sm`}
+          } bg-opacity-50 h-[6.7rem] backdrop-filter backdrop-blur-sm ${
+            audioPlayerVisible ? "visible" : "hidden"
+          } transition-all}`}
         >
           <div className="w-full h-full flex items-center px-6">
             {isPlaying ? (

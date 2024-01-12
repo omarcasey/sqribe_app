@@ -77,8 +77,6 @@ const userSlice = createSlice({
     projectsLoading: "idle",
     error: null,
     audio: { audioPlayerVisible: false, audioFile: null, autoPlay: false },
-    audioPlayerVisible: false, // New state to track if audio player should be visible
-    audioFile: null, // New state to track the audio file
   },
   reducers: {
     setUserData: (state, action) => {

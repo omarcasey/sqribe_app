@@ -35,8 +35,9 @@ import AppShell from "@/components/AppShell";
 import { FaCheckCircle, FaPlay } from "react-icons/fa";
 import { getVoices } from "@/helpers/voices";
 import { PiFlaskFill } from "react-icons/pi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
+import { setAudioFile, setAudioPlayerVisible, setAutoPlay } from "@/reducers/userSlice";
 
 const MakeSpeech = () => {
   const uid = useSelector((state) => state.user.auth.uid);
@@ -50,6 +51,7 @@ const MakeSpeech = () => {
   const [styleValue, setStyleValue] = useState(0);
   const [similarityValue, setSimilarityValue] = useState(0.75);
   const [speakerBoost, setSpeakerBoost] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchVoices = async () => {
@@ -126,6 +128,17 @@ const MakeSpeech = () => {
           user: uid,
         });
         console.log("Document written with ID: ", docRef.id);
+        await dispatch(setAutoPlay(true)),
+        dispatch(
+          setAudioFile({
+            text: inputText,
+            voice: voiceName,
+            date: Timestamp.fromDate(new Date()),
+            fileURL: result.audioUrl,
+            user: uid,
+          })
+        );
+        dispatch(setAudioPlayerVisible(true))
       } catch (e) {
         console.error("Error adding document: ", e);
       }
@@ -231,7 +244,6 @@ const MakeSpeech = () => {
                               className="text-black"
                               value={voice.voice_id}
                               textValue={voice.name}
-                              
                             >
                               <div className="flex flex-row items-center justify-start gap-1 ml-2">
                                 <button
