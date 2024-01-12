@@ -31,12 +31,14 @@ import { useState, useEffect, useRef } from "react";
 import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
 import { MdDownloadForOffline } from "react-icons/md";
 import { query, where } from "firebase/firestore";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 var JSZip = require("jszip");
+import { fetchAudioFile, setAudioPlayerVisible, setAutoPlay } from "@/reducers/userSlice";
 
 const History = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const uid = useSelector((state) => state.user.auth.uid);
   const isDarkMode = useSelector((state) => state.user.data.darkMode);
   const [audioFiles, setAudioFiles] = useState([]);
@@ -78,15 +80,10 @@ const History = () => {
     };
   }, []);
 
-  const audioRefs = useRef([]);
 
   const handlePlay = (index) => {
-    const audio = audioRefs.current[index];
-    if (audio.paused) {
-      audio.play();
-    } else {
-      audio.pause();
-    }
+    dispatch(setAudioPlayerVisible(true)); // Set the audio player visibility to true
+    console.log("audio player visible");
   };
 
   const handleDownload = (fileURL) => {
@@ -234,7 +231,11 @@ const History = () => {
                       <Button
                         className="px-unit-0 h-auto min-w-0 rounded-full"
                         variant="light"
-                        onClick={() => handlePlay(index)}
+                        onClick={async () => (
+                          await dispatch(setAutoPlay(true)),
+                          dispatch(fetchAudioFile(audioFile.id)),
+                          dispatch(setAudioPlayerVisible(true))
+                        )}
                       >
                         <FaCirclePlay className="text-blue-500" size={27} />
                       </Button>
@@ -249,10 +250,6 @@ const History = () => {
                         />
                       </Button>
                     </div>
-                    <audio
-                      ref={(ref) => (audioRefs.current[index] = ref)}
-                      src={audioFile.fileURL}
-                    />
                   </TableCell>
                 </TableRow>
               ))}

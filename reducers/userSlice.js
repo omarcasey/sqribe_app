@@ -1,6 +1,13 @@
 // userSlice.js
 import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebase";
 
 // Async thunk for fetching user data
@@ -33,8 +40,23 @@ export const fetchUserProjects = createAsyncThunk(
       id: doc.id,
       ...doc.data(),
     }));
-    
+
     return projectsData;
+  }
+);
+
+// Async thunk for fetching audio file data
+export const fetchAudioFile = createAsyncThunk(
+  "user/fetchAudioFile",
+  async (audioFileId) => {
+    const audioFileRef = doc(db, "audio files", audioFileId);
+    const snapshot = await getDoc(audioFileRef);
+
+    if (snapshot.exists()) {
+      return snapshot.data();
+    } else {
+      throw new Error("Audio file not found");
+    }
   }
 );
 
@@ -54,6 +76,9 @@ const userSlice = createSlice({
     userLoading: "idle",
     projectsLoading: "idle",
     error: null,
+    audio: { audioPlayerVisible: false, audioFile: null, autoPlay: false },
+    audioPlayerVisible: false, // New state to track if audio player should be visible
+    audioFile: null, // New state to track the audio file
   },
   reducers: {
     setUserData: (state, action) => {
@@ -68,6 +93,15 @@ const userSlice = createSlice({
     setAuthLoading: (state, action) => {
       state.authLoading = action.payload;
     },
+    setAudioPlayerVisible: (state, action) => {
+      state.audio.audioPlayerVisible = action.payload;
+    }, // New reducer to update audio player visibility
+    setAudioFile: (state, action) => {
+      state.audio.audioFile = action.payload;
+    }, // New reducer to update audio file
+    setAutoPlay: (state, action) => {
+      state.audio.autoPlay = action.payload;
+    }, // New reducer to update auto play
   },
   extraReducers: (builder) => {
     builder
@@ -93,6 +127,17 @@ const userSlice = createSlice({
         state.projectsLoading = "failed";
         state.error = action.error.message;
       })
+      .addCase(fetchAudioFile.pending, (state) => {
+        state.audioLoading = "loading";
+      })
+      .addCase(fetchAudioFile.fulfilled, (state, action) => {
+        state.audioLoading = "succeeded";
+        state.audio.audioFile = action.payload;
+      })
+      .addCase(fetchAudioFile.rejected, (state, action) => {
+        state.audioLoading = "failed";
+        state.error = action.error.message;
+      })
       // Add a case to handle clearing user data
       .addCase(clearUserData.fulfilled, (state, action) => {
         state.auth = null;
@@ -101,9 +146,17 @@ const userSlice = createSlice({
         state.userLoading = "idle";
         state.projectsLoading = "idle";
         state.authLoading = true;
+        state.audio = null;
       });
   },
 });
 
-export const { setUserData, setAuthData, setAuthLoading } = userSlice.actions;
+export const {
+  setUserData,
+  setAuthData,
+  setAuthLoading,
+  setAudioPlayerVisible,
+  setAudioFile,
+  setAutoPlay,
+} = userSlice.actions;
 export default userSlice.reducer;
