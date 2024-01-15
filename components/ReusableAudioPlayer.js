@@ -116,9 +116,9 @@ const ReusableAudioPlayer = ({ audioUrl, name, filename }) => {
                   thumb: "w-2 h-2 after:w-2 after:h-2 after:bg-foreground",
                 }}
                 color="foreground"
-                defaultValue={0}
+                value={currentTime ? (currentTime / duration) * 100 : 0}
                 size="sm"
-                onChangeEnd={moveAudio}
+                onChange={moveAudio}
               />
               <div className="flex justify-between">
                 <p className="text-small">{formatTime(currentTime)}</p>

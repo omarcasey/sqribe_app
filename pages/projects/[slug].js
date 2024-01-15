@@ -34,6 +34,15 @@ const Page = () => {
   const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  function formatTime(time) {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = (time % 60).toFixed(3).padStart(6, "0");
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds}`;
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       const slug = router.query.slug;
@@ -140,25 +149,48 @@ const Page = () => {
               </div>
             </div>
             <div className="w-full mt-4">
-              <p className="text-center text-foreground-400">
-                00:00:00,008 — 00:00:47,500
-              </p>
-            </div>
-            <div className="flex px-6 gap-x-12 mt-4">
-              <div className="w-1/2">
-                <p className="text-foreground-600">
-                  {project?.transcription?.transcript}
-                </p>
-              </div>
-              <div className="w-1/2">
-                <p
-                  className={`text-foreground-600 ${
-                    project.translationLanguage === "Arabic" ? "text-end" : ""
-                  }`}
-                >
-                  {project?.translation?.text}
-                </p>
-              </div>
+              {project?.transcription?.words
+                .reduce((sentences, word, index) => {
+                  if (
+                    index === 0 ||
+                    word.start_time - sentences[sentences.length - 1].end_time >
+                      0.1
+                  ) {
+                    // Start a new sentence if it's the first word or there's a pause of more than 0.1s
+                    sentences.push({
+                      sentence: [word.word],
+                      start_time: word.start_time,
+                      end_time: word.end_time,
+                    });
+                  } else {
+                    // Add the word to the current sentence
+                    sentences[sentences.length - 1].sentence.push(word.word);
+                    sentences[sentences.length - 1].end_time = word.end_time;
+                  }
+                  return sentences;
+                }, [])
+                .map((sentence, index) => (
+                  <>
+                    <p className="w-full text-center text-foreground-400">
+                      {formatTime(sentence.start_time)} —{" "}
+                      {formatTime(sentence.end_time)}
+                    </p>
+                    <div className="flex flex-row px-6 gap-x-12 mt-4">
+                      <p key={index} className="w-1/2 text-foreground-600">
+                        {sentence.sentence.join(" ")}
+                      </p>
+                      <p
+                        className={`w-1/2 text-foreground-600 ${
+                          project.translationLanguage === "Arabic"
+                            ? "text-end"
+                            : ""
+                        }`}
+                      >
+                        {project?.translation?.text}
+                      </p>
+                    </div>
+                  </>
+                ))}
             </div>
           </div>
           <div className="w-1/3 flex flex-col border-l border-neutral-600">

@@ -1,5 +1,5 @@
 import { uploadString, ref, getDownloadURL } from "firebase/storage";
-const ElevenLabs = require("elevenlabs-node");
+import ElevenLabs from "elevenlabs-node";
 import { storage } from "@/firebase";
 import { Buffer } from "buffer";
 

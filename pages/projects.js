@@ -130,6 +130,10 @@ const Projects = ({ openModal }) => {
     settranslationLanguage(e.target.value);
   };
 
+
+  const handleUploadNew = async () => {
+    
+  }
   const handleUpload = async () => {
     try {
       setisUploading(true);
