@@ -1,7 +1,7 @@
 import AppShell from "@/components/AppShell";
 import withAuth from "@/components/withAuth";
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Card,
   CardHeader,
@@ -23,11 +23,32 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { IoSparkles } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
 import { useRouter } from "next/router";
+import {
+  collection,
+  limit,
+  onSnapshot,
+  orderBy,
+  where,
+  query,
+} from "firebase/firestore";
+import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
+import { MdDownloadForOffline } from "react-icons/md";
+import { db } from "@/firebase";
+import {
+  fetchAudioFile,
+  setAudioPlayerVisible,
+  setAutoPlay,
+} from "@/reducers/userSlice";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
   const router = useRouter();
   const userData = useSelector((state) => state.user.data);
+  const dispatch = useDispatch();
+  const uid = useSelector((state) => state.user.auth.uid);
+  const projects = useSelector((state) => state.user.projects);
+  const [audioFiles, setAudioFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const data = {
     labels: ["Used Credits", "Remaining Credits"],
@@ -64,6 +85,34 @@ const Dashboard = () => {
     },
   };
 
+  useEffect(() => {
+    // Fetch audio files and set up real-time listener
+    const audioFilesCollectionRef = collection(db, "audio files");
+    const audioFilesQuery = query(
+      audioFilesCollectionRef,
+      where("user", "==", uid),
+      orderBy("date", "desc"), // Order the files by date in descending order
+      limit(4) // Limit the query to 4 documents
+    );
+    const unsubscribe = onSnapshot(audioFilesQuery, (querySnapshot) => {
+      const updatedAudioFiles = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        voice: doc.data().voice,
+        date: doc.data().date.toDate().toLocaleString(), // Convert timestamp to readable format
+        text: doc.data().text,
+        fileURL: doc.data().fileURL,
+      }));
+
+      setAudioFiles(updatedAudioFiles);
+      setLoading(false);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   return (
     <AppShell>
       <div className="w-full px-4 sm:px-10">
@@ -71,24 +120,22 @@ const Dashboard = () => {
           <div className="flex w-full gap-4">
             <div className="w-2/3 space-y-2">
               <h1 className="text-2xl mb-4">Recent Projects</h1>
-              <Card className="p-4 w-full">
-                <div className="flex justify-between">
+              {projects?.slice(0, 2).map((project, index) => (
+                <Card
+                  key={index}
+                  className="p-4 w-full flex flex-row items-center justify-between hover:bg-default-200"
+                  isPressable
+                  onPress={() => router.push(`/projects/${project.id}`)}
+                >
                   <div className="flex flex-col">
-                    <p className="text-md">Drake Snippet</p>
-                    <p className="text-small text-default-500">nextui.org</p>
+                    <p className="text-md text-left">{project.projectName}</p>
+                    <p className="text-small text-default-500">
+                      {project.date.toDate().toLocaleString()}
+                    </p>
                   </div>
                   <Spinner />
-                </div>
-              </Card>
-              <Card className="p-4 w-full">
-                <div className="flex justify-between">
-                  <div className="flex flex-col">
-                    <p className="text-md">Drake Snippet</p>
-                    <p className="text-small text-default-500">nextui.org</p>
-                  </div>
-                  <Spinner />
-                </div>
-              </Card>
+                </Card>
+              ))}
             </div>
             <div className="w-1/3">
               <h1 className="text-2xl mb-[18px]">New Features</h1>
@@ -106,42 +153,62 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="flex flex-col mt-4 w-full">
-            <h1 className="text-2xl mb-4">All Projects</h1>
+            <h1 className="text-2xl mb-4">Recent Samples</h1>
             <Table aria-label="Example static collection table">
               <TableHeader>
-                <TableColumn>PROJECT NAME</TableColumn>
-                <TableColumn>DATE CREATED</TableColumn>
-                <TableColumn>STATUS</TableColumn>
+                <TableColumn className="font-bold">Voice</TableColumn>
+                <TableColumn className="font-bold">Date</TableColumn>
+                <TableColumn className="font-bold">Status</TableColumn>
+                <TableColumn className="font-bold">Text</TableColumn>
+                <TableColumn className="font-bold">Actions</TableColumn>
               </TableHeader>
               <TableBody>
-                <TableRow key="1">
-                  <TableCell>Drake Snippet</TableCell>
-                  <TableCell>12/19/2023</TableCell>
-                  <TableCell>
-                    <Chip color="primary">Ready</Chip>
-                  </TableCell>
-                </TableRow>
-                <TableRow key="2">
-                  <TableCell>Pipe Down</TableCell>
-                  <TableCell>12/19/2023</TableCell>
-                  <TableCell>
-                    <Chip color="warning">Processing</Chip>
-                  </TableCell>
-                </TableRow>
-                <TableRow key="3">
-                  <TableCell>long speech</TableCell>
-                  <TableCell>12/19/2023</TableCell>
-                  <TableCell>
-                    <Chip color="primary">Ready</Chip>
-                  </TableCell>
-                </TableRow>
-                <TableRow key="4">
-                  <TableCell>ongah</TableCell>
-                  <TableCell>12/19/2023</TableCell>
-                  <TableCell>
-                    <Chip color="primary">Ready</Chip>
-                  </TableCell>
-                </TableRow>
+                {audioFiles.map((audioFile, index) => (
+                  <TableRow key={audioFile.id}>
+                    <TableCell>
+                      <div className="flex flex-row items-center justify-between">
+                        <p className="mr-2 w-28">{audioFile.voice}</p>
+                        <FaCircleInfo
+                          className="text-foreground-700 ml-2"
+                          size={12}
+                          onClick={() => console.log(audioFiles)}
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell>{audioFile.date}</TableCell>
+                    <TableCell>
+                      <Chip color="success" className="bg-green-200 text-tiny">
+                        Generated
+                      </Chip>
+                    </TableCell>
+                    <TableCell>{audioFile.text}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-row gap-2 items-center justify-center">
+                        <Button
+                          className="px-unit-0 h-auto min-w-0 rounded-full"
+                          variant="light"
+                          onClick={async () => (
+                            await dispatch(setAutoPlay(true)),
+                            dispatch(fetchAudioFile(audioFile.id)),
+                            dispatch(setAudioPlayerVisible(true))
+                          )}
+                        >
+                          <FaCirclePlay className="text-blue-500" size={27} />
+                        </Button>
+                        <Button
+                          className="px-unit-0 h-auto min-w-0 rounded-full"
+                          variant="light"
+                          onClick={() => handleDownload(audioFile.fileURL)}
+                        >
+                          <MdDownloadForOffline
+                            className="text-blue-900 dark:text-foreground-800 -m-[2px]"
+                            size={33}
+                          />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

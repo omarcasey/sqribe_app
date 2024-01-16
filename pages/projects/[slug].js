@@ -82,9 +82,9 @@ const Page = () => {
     >
       <div className="w-full flex justify-between px-5 border-b-1 border-neutral-600 py-4 dark:bg-neutral-900 bg-white">
         <div className="flex items-center justify-center text-foreground">
-          <Link href="/projects">
-            <IoIosArrowBack size={25} className="mr-3" />
-          </Link>
+          <div className="hover:cursor-pointer mr-3" onClick={() => router.back()}>
+            <IoIosArrowBack size={25} className="" />
+          </div>
           <p className="font-medium">{project.projectName}</p>
         </div>
         <div className="flex item justify-center gap-4">

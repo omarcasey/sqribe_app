@@ -51,7 +51,7 @@ const Navbar = () => {
 
   return (
     <header
-      className={`py-4 sm:py-6 border-b-2 border-gray-800 z-[100] sticky top-0 bg-opacity-0 backdrop-blur-md transition-all duration-300 ${
+      className={`py-4 sm:py-3 border-b-2 border-gray-800 z-[100] sticky top-0 bg-opacity-0 backdrop-blur-md transition-all duration-300 ${
         scrolling ? "bg-black" : ""
       }`}
     >
@@ -66,7 +66,7 @@ const Navbar = () => {
                 width={1024}
                 height={1024}
               />
-              <h1 className="text-white font-bold text-xl tracking-widest">
+              <h1 className="text-black font-extrabold text-3xl">
                 Sqribe
               </h1>
             </Link>

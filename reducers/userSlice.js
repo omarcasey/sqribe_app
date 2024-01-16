@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -32,12 +33,14 @@ export const fetchUserProjects = createAsyncThunk(
     const projectsCollection = collection(db, "projects");
     const userProjectsQuery = query(
       projectsCollection,
-      where("user", "==", uid)
+      where("user", "==", uid),
+      orderBy("date", "desc")
     );
 
     const projectsSnapshot = await getDocs(userProjectsQuery);
     const projectsData = projectsSnapshot.docs.map((doc) => ({
       id: doc.id,
+      date: doc.data().date.toDate().toLocaleString(),
       ...doc.data(),
     }));
 

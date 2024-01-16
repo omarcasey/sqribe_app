@@ -2,7 +2,24 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Button, Spinner, Switch, Slider } from "@nextui-org/react";
+import {
+  Button,
+  Spinner,
+  Switch,
+  Slider,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Input,
+  Listbox,
+  ListboxItem,
+  cn,
+  ListboxSection,
+  Kbd,
+} from "@nextui-org/react";
 import Image from "next/image";
 import { RiLayoutMasonryFill } from "react-icons/ri";
 import { SiAudiomack } from "react-icons/si";
@@ -31,6 +48,7 @@ const AppShell = ({ children }) => {
   const audioFile = useSelector((state) => state.user.audio.audioFile);
   const autoPlay = useSelector((state) => state.user.audio.autoPlay);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -48,6 +66,18 @@ const AppShell = ({ children }) => {
       };
     }
   }, [audioElement]);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.key === "k") {
+      // Prevent the default action
+      event.preventDefault();
+
+      // User pressed Ctrl+K
+      console.log("Ctrl+K pressedttt");
+      // Add your code here to handle the Ctrl+K key combination
+      onOpen();
+    }
+  });
 
   const handleAudioPause = () => {
     setIsPlaying(false);
@@ -123,7 +153,9 @@ const AppShell = ({ children }) => {
               width={1024}
               height={1024}
             />
-            <h1 className="text-foreground font-bold text-lg">Sqribe</h1>
+            <h1 className="text-foreground font-extrabold text-2xl tracking-tight">
+              Sqribe
+            </h1>
           </Link>
           <div className="flex flex-1 max-w-2xl justify-evenly">
             <Link
@@ -329,6 +361,173 @@ const AppShell = ({ children }) => {
           {/* Content for the semi-transparent bar */}
         </div>
       )}
+      <Modal
+        size="2xl"
+        isOpen={isOpen}
+        onClose={onClose}
+        className={`${
+          isDarkMode ? "dark bg-black border border-foreground-200" : "light"
+        } text-foreground max-h-[30rem]`}
+        hideCloseButton
+        scrollBehavior="normal"
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="py-0 px-0 flex flex-col">
+                <div className="border border-foreground-300 text-foreground-500 rounded-md flex items-center justify-center px-2 pb-[2px] text-tiny w-12 ml-3 mt-4">Home</div>
+                <Input
+                  className=""
+                  variant="underlined"
+                  placeholder="What do you need?"
+                  classNames={{
+                    input: ["bg-transparent", "px-3", "text-lg font-medium"],
+                  }}
+                  autoFocus
+                />
+              </ModalHeader>
+              <ModalBody className="px-0 py-0 pt-2 overflow-y-scroll">
+                <Listbox
+                  className="w-full"
+                  variant="faded"
+                  aria-label="Listbox menu with icons"
+                >
+                  <ListboxSection
+                    title="Projects"
+                    classNames={{ heading: "px-4 text-sm" }}
+                  >
+                    <ListboxItem key="new" startContent={<BsChevronDown />}>
+                      New file
+                    </ListboxItem>
+                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
+                      Copy link
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Speech Synthesis"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem
+                      key="edit"
+                      showDivider
+                      startContent={<BsChevronDown />}
+                      classNames={{ base: "font-bold" }}
+                    >
+                      Edit file
+                    </ListboxItem>
+                    <ListboxItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      startContent={<BsChevronDown className={"text-danger"} />}
+                    >
+                      Delete file
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Projects"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem key="new" startContent={<BsChevronDown />}>
+                      New file
+                    </ListboxItem>
+                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
+                      Copy link
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Speech Synthesis"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem
+                      key="edit"
+                      showDivider
+                      startContent={<BsChevronDown />}
+                      classNames={{ base: "font-bold" }}
+                    >
+                      Edit file
+                    </ListboxItem>
+                    <ListboxItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      startContent={<BsChevronDown className={"text-danger"} />}
+                    >
+                      Delete file
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Projects"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem key="new" startContent={<BsChevronDown />}>
+                      New file
+                    </ListboxItem>
+                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
+                      Copy link
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Speech Synthesis"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem
+                      key="edit"
+                      showDivider
+                      startContent={<BsChevronDown />}
+                      classNames={{ base: "font-bold" }}
+                    >
+                      Edit file
+                    </ListboxItem>
+                    <ListboxItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      startContent={<BsChevronDown className={"text-danger"} />}
+                    >
+                      Delete file
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Projects"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem key="new" startContent={<BsChevronDown />}>
+                      New file
+                    </ListboxItem>
+                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
+                      Copy link
+                    </ListboxItem>
+                  </ListboxSection>
+                  <ListboxSection
+                    title="Speech Synthesis"
+                    classNames={{ heading: "px-4 text-sm font-medium" }}
+                  >
+                    <ListboxItem
+                      key="edit"
+                      showDivider
+                      startContent={<BsChevronDown />}
+                      classNames={{ base: "font-bold" }}
+                    >
+                      Edit file
+                    </ListboxItem>
+                    <ListboxItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      startContent={<BsChevronDown className={"text-danger"} />}
+                    >
+                      Delete file
+                    </ListboxItem>
+                  </ListboxSection>
+                  
+                </Listbox>
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

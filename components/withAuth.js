@@ -6,7 +6,7 @@ import {
   clearUserData,
   fetchUserProjects,
 } from "@/reducers/userSlice";
-import { onSnapshot, doc, collection, query, where } from "firebase/firestore";
+import { onSnapshot, doc, collection, query, where, orderBy } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { Spinner } from "@nextui-org/react";
 
@@ -48,13 +48,15 @@ const withAuth = (WrappedComponent) => {
             const projectsCollection = collection(db, "projects");
             const userProjectsQuery = query(
               projectsCollection,
-              where("user", "==", currentUser.uid)
+              where("user", "==", currentUser.uid),
+              orderBy("date", "desc")
             );
             const unsubscribeUserProjects = onSnapshot(
               userProjectsQuery,
               (snapshot) => {
                 const projectsData = snapshot.docs.map((doc) => ({
                   id: doc.id,
+                  date: doc.data().date.toDate().toLocaleString(),
                   ...doc.data(),
                 }));
                 // Dispatch an action to update user projects in Redux
