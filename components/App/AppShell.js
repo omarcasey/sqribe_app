@@ -159,17 +159,17 @@ const AppShell = ({ children }) => {
           </Link>
           <div className="flex flex-1 max-w-2xl justify-evenly">
             <Link
-              href="/dashboard"
+              href="/app/dashboard"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
               <RiLayoutMasonryFill
                 className={`mr-2 ${
-                  router.pathname === "/dashboard" ? "text-cyan-300" : ""
+                  router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
                 }`}
               />
               <p
                 className={`${
-                  router.pathname === "/dashboard"
+                  router.pathname === "/app/dashboard"
                     ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
                     : ""
                 }`}
@@ -178,25 +178,25 @@ const AppShell = ({ children }) => {
               </p>
             </Link>
             <Link
-              href="/projects"
+              href="/app/projects"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
               <FaFolder className="mr-2" />
               <p className="">Projects</p>
             </Link>
             <Link
-              href="/makespeech"
+              href="/app/makespeech"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
               <SiAudiomack
                 size={20}
                 className={`mr-2 ${
-                  router.pathname === "/makespeech" ? "text-cyan-300" : ""
+                  router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
                 }`}
               />
               <p
                 className={`${
-                  router.pathname === "/makespeech"
+                  router.pathname === "/app/makespeech"
                     ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
                     : ""
                 }`}
@@ -205,7 +205,7 @@ const AppShell = ({ children }) => {
               </p>
             </Link>
             <Link
-              href="/history"
+              href="/app/history"
               className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
             >
               <FaHistory className="mr-2" />

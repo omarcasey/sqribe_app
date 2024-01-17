@@ -3,12 +3,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Card, CardBody, Image, Button, Slider } from "@nextui-org/react";
-import { HeartIcon } from "./HeartIcon";
-import { PauseCircleIcon } from "./PauseCircleIcon";
-import { NextIcon } from "./NextIcon";
-import { PreviousIcon } from "./PreviousIcon";
-import { RepeatOneIcon } from "./RepeatOneIcon";
-import { ShuffleIcon } from "./ShuffleIcon";
+import { HeartIcon } from "../Icons/HeartIcon";
+import { PauseCircleIcon } from "../Icons/PauseCircleIcon";
+import { NextIcon } from "../Icons/NextIcon";
+import { PreviousIcon } from "../Icons/PreviousIcon";
+import { RepeatOneIcon } from "../Icons/RepeatOneIcon";
+import { ShuffleIcon } from "../Icons/ShuffleIcon";
 import { FaPlayCircle  } from "react-icons/fa";
 
 const ReusableAudioPlayer = ({ audioUrl, name, filename }) => {

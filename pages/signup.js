@@ -42,7 +42,7 @@ const SignUp = () => {
       });
       console.log("Signed up and add")
 
-      router.push("/dashboard");
+      router.push("/app/dashboard");
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;

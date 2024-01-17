@@ -26,7 +26,7 @@ const SignIn = () => {
       );
 
       toast.success("Signed in successfully!");
-      router.push("/dashboard");
+      router.push("/app/dashboard");
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;

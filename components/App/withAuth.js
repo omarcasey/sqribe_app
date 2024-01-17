@@ -7,7 +7,7 @@ import {
   fetchUserProjects,
 } from "@/reducers/userSlice";
 import { onSnapshot, doc, collection, query, where, orderBy } from "firebase/firestore";
-import { db, auth } from "../firebase";
+import { db, auth } from "../../firebase";
 import { Spinner } from "@nextui-org/react";
 
 const withAuth = (WrappedComponent) => {
@@ -88,7 +88,7 @@ const withAuth = (WrappedComponent) => {
       if (loading === "idle" && authLoading === false) {
         checkAuth();
       }
-    }, [authLoading]);
+    }, [authLoading, dispatch, loading, router, user]);
 
     // Render the wrapped component if the user is authenticated and data is loaded
     return user && loading === "succeeded" ? (

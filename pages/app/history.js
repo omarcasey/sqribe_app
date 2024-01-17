@@ -1,5 +1,5 @@
-import AppShell from "@/components/AppShell";
-import withAuth from "@/components/withAuth";
+import AppShell from "@/components/App/AppShell";
+import withAuth from "@/components/App/withAuth";
 import {
   Button,
   Chip,
@@ -188,7 +188,7 @@ const History = () => {
               color="success"
               variant="ghost"
               className=" font-semibold text-sm"
-              onPress={() => router.push("/makespeech")}
+              onPress={() => router.push("/app/makespeech")}
             >
               Generate +
             </Button>

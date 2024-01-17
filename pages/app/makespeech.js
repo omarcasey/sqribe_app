@@ -30,8 +30,8 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import Link from "next/link";
-import withAuth from "@/components/withAuth";
-import AppShell from "@/components/AppShell";
+import withAuth from "@/components/App/withAuth";
+import AppShell from "@/components/App/AppShell";
 import { FaCheckCircle, FaPlay } from "react-icons/fa";
 import { getVoices } from "@/helpers/voices";
 import { PiFlaskFill } from "react-icons/pi";

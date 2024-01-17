@@ -66,7 +66,7 @@ const Navbar = () => {
                 width={1024}
                 height={1024}
               />
-              <h1 className="text-black font-extrabold text-3xl">
+              <h1 className="text-black font-extrabold text-3xl tracking-tight">
                 Sqribe
               </h1>
             </Link>
@@ -139,7 +139,7 @@ const Navbar = () => {
 
           {user ? (
             <Link
-              href="/dashboard"
+              href="/app/dashboard"
               className="relative hidden md:items-center md:justify-center md:inline-flex group"
             >
               <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>

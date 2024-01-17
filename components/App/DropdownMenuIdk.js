@@ -8,7 +8,7 @@ import {
   Button,
   User,
 } from "@nextui-org/react";
-import { PlusIcon } from "./PlusIcon.jsx";
+import { PlusIcon } from "../Icons/PlusIcon.jsx";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { auth } from "@/firebase";
 import { useDispatch, useSelector } from "react-redux";
@@ -96,7 +96,7 @@ export default function DropdownMenuIdk({ router }) {
           <DropdownItem
             key="dashboard"
             onPress={() => {
-              router.push("/dashboard");
+              router.push("/app/dashboard");
             }}
           >
             Dashboard
@@ -104,7 +104,7 @@ export default function DropdownMenuIdk({ router }) {
           <DropdownItem
             key="settings"
             onPress={() => {
-              router.push("/settings");
+              router.push("/app/settings");
             }}
           >
             Settings
@@ -113,7 +113,7 @@ export default function DropdownMenuIdk({ router }) {
             key="new_project"
             endContent={<PlusIcon className="text-large" />}
             onPress={() => {
-              router.push("/projects?openModal=true");
+              router.push("/app/projects?openModal=true");
             }}
           >
             New Project

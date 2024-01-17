@@ -1,11 +1,11 @@
 import { Inter } from 'next/font/google'
-import Navbar from '@/components/Navbar'
-import Hero from '@/components/Hero'
-import CallToAction from '@/components/CallToAction'
-import Newsletter from '@/components/Newsletter'
-import Features from '@/components/Features'
-import LifetimeDeal from '@/components/LifetimeDeal'
-import Footer from '@/components/Footer'
+import Navbar from '@/components/Marketing/Navbar'
+import Hero from '@/components/Marketing/Hero'
+import CallToAction from '@/components/Marketing/CallToAction'
+import Newsletter from '@/components/Marketing/Newsletter'
+import Features from '@/components/Marketing/Features'
+import LifetimeDeal from '@/components/Marketing/LifetimeDeal'
+import Footer from '@/components/Marketing/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 

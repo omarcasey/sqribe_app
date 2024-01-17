@@ -1,5 +1,5 @@
-import AppShell from "@/components/AppShell";
-import withAuth from "@/components/withAuth";
+import AppShell from "@/components/App/AppShell";
+import withAuth from "@/components/App/withAuth";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -125,7 +125,7 @@ const Dashboard = () => {
                   key={index}
                   className="p-4 w-full flex flex-row items-center justify-between hover:bg-default-200"
                   isPressable
-                  onPress={() => router.push(`/projects/${project.id}`)}
+                  onPress={() => router.push(`/app/projects/${project.id}`)}
                 >
                   <div className="flex flex-col">
                     <p className="text-md text-left">{project.projectName}</p>
@@ -140,7 +140,7 @@ const Dashboard = () => {
             <div className="w-1/3">
               <h1 className="text-2xl mb-[18px]">New Features</h1>
               <Button
-                onPress={() => router.push("/makespeech")}
+                onPress={() => router.push("/app/makespeech")}
                 className="bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500 w-full h-unit-18 mb-3 text-lg text-white"
               >
                 <IoSparkles />
@@ -269,7 +269,7 @@ const Dashboard = () => {
             <div className="w-[12.5%]">
               <Button
                 className="h-full w-full px-0 rounded-2xl"
-                onPress={() => router.push("/settings")}
+                onPress={() => router.push("/app/settings")}
               >
                 <Card className="p-4 w-full flex items-center justify-center">
                   <h1 className="text-xl mb-3">Settings</h1>

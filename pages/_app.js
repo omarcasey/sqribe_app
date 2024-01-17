@@ -1,7 +1,7 @@
 import { NextUIProvider } from "@nextui-org/react";
 import "@/styles/globals.css";
 import { Montserrat, Playfair_Display } from "next/font/google";
-import { AuthProvider } from "@/components/authContext";
+import { AuthProvider } from "@/components/App/authContext";
 import { Provider } from "react-redux";
 import store from "@/store";
 import { SpeedInsights } from "@vercel/speed-insights/next";

@@ -1,6 +1,6 @@
-import AppShell from '@/components/AppShell'
+import AppShell from '@/components/App/AppShell'
 import React from 'react'
-import withAuth from '@/components/withAuth'
+import withAuth from '@/components/App/withAuth'
 
 const Settings = () => {
   return (

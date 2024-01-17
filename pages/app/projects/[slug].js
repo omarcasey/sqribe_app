@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
-import ReusableAudioPlayer from "@/components/ReusableAudioPlayer";
+import ReusableAudioPlayer from "@/components/App/ReusableAudioPlayer";
 import {
   Tabs,
   Tab,
@@ -23,7 +23,7 @@ import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { getFlagCode } from "@/helpers/getFlag";
-import withAuth from "@/components/withAuth";
+import withAuth from "@/components/App/withAuth";
 import { useSelector } from "react-redux";
 
 const Page = () => {
@@ -56,7 +56,7 @@ const Page = () => {
           setProject(projectData);
         } else {
           // Redirect to the projects page if the project doesn't belong to the user
-          router.push("/projects");
+          router.push("/app/projects");
         }
       }
     };
@@ -82,7 +82,10 @@ const Page = () => {
     >
       <div className="w-full flex justify-between px-5 border-b-1 border-neutral-600 py-4 dark:bg-neutral-900 bg-white">
         <div className="flex items-center justify-center text-foreground">
-          <div className="hover:cursor-pointer mr-3" onClick={() => router.back()}>
+          <div
+            className="hover:cursor-pointer mr-3"
+            onClick={() => router.back()}
+          >
             <IoIosArrowBack size={25} className="" />
           </div>
           <p className="font-medium">{project.projectName}</p>
@@ -222,6 +225,10 @@ const Page = () => {
                   </div>
                 </Tab>
               </Tabs>
+              <div className="px-8">
+              <p className="text-foreground-400 mb-2">Summary:</p>
+              <p className="text-sm text-foreground-600">{project.summary}</p>
+              </div>
             </div>
           </div>
         </div>

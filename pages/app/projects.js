@@ -46,12 +46,12 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { NextIcon } from "@/components/NextIcon";
+import { NextIcon } from "@/components/Icons/NextIcon";
 import { getFlagCode, getTranslateCode } from "@/helpers/getFlag";
 import { languageOptions } from "@/helpers/languages";
-import withAuth from "@/components/withAuth";
-import AppShell from "@/components/AppShell";
-import { useAuth } from "@/components/authContext";
+import withAuth from "@/components/App/withAuth";
+import AppShell from "@/components/App/AppShell";
+import { useAuth } from "@/components/App/authContext";
 import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
@@ -92,6 +92,7 @@ const Projects = ({ openModal }) => {
   const [drag, setDrag] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedProject, setSelectedProject] = useState(null);
+  const [AIsummary, setAIsummary] = useState(false);
 
   const [dropdownStates, setDropdownStates] = useState(
     projects?.map(() => false) || []
@@ -130,10 +131,7 @@ const Projects = ({ openModal }) => {
     settranslationLanguage(e.target.value);
   };
 
-
-  const handleUploadNew = async () => {
-    
-  }
+  const handleUploadNew = async () => {};
   const handleUpload = async () => {
     try {
       setisUploading(true);
@@ -188,6 +186,25 @@ const Projects = ({ openModal }) => {
             const result = await response.json();
             const firstResult = result.results[0];
             console.log("Speech To Text Converted Successfully!");
+
+            let summaryResult;
+            if (AIsummary) {
+              // Call Summarize API
+              const summaryResponse = await fetch("/api/summarize", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  transcript: firstResult.transcript,
+                }),
+              });
+
+              // Get Summary Result
+              const summaryData = await summaryResponse.json();
+              summaryResult = summaryData.summary;
+              console.log("Transcript Summarized Successfully!");
+            }
 
             // Call translation API
             const translationResponse = await fetch("/api/translate-text", {
@@ -251,6 +268,7 @@ const Projects = ({ openModal }) => {
                   language: getTranslateCode(translationLanguage),
                 },
                 translatedFileURL: audioUrl,
+                summary: summaryResult || null,
               });
               console.log("Document written with ID: ", docRef.id);
               try {
@@ -274,10 +292,7 @@ const Projects = ({ openModal }) => {
             );
           }
 
-          // Reset state and close modal
-          setProjectName("");
-          setisUploading(false);
-          setUploadProgress(0);
+          // Close modal
           onClose();
         }
       );
@@ -304,8 +319,10 @@ const Projects = ({ openModal }) => {
   };
 
   const openFileInput = () => {
-    const fileInput = document.getElementById("fileInput");
-    fileInput.click();
+    if (!isUploading) {
+      const fileInput = document.getElementById("fileInput");
+      fileInput.click();
+    }
   };
 
   const handleFileSelection = (e) => {
@@ -343,7 +360,12 @@ const Projects = ({ openModal }) => {
 
   const handleModalClose = () => {
     setProjectName("");
+    setselectedFile("");
     setSelectedFileName("");
+    setisUploading(false);
+    setUploadProgress(0);
+    onClose();
+    setAIsummary(false);
   };
 
   const updateProjectName = async () => {
@@ -397,7 +419,7 @@ const Projects = ({ openModal }) => {
                   handleDropDownState(index, false);
                 }}
                 key={project.id}
-                href={`/projects/${project.id}`}
+                href={`/app/projects/${project.id}`}
                 className="w-96 h-56 border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
               >
                 <Card className="w-full h-full dark:hover:bg-foreground-100 group">
@@ -451,7 +473,7 @@ const Projects = ({ openModal }) => {
                           }
                           onPress={() => {
                             handleDropDownState(index, false);
-                            router.push(`/projects/${project.id}`);
+                            router.push(`/app/projects/${project.id}`);
                           }}
                         >
                           View file
@@ -527,6 +549,8 @@ const Projects = ({ openModal }) => {
               onOpenChange={onOpenChange}
               onClose={handleModalClose}
               className={`${isDarkMode ? "dark" : "light"}`}
+              isDismissable={!isUploading}
+              hideCloseButton={isUploading}
             >
               <ModalContent>
                 {(onClose) => (
@@ -617,7 +641,9 @@ const Projects = ({ openModal }) => {
                             <Avatar
                               alt={originalLanguage}
                               className="w-7 h-6 mr-1"
-                              src={`https://flagcdn.com/${getFlagCode(originalLanguage)}.svg`}
+                              src={`https://flagcdn.com/${getFlagCode(
+                                originalLanguage
+                              )}.svg`}
                             />
                           }
                         >
@@ -655,7 +681,9 @@ const Projects = ({ openModal }) => {
                             <Avatar
                               alt={originalLanguage}
                               className="w-7 h-6 mr-1"
-                              src={`https://flagcdn.com/${getFlagCode(translationLanguage)}.svg`}
+                              src={`https://flagcdn.com/${getFlagCode(
+                                translationLanguage
+                              )}.svg`}
                             />
                           }
                         >
@@ -682,7 +710,10 @@ const Projects = ({ openModal }) => {
                             color="danger"
                             isDisabled={isUploading}
                           >
-                            <Checkbox value="summary">
+                            <Checkbox
+                              isSelected={AIsummary}
+                              onValueChange={setAIsummary}
+                            >
                               <div className="flex items-center">
                                 <IoSparkles className="text-sky-300" />
                                 <p className="ml-1 mr-4 font-medium text-sm">
@@ -690,7 +721,7 @@ const Projects = ({ openModal }) => {
                                 </p>
                               </div>
                             </Checkbox>
-                            <Checkbox value="thumbnail">
+                            <Checkbox isDisabled value="thumbnail">
                               <div className="flex items-center">
                                 <IoSparkles className="text-sky-300" />
                                 <p className="ml-1 font-medium text-sm">
