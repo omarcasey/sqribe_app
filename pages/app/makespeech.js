@@ -156,7 +156,7 @@ const MakeSpeech = () => {
   return (
     <AppShell>
       <div className="w-full px-4 sm:px-10">
-        <main className="flex flex-col items-center py-24 mx-auto max-w-7xl text-foreground">
+        <main className="flex flex-col items-center pb-24 pt-10 mx-auto max-w-7xl text-foreground">
           <h1 className="w-full font-bold text-3xl mb-2">Speech Synthesis</h1>
           <p className="w-full text-foreground-500 font-medium mb-10">
             Unleash the power of our cutting-edge technology to generate

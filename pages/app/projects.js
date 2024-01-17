@@ -404,8 +404,8 @@ const Projects = ({ openModal }) => {
     <AppShell>
       <div className="w-full">
         {/* <Navbar /> */}
-        <div className="flex flex-col items-center pb-24 pt-10">
-          <div className="pt-12 flex flex-row items-center justify-center w-full px-10 gap-6 flex-wrap">
+        <div className="flex flex-col items-center pb-24 pt-16">
+          <div className="flex flex-row items-center justify-center w-full px-10 gap-6 flex-wrap">
             <div
               className="border border-dashed border-foreground-400 text-foreground w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
               onClick={onOpen}
@@ -590,7 +590,7 @@ const Projects = ({ openModal }) => {
                           )}
                         </div>
 
-                        <p className="py-4">or</p>
+                        <p className="py-4 text-foreground">or</p>
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Paste Link
                         </p>
@@ -602,7 +602,7 @@ const Projects = ({ openModal }) => {
                           }
                           color={selectedFile ? "danger" : "default"}
                           size="sm"
-                          className="text-black pb-4"
+                          className="text-foreground pb-4"
                           disabled={selectedFile ? true : false}
                           value={selectedFile ? "" : pasteLink}
                           onChange={handlePasteLinkChange}
@@ -616,7 +616,7 @@ const Projects = ({ openModal }) => {
                           placeholder="My First Project"
                           color="default"
                           size="sm"
-                          className="pb-4"
+                          className="pb-4 text-foreground"
                           value={projectName}
                           onChange={handleProjectNameChange}
                           isDisabled={isUploading}
@@ -631,7 +631,7 @@ const Projects = ({ openModal }) => {
                           color="default"
                           className={`${
                             isDarkMode ? "dark" : "light"
-                          } text-black pb-4`}
+                          } text-foreground pb-4`}
                           selectedKeys={[originalLanguage]}
                           onChange={handleOriginalLanguage}
                           aria-label="Original Language"

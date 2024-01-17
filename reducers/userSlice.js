@@ -147,7 +147,7 @@ const userSlice = createSlice({
         state.userLoading = "idle";
         state.projectsLoading = "idle";
         state.authLoading = true;
-        state.audio = null;
+        state.audio = { audioPlayerVisible: false, audioFile: null, autoPlay: false };
       });
   },
 });

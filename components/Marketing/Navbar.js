@@ -66,7 +66,7 @@ const Navbar = () => {
                 width={1024}
                 height={1024}
               />
-              <h1 className="text-black font-extrabold text-3xl tracking-tight">
+              <h1 className="text-foreground font-extrabold text-3xl tracking-tight">
                 Sqribe
               </h1>
             </Link>
@@ -93,8 +93,8 @@ const Navbar = () => {
               href="#"
               title=""
               className={`text-lg font-semibold ${
-                scrolling ? "text-white" : "text-gray-400"
-              } transition-all duration-200 hover:text-white hover-underline`}
+                scrolling ? "text-foreground" : "text-foreground-500"
+              } transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
               Products{" "}
@@ -104,7 +104,7 @@ const Navbar = () => {
               href="#"
               title=""
               className={`text-lg font-semibold ${
-                scrolling ? "text-white" : "text-gray-400"
+                scrolling ? "text-foreground" : "text-foreground-500"
               } transition-all duration-200 hover:text-white hover-underline`}
             >
               {" "}
@@ -114,7 +114,7 @@ const Navbar = () => {
             <Link
               href="/pricing"
               className={`text-lg font-semibold ${
-                scrolling ? "text-white" : "text-gray-400"
+                scrolling ? "text-foreground" : "text-foreground-500"
               } transition-all duration-200 hover:text-white ${
                 router.pathname === "/pricing"
                   ? "gradient-underline"
@@ -129,39 +129,24 @@ const Navbar = () => {
               href="#"
               title=""
               className={`text-lg font-semibold ${
-                scrolling ? "text-white" : "text-gray-400"
+                scrolling ? "text-foreground" : "text-foreground-500"
               } transition-all duration-200 hover:text-white hover-underline`}
             >
               {" "}
               Blog{" "}
             </a>
           </nav>
-
-          {user ? (
-            <Link
-              href="/app/dashboard"
-              className="relative hidden md:items-center md:justify-center md:inline-flex group"
-            >
-              <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-              {/* <a onClick={() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join Waitlist </a> */}
-              <div className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full">
-                {" "}
-                Sign In{" "}
-              </div>
-            </Link>
-          ) : (
-            <Link
-              href="/signin"
-              className="relative hidden md:items-center md:justify-center md:inline-flex group"
-            >
-              <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-              {/* <a onClick={() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join Waitlist </a> */}
-              <div className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full">
-                {" "}
-                Sign In{" "}
-              </div>
-            </Link>
-          )}
+          <Link
+            href={user ? "/app/dashboard" : "/signin"}
+            className="relative hidden md:items-center md:justify-center md:inline-flex group"
+          >
+            <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
+            {/* <a onClick={() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' })} className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-white bg-[#0e1015] border border-transparent rounded-full" role="button"> Join Waitlist </a> */}
+            <div className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-foreground bg-foreground-50 border border-transparent rounded-full">
+              {" "}
+              Sign In{" "}
+            </div>
+          </Link>
         </div>
 
         {/* <nav x-show="expanded" x-collapse>

@@ -153,7 +153,7 @@ const History = () => {
   return (
     <AppShell>
       <div className="w-full px-4 sm:px-10">
-        <main className="flex min-h-screen flex-col items-center py-24 mx-auto max-w-7xl text-foreground">
+        <main className="flex min-h-screen flex-col items-center pb-24 pt-10 mx-auto max-w-7xl text-foreground">
           <h1
             onClick={() => console.log(selectedKeys)}
             className="w-full font-bold text-3xl mb-2"
