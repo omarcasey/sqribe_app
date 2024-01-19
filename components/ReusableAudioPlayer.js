@@ -59,7 +59,7 @@ const ReusableAudioPlayer = ({ audioUrl, name, filename }) => {
         setCurrentTime(0);
       });
     }
-  }, [audioUrl]);
+  }, [audioUrl, duration]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
@@ -116,7 +116,7 @@ const ReusableAudioPlayer = ({ audioUrl, name, filename }) => {
                   thumb: "w-2 h-2 after:w-2 after:h-2 after:bg-foreground",
                 }}
                 color="foreground"
-                defaultValue={0}
+                value={currentTime}
                 size="sm"
                 onChangeEnd={moveAudio}
               />
