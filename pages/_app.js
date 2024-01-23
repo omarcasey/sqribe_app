@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/App/authContext";
 import { Provider } from "react-redux";
 import store from "@/store";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import ThemeProvider from "@/components/App/ThemeProvider";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -23,12 +24,14 @@ export default function App({ Component, pageProps }) {
     <NextUIProvider>
       <Provider store={store}>
         <AuthProvider>
-          <main
-            className={`${montserrat.variable} ${playfair.variable} font-mont`}
-          >
-            <Component {...pageProps} />
-            {/* <SpeedInsights /> */}
-          </main>
+          <ThemeProvider>
+            <main
+              className={`${montserrat.variable} ${playfair.variable} font-mont`}
+            >
+              <Component {...pageProps} />
+              {/* <SpeedInsights /> */}
+            </main>
+          </ThemeProvider>
         </AuthProvider>
       </Provider>
     </NextUIProvider>
