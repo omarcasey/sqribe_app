@@ -18,10 +18,16 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
+import { IoMdArrowDropdown } from "react-icons/io";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
+import { PiWaveform } from "react-icons/pi";
 import { getFlagCode } from "@/helpers/getFlag";
 import withAuth from "@/components/App/withAuth";
 import { useSelector } from "react-redux";
@@ -152,48 +158,66 @@ const Page = () => {
               </div>
             </div>
             <div className="w-full mt-4">
-              {project?.transcription?.words
-                .reduce((sentences, word, index) => {
-                  if (
-                    index === 0 ||
-                    word.start_time - sentences[sentences.length - 1].end_time >
-                      0.1
-                  ) {
-                    // Start a new sentence if it's the first word or there's a pause of more than 0.1s
-                    sentences.push({
-                      sentence: [word.word],
-                      start_time: word.start_time,
-                      end_time: word.end_time,
-                    });
-                  } else {
-                    // Add the word to the current sentence
-                    sentences[sentences.length - 1].sentence.push(word.word);
-                    sentences[sentences.length - 1].end_time = word.end_time;
-                  }
-                  return sentences;
-                }, [])
-                .map((sentence, index) => (
-                  <>
-                    <p className="w-full text-center text-foreground-400">
-                      {formatTime(sentence.start_time)} —{" "}
-                      {formatTime(sentence.end_time)}
-                    </p>
-                    <div className="flex flex-row px-6 gap-x-12 mt-4">
-                      <p key={index} className="w-1/2 text-foreground-600">
-                        {sentence.sentence.join(" ")}
+              {project.segments?.map((segment, index) => {
+                return (
+                  <div key={index} className="flex flex-col mb-6 px-6 text-sm">
+                    <div className="flex flex-row text-foreground-500 justify-center items-center gap-8 mb-4">
+                      <div>
+                        <Dropdown className={isDarkMode ? 'dark' : 'light'}>
+                          <DropdownTrigger>
+                            <div className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all">
+                              <p className="mr-1">
+                                Speaker {segment.speaker}
+                              </p>
+                              <IoMdArrowDropdown />
+                            </div>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            aria-label="Dropdown Variants"
+                            variant="flat"
+                          >
+                            <DropdownItem
+                              key="speaker1"
+                              className="text-foreground"
+                            >
+                              Speaker 1
+                            </DropdownItem>
+                            <DropdownItem
+                              key="speaker2"
+                              className="text-foreground"
+                            >
+                              Speaker 2
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
+                      <p>
+                        {formatTime(segment.start)} — {formatTime(segment.end)}
                       </p>
-                      <p
-                        className={`w-1/2 text-foreground-600 ${
-                          project.translationLanguage === "Arabic"
-                            ? "text-end"
-                            : ""
-                        }`}
-                      >
-                        {project?.translation?.text}
-                      </p>
+                      <div className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all">
+                        <p className="mr-1 ">{segment.voiceId}</p>
+                        <PiWaveform size={18} />
+                      </div>
                     </div>
-                  </>
-                ))}
+                    <div className="grid grid-cols-2 border-b border-foreground-300 text-foreground">
+                      <div className="border-r border-foreground-300 p-3">
+                        <p>{segment.text}</p>
+                      </div>
+                      <div className="p-3">
+                        <p
+                          className={`${
+                            project.translationLanguage === "Arabic"
+                              ? "text-right"
+                              : ""
+                          }`}
+                        >
+                          {segment.translatedText}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="w-1/3 flex flex-col border-l border-neutral-600">
@@ -226,8 +250,11 @@ const Page = () => {
                 </Tab>
               </Tabs>
               <div className="px-8">
-              <p className="text-foreground-400 mb-2">Summary:</p>
-              <p className="text-sm text-foreground-600">{project.summary}</p>
+                <p className="text-foreground">
+                  {formatTime(project.duration)}
+                </p>
+                <p className="text-foreground-400 mb-2">Summary:</p>
+                <p className="text-sm text-foreground-600">{project.summary}</p>
               </div>
             </div>
           </div>

@@ -222,7 +222,7 @@ const MakeSpeech = () => {
                       label="Select a voice"
                       placeholder="Select a voice"
                       labelPlacement="outside"
-                      className="flex-1 mb-4 text-foreground-400"
+                      className={`flex-1 mb-4 text-foreground-400`}
                       disallowEmptySelection
                       selectionMode="single"
                       variant="bordered"

@@ -132,6 +132,7 @@ const Projects = ({ openModal }) => {
   };
 
   const handleUploadNew = async () => {};
+
   const handleUpload = async () => {
     try {
       setisUploading(true);
@@ -160,7 +161,9 @@ const Projects = ({ openModal }) => {
         async () => {
           // Handle successful uploads on complete
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          const filePath = "files/" + selectedFileName;
+          const filePath =
+            "files/" +
+            selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
           console.log("File uploaded at " + filePath);
 
           try {
@@ -184,8 +187,52 @@ const Projects = ({ openModal }) => {
 
             // Get speech-to-text result
             const result = await response.json();
-            const firstResult = result.results[0];
+            const deepgramResult = result.result;
             console.log("Speech To Text Converted Successfully!");
+
+            const segments = await Promise.all(
+              deepgramResult.results.channels[0].alternatives[0].paragraphs.paragraphs.flatMap(
+                async (paragraph) => {
+                  const sentences = await Promise.all(
+                    paragraph.sentences.map(async (sentence) => {
+                      const translationResponse = await fetch("/api/translate-text", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          inputText: sentence.text,
+                          target: getTranslateCode(translationLanguage),
+                        }),
+                      });
+
+                      if (!translationResponse.ok) {
+                        throw new Error(
+                          `Failed to translate text: ${translationResponse.statusText}`
+                        );
+                      }
+
+                      const translationResult = await translationResponse.json();
+                      const translatedText = translationResult.translations[0];
+
+                      return {
+                        text: sentence.text,
+                        translatedText: translatedText,
+                        start: sentence.start,
+                        end: sentence.end,
+                        speaker: 1,
+                        voiceId: "Adam",
+                      };
+                    })
+                  );
+
+                  return sentences;
+                }
+              )
+            );
+
+            const segmentsNew = [].concat(...segments);
+            console.log(segmentsNew);
 
             let summaryResult;
             if (AIsummary) {
@@ -196,7 +243,9 @@ const Projects = ({ openModal }) => {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  transcript: firstResult.transcript,
+                  transcript:
+                    deepgramResult.results.channels[0].alternatives[0]
+                      .transcript,
                 }),
               });
 
@@ -213,7 +262,8 @@ const Projects = ({ openModal }) => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                inputText: firstResult.transcript,
+                inputText:
+                  deepgramResult.results.channels[0].alternatives[0].transcript,
                 target: getTranslateCode(translationLanguage),
               }),
             });
@@ -259,14 +309,19 @@ const Projects = ({ openModal }) => {
                 translationLanguage: translationLanguage,
                 date: Timestamp.fromDate(new Date()),
                 fileURL: downloadURL,
+                duration: deepgramResult.metadata.duration,
                 transcription: {
-                  transcript: firstResult.transcript,
-                  words: firstResult.words,
+                  transcript:
+                    deepgramResult.results.channels[0].alternatives[0]
+                      .transcript,
+                  words:
+                    deepgramResult.results.channels[0].alternatives[0].words,
                 },
                 translation: {
                   text: translatedText,
                   language: getTranslateCode(translationLanguage),
                 },
+                segments: segmentsNew,
                 translatedFileURL: audioUrl,
                 summary: summaryResult || null,
               });
