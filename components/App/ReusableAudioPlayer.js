@@ -76,18 +76,7 @@ const ReusableAudioPlayer = ({ audioUrl, name, filename }) => {
       <audio ref={audioRef} src={audioUrl} />
       <CardBody>
         <div className="grid grid-cols-6 md:grid-cols-12 gap-6 md:gap-4 items-center justify-center">
-          <div className="relative col-span-6 md:col-span-4">
-            <Image
-              alt="Album cover"
-              className="object-cover"
-              height={200}
-              shadow="md"
-              src="/album-cover.png"
-              width="100%"
-            />
-          </div>
-
-          <div className="flex flex-col col-span-6 md:col-span-8">
+          <div className="flex flex-col col-span-6 md:col-span-12">
             <div className="flex justify-between items-start">
               <div className="flex flex-col gap-0">
                 <h3 className="text-large font-semibold text-foreground/90">{name}</h3>

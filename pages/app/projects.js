@@ -331,8 +331,8 @@ const Projects = ({ openModal }) => {
                 const docSnap = await getDoc(userRef);
                 const currentData = docSnap.data();
                 await updateDoc(userRef, {
-                  usedCredits: currentData.usedCredits + 20,
-                  remainingCredits: currentData.remainingCredits - 20,
+                  usedSeconds: currentData.usedSeconds + deepgramResult.metadata.duration,
+                  remainingSeconds: currentData.remainingSeconds - deepgramResult.metadata.duration,
                 });
               } catch (e) {
                 console.error("Error updating credits: ", e);

@@ -2,6 +2,8 @@ import { uploadString, ref, getDownloadURL } from "firebase/storage";
 import ElevenLabs from "elevenlabs-node";
 import { storage } from "@/firebase";
 import { Buffer } from "buffer";
+const ffmpeg = require("ffmpeg-static"); // Install the ffmpeg-static package
+import { exec } from "child_process";
 
 const apiKey = "9b139b9c3761bd2453c432ce92ca4498"; // Your ElevenLabs API key
 
@@ -10,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { text, voiceId, stabilityValue, similarityValue, styleValue, speakerBoostValue } = req.body;
+  const { text, fileURL, voiceId, stabilityValue, similarityValue, styleValue, speakerBoostValue } = req.body;
 
   if (!text) {
     return res.status(400).json({ error: "Missing 'text' parameter" });
@@ -47,9 +49,25 @@ export default async function handler(req, res) {
       await uploadString(storageRef, audioBuffer.toString("base64"), "base64");
 
       // Get the download URL
-      const downloadURL = await getDownloadURL(storageRef);
+      const audioURL = await getDownloadURL(storageRef);
 
-      res.status(200).json({ audioUrl: downloadURL });
+      // Replace the original audio of fileURL with the new audio from audioUrl
+      const mergeAudioWithVideo = async (fileURL, audioUrl, outputFilePath) => {
+        try {
+          // Run FFmpeg command to remove the original audio and merge the video with the new audio
+          const command = `${ffmpeg} -i ${fileURL} -i ${audioUrl} -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ${outputFilePath}`;
+          await exec(command);
+
+          console.log("Audio merged successfully!");
+        } catch (error) {
+          console.error("Failed to merge audio with video:", error);
+        }
+      };
+
+      const outputFilePath = "public/video_with_audio.mp4";
+      mergeAudioWithVideo(fileURL, audioURL, outputFilePath);
+
+      res.status(200).json({ audioUrl: audioURL });
     });
   } catch (error) {
     console.error("Error converting text to speech:", error);

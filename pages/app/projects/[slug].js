@@ -2,9 +2,6 @@
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { db } from "@/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import Link from "next/link";
 import ReusableAudioPlayer from "@/components/App/ReusableAudioPlayer";
 import {
   Tabs,
@@ -22,6 +19,8 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Textarea,
+  Progress,
 } from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -31,14 +30,37 @@ import { PiWaveform } from "react-icons/pi";
 import { getFlagCode } from "@/helpers/getFlag";
 import withAuth from "@/components/App/withAuth";
 import { useSelector } from "react-redux";
+import VideoPlayer from "@/components/App/VideoPlayer";
+import { motion } from "framer-motion";
 
 const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
   const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const userData = useSelector((state) => state.user.data);
   const userProjects = useSelector((state) => state.user.projects);
   const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editSegments, setEditSegments] = useState([]);
+
+  useEffect(() => {
+    if (project) {
+      setEditSegments(project.segments);
+    }
+  }, [project]);
+
+  const handleTextChange = (e, index, type) => {
+    const newSegments = [...editSegments];
+    const updatedSegment = { ...newSegments[index], [type]: e.target.value };
+    newSegments[index] = updatedSegment;
+    setEditSegments(newSegments);
+  };
+
+  const resetText = (index, field) => {
+    const updatedSegments = [...editSegments];
+    updatedSegments[index][field] = project.segments[index][field];
+    setEditSegments(updatedSegments);
+  };
 
   function formatTime(time) {
     const hours = Math.floor(time / 3600);
@@ -82,7 +104,7 @@ const Page = () => {
 
   return (
     <div
-      className={`flex min-h-screen flex-col items-center pb-24 bg-default-100 ${
+      className={`flex h-screen flex-col items-center bg-default-100 ${
         isDarkMode ? "dark" : "light"
       }`}
     >
@@ -96,7 +118,17 @@ const Page = () => {
           </div>
           <p className="font-medium">{project.projectName}</p>
         </div>
-        <div className="flex item justify-center gap-4">
+        <div className="flex items-center justify-center gap-3">
+          <div className="w-32 mr-5">
+            <p className="text-tiny mb-1 text-center text-foreground-600">
+              {(userData.usedSeconds / 60).toFixed(1)} /{" "}
+              {(userData.totalSeconds / 60).toFixed(0)} mins used
+            </p>
+            <Progress
+              color="danger"
+              value={(userData.usedSeconds / userData.totalSeconds) * 100}
+            />
+          </div>
           <Button
             className="px-3 text-white"
             startContent={<IoInformationCircleOutline size={25} />}
@@ -157,18 +189,19 @@ const Page = () => {
                 </Button>
               </div>
             </div>
-            <div className="w-full mt-4">
-              {project.segments?.map((segment, index) => {
+            <div className="w-full max-h-[86vh] pt-4 overflow-y-auto">
+              {editSegments?.map((segment, index) => {
+                const originalSegment = project.segments[index];
+                const isDifferent = segment.text !== originalSegment.text;
+
                 return (
-                  <div key={index} className="flex flex-col mb-6 px-6 text-sm">
+                  <div key={index} className="flex flex-col mb-4 px-6 text-sm">
                     <div className="flex flex-row text-foreground-500 justify-center items-center gap-8 mb-4">
                       <div>
-                        <Dropdown className={isDarkMode ? 'dark' : 'light'}>
+                        <Dropdown className={isDarkMode ? "dark" : "light"}>
                           <DropdownTrigger>
                             <div className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all">
-                              <p className="mr-1">
-                                Speaker {segment.speaker}
-                              </p>
+                              <p className="mr-1">Speaker {segment.speaker}</p>
                               <IoMdArrowDropdown />
                             </div>
                           </DropdownTrigger>
@@ -201,19 +234,47 @@ const Page = () => {
                     </div>
                     <div className="grid grid-cols-2 border-b border-foreground-300 text-foreground">
                       <div className="border-r border-foreground-300 p-3">
-                        <p>{segment.text}</p>
+                        <Textarea
+                          variant="flat"
+                          minRows={1}
+                          value={segment.text}
+                          onChange={(e) => handleTextChange(e, index, "text")}
+                        />
                       </div>
                       <div className="p-3">
-                        <p
-                          className={`${
-                            project.translationLanguage === "Arabic"
-                              ? "text-right"
-                              : ""
-                          }`}
-                        >
-                          {segment.translatedText}
-                        </p>
+                        <Textarea
+                          variant="flat"
+                          minRows={1}
+                          isDisabled
+                          value={segment.translatedText}
+                          onChange={(e) =>
+                            handleTextChange(e, index, "translatedText")
+                          }
+                        />
                       </div>
+                      {isDifferent && (
+                        <motion.div
+                          initial={{ y: -10, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className="col-span-2 flex items-center justify-center mb-3 mt-1"
+                        >
+                          <div className="flex flex-row gap-8 ml-3 font-semibold text-sm">
+                            <p
+                              className="text-foreground-500 hover:cursor-pointer hover:text-foreground transition-all"
+                              onClick={() => resetText(index, "text")}
+                            >
+                              Cancel
+                            </p>
+                            <p
+                              className="text-blue-800 hover:cursor-pointer"
+                              onClick={() => console.log(editSegments)}
+                            >
+                              Translate
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
                   </div>
                 );
@@ -232,11 +293,15 @@ const Page = () => {
               >
                 <Tab key="original" title="Original">
                   <div className="p-4 px-5">
-                    <ReusableAudioPlayer
-                      audioUrl={project.fileURL}
-                      name={project.projectName}
-                      filename={project.fileName}
-                    />
+                    {project.fileName.endsWith(".mp4") ? (
+                      <VideoPlayer url={project.fileURL} />
+                    ) : (
+                      <ReusableAudioPlayer
+                        audioUrl={project.fileURL}
+                        name={project.projectName}
+                        filename={project.fileName}
+                      />
+                    )}
                   </div>
                 </Tab>
                 <Tab key="translated" title="Translated">
@@ -250,11 +315,14 @@ const Page = () => {
                 </Tab>
               </Tabs>
               <div className="px-8">
-                <p className="text-foreground">
-                  {formatTime(project.duration)}
-                </p>
-                <p className="text-foreground-400 mb-2">Summary:</p>
-                <p className="text-sm text-foreground-600">{project.summary}</p>
+                {project.summary && (
+                  <>
+                    <p className="text-foreground-400 mb-2">Summary:</p>
+                    <p className="text-sm text-foreground-600">
+                      {project.summary}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
