@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }) {
         <AuthProvider>
           <ThemeProvider>
             <main
-              className={`${montserrat.variable} ${playfair.variable} font-mont`}
+              className={`${montserrat.variable} ${playfair.variable} bg-default-100 dark:bg-black font-mont`}
             >
               <Component {...pageProps} />
               {/* <SpeedInsights /> */}

@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Pricing() {
   return (
-    <main className="min-h-screen bg-[#0e1015] font-mont">
+    <main className="min-h-screen">
       <Navbar />
       <PricingOptions/>
       <LifetimeDeal />

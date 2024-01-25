@@ -3,12 +3,12 @@ import Image from "next/image"
 const LifetimeDeal = () => {
     return (
         <section className="py-12 sm:pb-16 lg:pb-20 xl:pb-24">
-            <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl xl:max-w-[100rem]">
+            <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
                 <div className="flex flex-col gap-y-8 relative">
                     <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase text-xl w-fit">
-                        Choose a subscription
+                        SPECIAL OFFER EARLY BIRD DEAL - EXTREMELY LIMITED
                     </p>
-                    <h1 className="text-4xl font-light text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+                    <h1 className="text-3xl font-light text-white sm:text-5xl lg:text-6xl xl:text-6xl">
                         Make the best investment
                     </h1>
                     <p className="text-xl font-normal text-gray-400 xl:w-[54rem] mb-12">
@@ -91,7 +91,7 @@ const LifetimeDeal = () => {
                         <div className="w-1/3 border-l border-gray-400 border-opacity-20 flex justify-center items-center ml-2">
                             <div className="flex flex-col items-center gap-y-4 w-full">
                                 <h1 className="text-6xl text-white tracking-wide">$99</h1>
-                                <p className="text-gray-500">Lifetime Account</p>
+                                <p className="text-gray-500">Lifetime Creator Account</p>
                                 <button className="bg-gradient-to-r from-cyan-500 to-purple-500 rounded-md flex items-center justify-center w-[70%] py-4 text-lg transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/50">Buy now</button>
                                 <p className="text-gray-500">30 Days Money-back Guarantee</p>
                             </div>
