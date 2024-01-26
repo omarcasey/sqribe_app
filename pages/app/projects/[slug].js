@@ -21,6 +21,8 @@ import {
   DropdownItem,
   Textarea,
   Progress,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -32,6 +34,9 @@ import withAuth from "@/components/App/withAuth";
 import { useSelector } from "react-redux";
 import VideoPlayer from "@/components/App/VideoPlayer";
 import { motion } from "framer-motion";
+import { BsBodyText, BsTextLeft } from "react-icons/bs";
+import { RxTextAlignLeft } from "react-icons/rx";
+import CustomCursor from "@/components/App/CustomCursor";
 
 const Page = () => {
   const router = useRouter();
@@ -42,12 +47,25 @@ const Page = () => {
   const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editSegments, setEditSegments] = useState([]);
+  const [organizedSegments, setOrganizedSegments] = useState("Sentences");
 
   useEffect(() => {
     if (project) {
-      setEditSegments(project.segments);
+      if (organizedSegments === "Sentences") {
+        setEditSegments(project.segmentsSentences);
+      } else if (organizedSegments === "Paragraphs") {
+        setEditSegments(project.segmentsParagraphs);
+      }
     }
-  }, [project]);
+  }, [organizedSegments, project]);
+
+  const handleSelectSentences = () => {
+    setOrganizedSegments("Sentences");
+  };
+
+  const handleSelectParagraphs = () => {
+    setOrganizedSegments("Paragraphs");
+  };
 
   const handleTextChange = (e, index, type) => {
     const newSegments = [...editSegments];
@@ -58,7 +76,11 @@ const Page = () => {
 
   const resetText = (index, field) => {
     const updatedSegments = [...editSegments];
-    updatedSegments[index][field] = project.segments[index][field];
+    if (organizedSegments === "Sentences") {
+      updatedSegments[index][field] = project.segmentsSentences[index][field];
+    } else if (organizedSegments === "Paragraphs") {
+      updatedSegments[index][field] = project.segmentsParagraphs[index][field];
+    }
     setEditSegments(updatedSegments);
   };
 
@@ -149,17 +171,31 @@ const Page = () => {
         <div className="flex flex-row w-full">
           <div className="w-2/3 flex flex-col">
             <div className="flex flex-row">
-              <div className="w-1/2 border-b border-neutral-600 flex items-center h-14 px-5">
-                <Avatar
-                  alt="English"
-                  className="w-5 h-5 mr-3"
-                  src={`https://flagcdn.com/${getFlagCode(
-                    project.originalLanguage
-                  )}.svg`}
-                />
-                <p className="font-medium text-foreground">
-                  {project.originalLanguage}
-                </p>
+              <div className="w-1/2 border-b border-neutral-600 flex items-center h-14 px-5 justify-between">
+                <div className="flex items-center justify-center">
+                  <Avatar
+                    alt="English"
+                    className="w-5 h-5 mr-3"
+                    src={`https://flagcdn.com/${getFlagCode(
+                      project.originalLanguage
+                    )}.svg`}
+                  />
+                  <p className="font-medium text-foreground">
+                    {project.originalLanguage}
+                  </p>
+                </div>
+                <div className="flex flex-row items-center gap-2">
+                  <Button size="sm" className={`min-w-0 w-unit-7 px-[5px] h-unit-7 transition-all border-1 text-foreground-500 ${organizedSegments=="Sentences" ? "border-foreground-500 text-foreground": ""}`} onPress={handleSelectSentences} variant="ghost">
+                    <BsTextLeft
+                      className="h-full w-full"
+                    />
+                  </Button>
+                  <Button size="sm" className={`min-w-0 px-[5px] w-unit-7 h-unit-7 transition-all border-1 text-foreground-500 ${organizedSegments=="Paragraphs" ? "border-foreground-500 text-foreground": ""}`} onPress={handleSelectParagraphs} variant="ghost">
+                    <BsBodyText
+                      className="h-full w-full"
+                    />
+                  </Button>
+                </div>
               </div>
               <div className="w-1/2 border border-t-0 border-r-0 border-neutral-600 flex items-center h-14 px-5 justify-between">
                 <div className="flex items-center justify-center">
@@ -191,8 +227,13 @@ const Page = () => {
             </div>
             <div className="w-full max-h-[86vh] pt-4 overflow-y-auto">
               {editSegments?.map((segment, index) => {
-                const originalSegment = project.segments[index];
-                const isDifferent = segment.text !== originalSegment.text;
+                let originalSegment = null;
+                if (organizedSegments === "Sentences") {
+                  originalSegment = project.segmentsSentences[index];
+                } else if (organizedSegments === "Paragraphs") {
+                  originalSegment = project.segmentsParagraphs[index];
+                }
+                const isDifferent = segment.text !== originalSegment?.text;
 
                 return (
                   <div key={index} className="flex flex-col mb-4 px-6 text-sm">
@@ -237,6 +278,7 @@ const Page = () => {
                         <Textarea
                           variant="flat"
                           minRows={1}
+                          maxRows={20}
                           value={segment.text}
                           onChange={(e) => handleTextChange(e, index, "text")}
                         />
@@ -245,6 +287,7 @@ const Page = () => {
                         <Textarea
                           variant="flat"
                           minRows={1}
+                          maxRows={20}
                           isDisabled
                           value={segment.translatedText}
                           onChange={(e) =>

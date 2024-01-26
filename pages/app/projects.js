@@ -189,22 +189,26 @@ const Projects = ({ openModal }) => {
             const result = await response.json();
             const deepgramResult = result.result;
             console.log("Speech To Text Converted Successfully!");
+            console.log(deepgramResult);
 
             const segments = await Promise.all(
               deepgramResult.results.channels[0].alternatives[0].paragraphs.paragraphs.flatMap(
-                async (paragraph) => {
+                async (paragraph, index) => {
                   const sentences = await Promise.all(
                     paragraph.sentences.map(async (sentence) => {
-                      const translationResponse = await fetch("/api/translate-text", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          inputText: sentence.text,
-                          target: getTranslateCode(translationLanguage),
-                        }),
-                      });
+                      const translationResponse = await fetch(
+                        "/api/translate-text",
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            inputText: sentence.text,
+                            target: getTranslateCode(translationLanguage),
+                          }),
+                        }
+                      );
 
                       if (!translationResponse.ok) {
                         throw new Error(
@@ -212,7 +216,8 @@ const Projects = ({ openModal }) => {
                         );
                       }
 
-                      const translationResult = await translationResponse.json();
+                      const translationResult =
+                        await translationResponse.json();
                       const translatedText = translationResult.translations[0];
 
                       return {
@@ -221,6 +226,7 @@ const Projects = ({ openModal }) => {
                         start: sentence.start,
                         end: sentence.end,
                         speaker: 1,
+                        paragraph: index,
                         voiceId: "Adam",
                       };
                     })
@@ -231,8 +237,64 @@ const Projects = ({ openModal }) => {
               )
             );
 
-            const segmentsNew = [].concat(...segments);
-            console.log(segmentsNew);
+            const segmentsSentences = [].concat(...segments);
+            console.log(segmentsSentences);
+
+            // Initialize an empty array to store paragraphs
+            const segmentsParagraphs = [];
+
+            // Initialize variables to track paragraph details
+            let currentParagraph = -1;
+            let paragraphStart = null;
+            let paragraphEnd = null;
+            let paragraphText = "";
+            let paragraphTranslatedText = "";
+            let voiceId = null;
+            let speaker = null;
+
+            // Loop through the sentence objects
+            segmentsSentences.forEach((sentence) => {
+              // If the current sentence belongs to a new paragraph
+              if (sentence.paragraph !== currentParagraph) {
+                // If this is not the first iteration, push the previous paragraph details into the paragraphsArray
+                if (currentParagraph !== -1) {
+                  segmentsParagraphs.push({
+                    start: paragraphStart,
+                    end: paragraphEnd,
+                    text: paragraphText,
+                    translatedText: paragraphTranslatedText,
+                    voiceId: voiceId,
+                    speaker: speaker,
+                  });
+                }
+                // Reset paragraph variables for the new paragraph
+                currentParagraph = sentence.paragraph;
+                paragraphStart = sentence.start;
+                paragraphEnd = sentence.end;
+                paragraphText = sentence.text;
+                paragraphTranslatedText = sentence.translatedText;
+                voiceId = sentence.voiceId;
+                speaker = sentence.speaker;
+              } else {
+                // If the current sentence belongs to the same paragraph, update paragraph details
+                paragraphEnd = sentence.end;
+                paragraphText += " " + sentence.text; // Concatenate text
+                paragraphTranslatedText += " " + sentence.translatedText; // Concatenate translatedText
+              }
+            });
+
+            // Push the last paragraph into paragraphsArray (since the loop ends before pushing the last one)
+            segmentsParagraphs.push({
+              start: paragraphStart,
+              end: paragraphEnd,
+              text: paragraphText,
+              translatedText: paragraphTranslatedText,
+              voiceId: voiceId,
+              speaker: speaker,
+            });
+
+            // Now paragraphsArray contains the desired array of paragraphs
+            console.log(segmentsParagraphs);
 
             let summaryResult;
             if (AIsummary) {
@@ -280,24 +342,28 @@ const Projects = ({ openModal }) => {
             console.log("Text Translated Successfully!");
 
             // Call text-to-speech API
-            const ttsResponse = await fetch("/api/text-to-speech", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ text: translatedText }),
-            });
+            // console.log("Starting text to speech...")
+            // const ttsResponse = await fetch("/api/text-to-speech", {
+            //   method: "POST",
+            //   headers: {
+            //     "Content-Type": "application/json",
+            //   },
+            //   body: JSON.stringify({ text: translatedText }),
+            // });
 
-            if (!ttsResponse.ok) {
-              throw new Error(
-                `Failed to convert text to speech: ${ttsResponse.statusText}`
-              );
-            }
+            // if (!ttsResponse.ok) {
+            //   throw new Error(
+            //     `Failed to convert text to speech: ${ttsResponse.statusText}`
+            //   );
+            // }
 
-            // Get text-to-speech result
-            const ttsResult = await ttsResponse.json();
-            const audioUrl = ttsResult.audioUrl;
-            console.log("Text To Speech Converted Successfully!");
+            // // Get text-to-speech result
+            // const ttsResult = await ttsResponse.json();
+            // const audioUrl = ttsResult.audioUrl;
+            // console.log("Text To Speech Converted Successfully!");
+            const audioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+
 
             // Add the converted text, translation, and audio URL to the audio files collection
             try {
@@ -321,7 +387,8 @@ const Projects = ({ openModal }) => {
                   text: translatedText,
                   language: getTranslateCode(translationLanguage),
                 },
-                segments: segmentsNew,
+                segmentsSentences: segmentsSentences,
+                segmentsParagraphs: segmentsParagraphs,
                 translatedFileURL: audioUrl,
                 summary: summaryResult || null,
               });
@@ -331,8 +398,11 @@ const Projects = ({ openModal }) => {
                 const docSnap = await getDoc(userRef);
                 const currentData = docSnap.data();
                 await updateDoc(userRef, {
-                  usedSeconds: currentData.usedSeconds + deepgramResult.metadata.duration,
-                  remainingSeconds: currentData.remainingSeconds - deepgramResult.metadata.duration,
+                  usedSeconds:
+                    currentData.usedSeconds + deepgramResult.metadata.duration,
+                  remainingSeconds:
+                    currentData.remainingSeconds -
+                    deepgramResult.metadata.duration,
                 });
               } catch (e) {
                 console.error("Error updating credits: ", e);
