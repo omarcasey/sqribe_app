@@ -36,7 +36,7 @@ import { motion } from "framer-motion";
 const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
-  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const userData = useSelector((state) => state.user.data);
   const userProjects = useSelector((state) => state.user.projects);
   const loading = useSelector((state) => state.user.projectsLoading);

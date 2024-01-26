@@ -40,7 +40,7 @@ const History = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const uid = useSelector((state) => state.user.auth.uid);
-  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const [audioFiles, setAudioFiles] = useState([]);
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [loading, setLoading] = useState(true);

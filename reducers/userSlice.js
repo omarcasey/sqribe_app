@@ -80,6 +80,7 @@ const userSlice = createSlice({
     projectsLoading: "idle",
     error: null,
     audio: { audioPlayerVisible: false, audioFile: null, autoPlay: false },
+    darkMode: null,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -103,6 +104,9 @@ const userSlice = createSlice({
     setAutoPlay: (state, action) => {
       state.audio.autoPlay = action.payload;
     }, // New reducer to update auto play
+    setDarkMode: (state, action) => {
+      state.darkMode = action.payload;
+    }, // New reducer to update dark mode
   },
   extraReducers: (builder) => {
     builder
@@ -159,5 +163,6 @@ export const {
   setAudioPlayerVisible,
   setAudioFile,
   setAutoPlay,
+  setDarkMode,
 } = userSlice.actions;
 export default userSlice.reducer;

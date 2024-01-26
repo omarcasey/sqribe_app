@@ -63,7 +63,7 @@ import { FaEye } from "react-icons/fa";
 import Image from "next/image";
 
 const Projects = ({ openModal }) => {
-  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const projects = useSelector((state) => state.user.projects);
   const uid = useSelector((state) => state.user.auth.uid);
   const router = useRouter();

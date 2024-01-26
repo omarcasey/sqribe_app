@@ -35,12 +35,13 @@ import { TbRewindBackward10, TbRewindForward10 } from "react-icons/tb";
 import { GoThumbsup, GoThumbsdown } from "react-icons/go";
 import { BsDownload, BsChevronDown } from "react-icons/bs";
 import { useState } from "react";
-import { setAudioPlayerVisible, setAutoPlay } from "@/reducers/userSlice";
+import { setAudioPlayerVisible, setAutoPlay, setDarkMode } from "@/reducers/userSlice";
+import ThemeSwitch from "./ThemeSwitch";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const uid = useSelector((state) => state.user.auth.uid);
   const audioPlayerVisible = useSelector(
     (state) => state.user.audio.audioPlayerVisible
@@ -124,19 +125,6 @@ const AppShell = ({ children }) => {
       .padStart(2, "0")}`;
   };
 
-  const toggleTheme = async () => {
-    try {
-      const userRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userRef);
-      const currentData = docSnap.data();
-      await updateDoc(userRef, {
-        darkMode: !currentData.darkMode,
-      });
-    } catch (e) {
-      console.error("Error updating darkMode: ", e);
-    }
-  };
-
   return (
     <div
       className={`flex flex-col h-screen ${
@@ -213,12 +201,7 @@ const AppShell = ({ children }) => {
             </Link>
           </div>
           <div className="flex space-x-3 items-center">
-            <Switch
-              defaultSelected={isDarkMode}
-              size="md"
-              color="secondary"
-              onChange={toggleTheme}
-            />
+            <ThemeSwitch />
             <DropdownMenuIdk router={router} />
             <Button
               className="px-3"

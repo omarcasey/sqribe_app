@@ -19,7 +19,7 @@ import {
 } from "@/reducers/userSlice.js";
 
 export default function DropdownMenuIdk({ router }) {
-  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const user = useSelector((state) => state.user.auth);
   const dispatch = useDispatch();
 

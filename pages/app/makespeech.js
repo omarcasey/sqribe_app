@@ -41,7 +41,7 @@ import { setAudioFile, setAudioPlayerVisible, setAutoPlay } from "@/reducers/use
 
 const MakeSpeech = () => {
   const uid = useSelector((state) => state.user.auth.uid);
-  const isDarkMode = useSelector((state) => state.user.data.darkMode);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const [inputText, setInputText] = useState(""); // State to store the input text
   const [selectedTask, setSelectedTask] = useState("textToSpeech"); // State to store the selected card
   const [isLoading, setIsLoading] = useState(false); // State to store the loading state

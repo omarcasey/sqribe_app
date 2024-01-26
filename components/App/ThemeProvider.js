@@ -1,31 +1,22 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Cookies from "js-cookie";
+import { setDarkMode } from "@/reducers/userSlice";
 
 const ThemeProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const isDarkMode = useSelector((state) => state.user.data?.darkMode) || null;
+  const isDarkMode = useSelector((state) => state.user?.darkMode);
 
   useEffect(() => {
-    const savedDarkMode = Cookies.get("darkMode");
-    if (savedDarkMode) {
-      dispatch({ type: "SET_DARK_MODE", payload: savedDarkMode === "true" });
+    // Check browser/system dark mode preference
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    dispatch(setDarkMode(darkModeMediaQuery.matches));
+
+    // Load user preferences from storage
+    const userDarkModePreference = localStorage.getItem('userDarkModePreference');
+    if (userDarkModePreference !== null) {
+      dispatch(setDarkMode(userDarkModePreference === 'true'));
     }
   }, [dispatch]);
-
-  useEffect(() => {
-    // Check if dark mode preference is available in local storage
-    const savedMode = localStorage.getItem('darkMode');
-
-    // If dark mode preference is available, set the state accordingly
-    if (savedMode === 'true') {
-      setIsDarkMode(true);
-    }
-  }, []); // Empty array ensures that effect is only run on mount
-
-  useEffect(() => {
-    Cookies.set("darkMode", isDarkMode);
-  }, [isDarkMode]);
 
   return <div className={isDarkMode ? "dark" : "light"}>{children}</div>;
 };

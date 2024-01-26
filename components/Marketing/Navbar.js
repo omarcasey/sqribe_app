@@ -121,7 +121,9 @@ const Navbar = () => {
               Blog{" "}
             </a>
           </nav>
-          <ThemeSwitch />
+          <div className="mr-6 mt-1">
+            <ThemeSwitch />
+          </div>
           <Link
             href={user ? "/app/dashboard" : "/signin"}
             className="relative hidden md:items-center md:justify-center md:inline-flex group"

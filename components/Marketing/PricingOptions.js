@@ -56,7 +56,7 @@ const PricingOptions = () => {
           <p className="text-3xl font-semibold">
             {selected ? "$25" : "$30"} / month
           </p>
-          <p className="font-semibold mb-6">+ $2 per extra minute</p>
+          <p className="font-semibold mb-6">+ $1 per extra minute</p>
           <ul className="flex flex-col gap-2 text-sm mb-6 flex-1 text-foreground-500">
             <li className="flex flex-row items-center">
               <FaCheck size={12} className="mr-2 flex-shrink-0" />
@@ -101,9 +101,9 @@ const PricingOptions = () => {
             audience
           </p>
           <p className="text-3xl font-semibold">
-            {selected ? "$100" : "$120"} / month
+            {selected ? "$60" : "$75"} / month
           </p>
-          <p className="font-semibold mb-6">+ $1.5 per extra minute</p>
+          <p className="font-semibold mb-6">+ $0.8 per extra minute</p>
           <ul className="flex flex-col gap-2 text-sm mb-6 flex-1 text-foreground-500">
             <li className="flex flex-row items-center">
               <FaCheck size={12} className="mr-2 flex-shrink-0 text-blue-500" />
@@ -152,8 +152,8 @@ const PricingOptions = () => {
             For small to medium sized buisness that have a smaller target
             audience
           </p>
-          <p className="text-3xl font-semibold">{selected ? "$500" : "$560"} / month</p>
-          <p className="font-semibold mb-6">+ $1 per extra minute</p>
+          <p className="text-3xl font-semibold">{selected ? "$250" : "$300"} / month</p>
+          <p className="font-semibold mb-6">+ $0.5 per extra minute</p>
           <ul className="flex flex-col gap-2 text-sm mb-6 flex-1 text-foreground-500">
             <li className="flex flex-row items-center">
               <FaCheck size={12} className="mr-2 flex-shrink-0" />

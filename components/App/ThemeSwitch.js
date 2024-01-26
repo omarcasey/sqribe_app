@@ -1,61 +1,29 @@
 import React from "react";
-import {Switch, VisuallyHidden, toggle, useSwitch} from "@nextui-org/react";
 import { MoonIcon } from "../Icons/MoonIcon";
 import { SunIcon } from "../Icons/SunIcon";
-import { useSelector } from "react-redux";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { setDarkMode } from "@/reducers/userSlice";
 
-const ThemeSwitch = (props) => {
-  const {
-    Component, 
-    slots, 
-    isSelected, 
-    getBaseProps, 
-    getInputProps, 
-    getWrapperProps
-  } = useSwitch(props);
-
-  const isDarkMode = useSelector((state) => state.user?.data?.darkMode);
-  const uid = useSelector((state) => state.user?.auth?.uid);
+export default function ThemeSwitch() {
+  const dispatch = useDispatch();
+  const isDarkMode = useSelector((state) => state.user?.darkMode);
 
   const toggleTheme = async () => {
-    try {
-      const userRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userRef);
-      const currentData = docSnap.data();
-      await updateDoc(userRef, {
-        darkMode: !currentData.darkMode,
-      });
-    } catch (e) {
-      console.error("Error updating darkMode: ", e);
-    }
+    const newMode = !isDarkMode;
+    dispatch(setDarkMode(newMode));
+    localStorage.setItem("userDarkModePreference", newMode.toString());
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <Component {...getBaseProps()}>
-          <VisuallyHidden>
-            <input {...getInputProps()} onChange={toggleTheme} />
-          </VisuallyHidden>
-          <div
-            {...getWrapperProps()}
-            className={slots.wrapper({
-              class: [
-                "w-8 h-8",
-                "flex items-center justify-center",
-                "rounded-lg bg-default-100 hover:bg-default-200",
-              ],
-            })}
-          >
-            {isSelected ? <SunIcon/> : <MoonIcon/>}
-          </div>
-      </Component>
+    <div
+      className="w-[22px] h-[22px] flex items-center justify-center text-foreground-500 hover:text-foreground hover:cursor-pointer transition-all"
+      onClick={toggleTheme}
+    >
+      {isDarkMode ? (
+        <MoonIcon className="w-full h-full" />
+      ) : (
+        <SunIcon className="w-full h-full" />
+      )}
     </div>
-  )
-}
-
-
-export default function App() {
-  return <ThemeSwitch/>
-}
+  );
+};
