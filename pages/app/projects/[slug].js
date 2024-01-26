@@ -35,8 +35,6 @@ import { useSelector } from "react-redux";
 import VideoPlayer from "@/components/App/VideoPlayer";
 import { motion } from "framer-motion";
 import { BsBodyText, BsTextLeft } from "react-icons/bs";
-import { RxTextAlignLeft } from "react-icons/rx";
-import CustomCursor from "@/components/App/CustomCursor";
 
 const Page = () => {
   const router = useRouter();
