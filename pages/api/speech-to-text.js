@@ -1,88 +1,126 @@
-import { SpeechClient } from "@google-cloud/speech";
-import { createClient } from "@deepgram/sdk";
+import { AssemblyAI } from "assemblyai";
 
-// Your Google Cloud Speech-to-Text API credentials
-const googleCredentials = JSON.parse(
-  process.env.REACT_APP_GOOGLE_APPLICATION_CREDENTIALS
-);
+function splitIntoParagraphs(transcriptObjects, maxSentencesPerParagraph = 5) {
+  const paragraphs = [];
+  let currentParagraph = [];
+  let sentenceCount = 0;
+  let currentSpeaker = null;
+  let paragraphStartTime = null;
+  let paragraphEndTime = null;
 
-const deepgramCredentials = process.env.DEEPGRAM_KEY;
+  // Iterate through each transcript object
+  for (let i = 0; i < transcriptObjects.length; i++) {
+    const { text, speaker, start, end } = transcriptObjects[i];
+
+    // Set the start time for the first paragraph
+    if (paragraphStartTime === null) {
+      paragraphStartTime = start;
+    }
+
+    // Detect speaker change
+    if (currentSpeaker !== null && speaker !== currentSpeaker) {
+      if (currentParagraph.length > 0) {
+        paragraphs.push({
+          text: currentParagraph.join(" "),
+          speaker: currentSpeaker,
+          startTime: paragraphStartTime,
+          endTime: paragraphEndTime,
+        });
+        currentParagraph = [];
+        sentenceCount = 0;
+        paragraphStartTime = start; // Update paragraph start time
+      }
+    }
+
+    // Add text to current paragraph
+    currentParagraph.push(text);
+
+    // If the word ends with a period, question mark, or exclamation mark,
+    // treat it as the end of a sentence and count it
+    if (text.match(/[.?!]$/)) {
+      sentenceCount++;
+    }
+
+    // Start a new paragraph if sentence count exceeds the threshold
+    if (sentenceCount >= maxSentencesPerParagraph) {
+      paragraphs.push({
+        text: currentParagraph.join(" "),
+        speaker: currentSpeaker,
+        startTime: paragraphStartTime,
+        endTime: paragraphEndTime,
+      });
+      currentParagraph = [];
+      sentenceCount = 0;
+      paragraphStartTime = start; // Update paragraph start time
+    }
+
+    // Update paragraph end time
+    paragraphEndTime = end;
+
+    currentSpeaker = speaker;
+  }
+
+  // Add the last paragraph
+  if (currentParagraph.length > 0) {
+    paragraphs.push({
+      text: currentParagraph.join(" "),
+      speaker: currentSpeaker,
+      startTime: paragraphStartTime,
+      endTime: paragraphEndTime,
+    });
+  }
+
+  return paragraphs;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { audioPath, audioLanguage } = req.body;
+  const { audioPath, audioLanguage, numOfSpeakers } = req.body;
 
   if (!audioPath) {
     return res.status(400).json({ error: "Missing 'audioPath' parameter" });
   }
 
-  if (!audioLanguage) {
-    return res.status(400).json({ error: "Missing 'audioLanguage' parameter" });
-  }
-
   try {
-    // // Initialize Google Cloud Speech-to-Text client
-    // const speechClient = new SpeechClient({ credentials: googleCredentials });
+    const client = new AssemblyAI({
+      apiKey: "4cdf7675ca834590a29cfdab160be8e6",
+    });
 
-    // // Configure the audio settings with GCS URI
-    // const audio = {
-    //   uri: `gs://sqribe-app.appspot.com/${audioPath}`, // Replace with your GCS URI
-    // };
+    const params = {
+      audio: `https://storage.googleapis.com/sqribe-app.appspot.com/${audioPath}`,
+      speaker_labels: true,
+      summarization: true,
+      summary_model: numOfSpeakers == 2 ? "conversational" : "informative",
+      summary_type: "bullets",
+    };
 
-    // // Configure the audio settings
-    // const config = {
-    //   encoding: "MP3",
-    //   sampleRateHertz: 16000,
-    //   languageCode: audioLanguage,
-    //   enableWordTimeOffsets: true, // Enable word-level timestamps
-    // };
+    if (numOfSpeakers !== "autodetect") {
+      params.speakers_expected = parseInt(numOfSpeakers);
+    }
 
-    // const request = {
-    //   audio: audio,
-    //   config: config,
-    // };
+    if (audioLanguage) {
+      params.language_code = audioLanguage;
+    } else {
+      params.language_detection = true;
+    }
 
-    // // Perform the asynchronous speech-to-text conversion
-    // const [operation] = await speechClient.longRunningRecognize(request);
-    // const [transcriptionResponse] = await operation.promise();
+    console.log(params);
 
-    // // Extract the transcription with word-level timestamps from the response
-    // const results = transcriptionResponse.results.map((result) => {
-    //   const alternatives = result.alternatives[0];
-    //   const wordsWithTimestamps = alternatives.words.map((word) => ({
-    //     word: word.word,
-    //     start_time:
-    //       parseFloat(word.startTime.seconds) + word.startTime.nanos / 1e9,
-    //     end_time: parseFloat(word.endTime.seconds) + word.endTime.nanos / 1e9,
-    //   }));
-    //   return {
-    //     transcript: alternatives.transcript,
-    //     words: wordsWithTimestamps,
-    //   };
-    // });
+    const transcript = await client.transcripts.transcribe(params);
+    // const { sentences } = await client.transcripts.sentences(transcript.id);
+    // for (const sentence of sentences) {
+    //   console.log(sentence.text);
+    // }
 
-    // Transcribe an audio file from a URL:
-    const deepgram = createClient(deepgramCredentials);
+    // const { paragraphs } = await client.transcripts.paragraphs(transcript.id);
+    // console.log(paragraphs)
 
-    const { result, error } = await deepgram.listen.prerecorded.transcribeUrl(
-      {
-        url: `https://storage.googleapis.com/sqribe-app.appspot.com/${audioPath}`,
-      },
-      {
-        smart_format: true,
-        model: "nova-2",
-      }
-    );
+    const segments = splitIntoParagraphs(transcript.words);
 
-    if (error) throw error;
-    // if (!error) console.dir(result, { depth: null });
-
-    // Respond with the transcribed text and timestamps
-    // console.log("Transcription: ", JSON.stringify(result));
-    res.status(200).json({ result });
+    res.status(200).json({ segments: segments, assembly: transcript });
   } catch (error) {
     console.error("Error converting speech to text:", error);
     res.status(500).json({ error: "Internal Server Error" });

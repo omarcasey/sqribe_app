@@ -93,6 +93,11 @@ const Projects = ({ openModal }) => {
   const [newName, setNewName] = useState("");
   const [selectedProject, setSelectedProject] = useState(null);
   const [AIsummary, setAIsummary] = useState(false);
+  const [numOfSpeakers, setNumOfSpeakers] = useState("autodetect");
+
+  const handleNumOfSpeakers = (e) => {
+    setNumOfSpeakers(e.target.value);
+  };
 
   const [dropdownStates, setDropdownStates] = useState(
     projects?.map(() => false) || []
@@ -130,8 +135,6 @@ const Projects = ({ openModal }) => {
   const handleTranslationLanguage = (e) => {
     settranslationLanguage(e.target.value);
   };
-
-  const handleUploadNew = async () => {};
 
   const handleUpload = async () => {
     try {
@@ -176,6 +179,7 @@ const Projects = ({ openModal }) => {
               body: JSON.stringify({
                 audioPath: filePath,
                 audioLanguage: getTranslateCode(originalLanguage),
+                numOfSpeakers: numOfSpeakers,
               }),
             });
 
@@ -187,158 +191,46 @@ const Projects = ({ openModal }) => {
 
             // Get speech-to-text result
             const result = await response.json();
-            const deepgramResult = result.result;
+            const assemblyResult = result;
             console.log("Speech To Text Converted Successfully!");
-            console.log(deepgramResult);
+            // console.log(assemblyResult.segments);
+            console.log(assemblyResult.assembly);
 
-            const segments = await Promise.all(
-              deepgramResult.results.channels[0].alternatives[0].paragraphs.paragraphs.flatMap(
-                async (paragraph, index) => {
-                  const sentences = await Promise.all(
-                    paragraph.sentences.map(async (sentence) => {
-                      const translationResponse = await fetch(
-                        "/api/translate-text",
-                        {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            inputText: sentence.text,
-                            target: getTranslateCode(translationLanguage),
-                          }),
-                        }
-                      );
+            const translatedParagraphs = await Promise.all(
+              assemblyResult.segments.map(async (paragraph) => {
+                // Call Translation API - Translate each paragraph
+                const translationResponse = await fetch("/api/translate-text", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    inputText: paragraph.text,
+                    target: getTranslateCode(translationLanguage),
+                  }),
+                });
 
-                      if (!translationResponse.ok) {
-                        throw new Error(
-                          `Failed to translate text: ${translationResponse.statusText}`
-                        );
-                      }
-
-                      const translationResult =
-                        await translationResponse.json();
-                      const translatedText = translationResult.translations[0];
-
-                      return {
-                        text: sentence.text,
-                        translatedText: translatedText,
-                        start: sentence.start,
-                        end: sentence.end,
-                        speaker: 1,
-                        paragraph: index,
-                        voiceId: "Adam",
-                      };
-                    })
+                if (!translationResponse.ok) {
+                  throw new Error(
+                    `Failed to translate text: ${translationResponse.statusText}`
                   );
-
-                  return sentences;
                 }
-              )
+
+                const translationResult = await translationResponse.json();
+                const translatedText = translationResult.translations[0];
+
+                return {
+                  text: paragraph.text,
+                  translatedText: translatedText,
+                  start: paragraph.startTime,
+                  end: paragraph.endTime,
+                  speaker: paragraph.speaker,
+                  voiceId: "Adam",
+                };
+              })
             );
 
-            const segmentsSentences = [].concat(...segments);
-            console.log(segmentsSentences);
-
-            // Initialize an empty array to store paragraphs
-            const segmentsParagraphs = [];
-
-            // Initialize variables to track paragraph details
-            let currentParagraph = -1;
-            let paragraphStart = null;
-            let paragraphEnd = null;
-            let paragraphText = "";
-            let paragraphTranslatedText = "";
-            let voiceId = null;
-            let speaker = null;
-
-            // Loop through the sentence objects
-            segmentsSentences.forEach((sentence) => {
-              // If the current sentence belongs to a new paragraph
-              if (sentence.paragraph !== currentParagraph) {
-                // If this is not the first iteration, push the previous paragraph details into the paragraphsArray
-                if (currentParagraph !== -1) {
-                  segmentsParagraphs.push({
-                    start: paragraphStart,
-                    end: paragraphEnd,
-                    text: paragraphText,
-                    translatedText: paragraphTranslatedText,
-                    voiceId: voiceId,
-                    speaker: speaker,
-                  });
-                }
-                // Reset paragraph variables for the new paragraph
-                currentParagraph = sentence.paragraph;
-                paragraphStart = sentence.start;
-                paragraphEnd = sentence.end;
-                paragraphText = sentence.text;
-                paragraphTranslatedText = sentence.translatedText;
-                voiceId = sentence.voiceId;
-                speaker = sentence.speaker;
-              } else {
-                // If the current sentence belongs to the same paragraph, update paragraph details
-                paragraphEnd = sentence.end;
-                paragraphText += " " + sentence.text; // Concatenate text
-                paragraphTranslatedText += " " + sentence.translatedText; // Concatenate translatedText
-              }
-            });
-
-            // Push the last paragraph into paragraphsArray (since the loop ends before pushing the last one)
-            segmentsParagraphs.push({
-              start: paragraphStart,
-              end: paragraphEnd,
-              text: paragraphText,
-              translatedText: paragraphTranslatedText,
-              voiceId: voiceId,
-              speaker: speaker,
-            });
-
-            // Now paragraphsArray contains the desired array of paragraphs
-            console.log(segmentsParagraphs);
-
-            let summaryResult;
-            if (AIsummary) {
-              // Call Summarize API
-              const summaryResponse = await fetch("/api/summarize", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  transcript:
-                    deepgramResult.results.channels[0].alternatives[0]
-                      .transcript,
-                }),
-              });
-
-              // Get Summary Result
-              const summaryData = await summaryResponse.json();
-              summaryResult = summaryData.summary;
-              console.log("Transcript Summarized Successfully!");
-            }
-
-            // Call translation API
-            const translationResponse = await fetch("/api/translate-text", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                inputText:
-                  deepgramResult.results.channels[0].alternatives[0].transcript,
-                target: getTranslateCode(translationLanguage),
-              }),
-            });
-
-            if (!translationResponse.ok) {
-              throw new Error(
-                `Failed to translate text: ${translationResponse.statusText}`
-              );
-            }
-
-            // Get translation result
-            const translationResult = await translationResponse.json();
-            const translatedText = translationResult.translations[0];
+            console.log(translatedParagraphs);
             console.log("Text Translated Successfully!");
 
             // Call text-to-speech API
@@ -361,9 +253,8 @@ const Projects = ({ openModal }) => {
             // const ttsResult = await ttsResponse.json();
             // const audioUrl = ttsResult.audioUrl;
             // console.log("Text To Speech Converted Successfully!");
-            const audioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-
-
+            const audioUrl =
+              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
             // Add the converted text, translation, and audio URL to the audio files collection
             try {
@@ -375,22 +266,10 @@ const Projects = ({ openModal }) => {
                 translationLanguage: translationLanguage,
                 date: Timestamp.fromDate(new Date()),
                 fileURL: downloadURL,
-                duration: deepgramResult.metadata.duration,
-                transcription: {
-                  transcript:
-                    deepgramResult.results.channels[0].alternatives[0]
-                      .transcript,
-                  words:
-                    deepgramResult.results.channels[0].alternatives[0].words,
-                },
-                translation: {
-                  text: translatedText,
-                  language: getTranslateCode(translationLanguage),
-                },
-                segmentsSentences: segmentsSentences,
-                segmentsParagraphs: segmentsParagraphs,
+                duration: assemblyResult.assembly.audio_duration,
+                transcription: assemblyResult.assembly,
+                segments: translatedParagraphs,
                 translatedFileURL: audioUrl,
-                summary: summaryResult || null,
               });
               console.log("Document written with ID: ", docRef.id);
               try {
@@ -399,10 +278,11 @@ const Projects = ({ openModal }) => {
                 const currentData = docSnap.data();
                 await updateDoc(userRef, {
                   usedSeconds:
-                    currentData.usedSeconds + deepgramResult.metadata.duration,
+                    currentData.usedSeconds +
+                    assemblyResult.assembly.audio_duration,
                   remainingSeconds:
                     currentData.remainingSeconds -
-                    deepgramResult.metadata.duration,
+                    assemblyResult.assembly.audio_duration,
                 });
               } catch (e) {
                 console.error("Error updating credits: ", e);
@@ -418,12 +298,12 @@ const Projects = ({ openModal }) => {
           }
 
           // Close modal
-          onClose();
+          handleModalClose();
         }
       );
     } catch (e) {
       console.error("Error adding document: ", e);
-      setisUploading(false);
+      handleModalClose();
     }
   };
 
@@ -746,6 +626,51 @@ const Projects = ({ openModal }) => {
                           onChange={handleProjectNameChange}
                           isDisabled={isUploading}
                         />
+
+                        <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
+                          Number of Speakers
+                        </p>
+                        <Select
+                          size="sm"
+                          color="default"
+                          className={`${
+                            isDarkMode ? "dark" : "light"
+                          } text-foreground pb-4`}
+                          selectedKeys={[numOfSpeakers]}
+                          onChange={handleNumOfSpeakers}
+                          aria-label="Number of Speakers"
+                          disallowEmptySelection
+                          isDisabled={isUploading}
+                        >
+                          <SelectItem
+                            key={"autodetect"}
+                            className="text-black"
+                            value={"autodetect"}
+                          >
+                            Autodetect
+                          </SelectItem>
+                          <SelectItem
+                            key={1}
+                            className="text-black"
+                            value={1}
+                          >
+                            1
+                          </SelectItem>
+                          <SelectItem
+                            key={2}
+                            className="text-black"
+                            value={2}
+                          >
+                            2
+                          </SelectItem>
+                          <SelectItem
+                            key={3}
+                            className="text-black"
+                            value={3}
+                          >
+                            3
+                          </SelectItem>
+                        </Select>
 
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Original Language
