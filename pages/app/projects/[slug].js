@@ -375,6 +375,7 @@ const Page = () => {
                   fullWidth
                   variant="underlined"
                   className="pt-5"
+                  defaultSelectedKey={"translated"}
                 >
                   <Tab key="original" title="Original">
                     <div className="p-4 px-5">
@@ -392,8 +393,8 @@ const Page = () => {
                   <Tab key="translated" title="Translated" className="">
                     <div className="p-4 px-5">
                       {project.needsUpdate === true && (
-                        <div className="bg-blue-500 h-12 w-full flex items-center justify-center rounded-xl mb-2">
-                          <p className="text-sm text-white">
+                        <div className="bg-blue-500 w-full flex items-center justify-center rounded-xl mb-2 px-4 py-3">
+                          <p className="text-sm text-white text-center">
                             <span className="font-semibold">
                               This is an old version!{" "}
                             </span>

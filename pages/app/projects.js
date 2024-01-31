@@ -164,6 +164,34 @@ const Projects = ({ openModal }) => {
         async () => {
           // Handle successful uploads on complete
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          const generateThumbnail = async (videoUrl) => {
+            try {
+              const response = await fetch("/api/generateThumbnail", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ videoUrl }), // Send videoUrl in the request body
+              });
+
+              if (!response.ok) {
+                throw new Error("Failed to generate thumbnail");
+              }
+
+              const data = await response.json();
+              return data.thumbnailUrl; // Return the generated thumbnail URL
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          };
+
+          // Usage example
+          // const mp4Url = 'https://example.com/your_video.mp4';
+          const thumbnailUrl = await generateThumbnail(downloadURL);
+          console.log("Thumbnail URL:", thumbnailUrl);
+
           const filePath =
             "files/" +
             selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
@@ -266,6 +294,7 @@ const Projects = ({ openModal }) => {
                 translationLanguage: translationLanguage,
                 date: Timestamp.fromDate(new Date()),
                 fileURL: downloadURL,
+                thumbnailURL: thumbnailUrl,
                 duration: assemblyResult.assembly.audio_duration,
                 transcription: assemblyResult.assembly,
                 segments: translatedParagraphs,
@@ -392,7 +421,7 @@ const Projects = ({ openModal }) => {
   const deleteProject = async () => {
     try {
       const projectRef = doc(db, "projects", selectedProject.id); // Assuming "id" is the field that uniquely identifies a project
-      await deleteDoc(projectRef);
+      deleteDoc(projectRef);
 
       // Optionally, you can update the local state or Redux store to remove the deleted project
       // This step depends on how you manage the state of projects in your application
@@ -410,9 +439,9 @@ const Projects = ({ openModal }) => {
       <div className="w-full">
         {/* <Navbar /> */}
         <div className="flex flex-col items-center pb-24 pt-16">
-          <div className="flex flex-row items-center justify-center w-full px-10 gap-6 flex-wrap">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-10">
             <div
-              className="border border-dashed border-foreground-400 text-foreground w-96 h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
+              className="border border-dashed border-foreground-400 text-foreground h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
               onClick={onOpen}
             >
               <p className="text-3xl">+</p>
@@ -425,24 +454,24 @@ const Projects = ({ openModal }) => {
                 }}
                 key={project.id}
                 href={`/app/projects/${project.id}`}
-                className="w-96 h-56 border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
+                className="mb-4 h-56 max-w-[24rem] border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
               >
                 <Card className="w-full h-full dark:hover:bg-foreground-100 group">
-                  <CardHeader className="flex justify-between">
-                    <div className="flex gap-3">
+                  {/* <CardHeader className="flex justify-between p-1 px-3 items-center">
+                    <div className="flex gap-3 items-center flex-1">
                       <Image
                         alt="nextui logo"
                         height={40}
                         radius="sm"
-                        src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
+                        src={`https://flagcdn.com/${getFlagCode(
+                          project.translationLanguage
+                        )}.svg`}
                         width={40}
-                        className="w-10 h-10"
+                        className="w-6 h-6 rounded-full mr-1"
                       />
-                      <div className="flex flex-col">
-                        <p className="text-md">{project.projectName}</p>
-                        <p className="text-small text-default-500">
-                          {project.date &&
-                            project.date.toDate().toLocaleDateString()}
+                      <div className="flex-1 flex items-center">
+                        <p className="w-64 text-center text-foreground overflow-hidden whitespace-nowrap overflow-ellipsis">
+                          {project.projectName}
                         </p>
                       </div>
                     </div>
@@ -462,6 +491,7 @@ const Projects = ({ openModal }) => {
                             handleDropDownState(index, "both");
                           }}
                           variant="light"
+                          className="min-w-0"
                         >
                           <IoEllipsisHorizontalSharp size={20} />
                         </Button>
@@ -531,16 +561,143 @@ const Projects = ({ openModal }) => {
                       </DropdownMenu>
                     </Dropdown>
                   </CardHeader>
-                  <Divider />
-                  <CardBody className="flex items-center justify-center">
-                    <div className="bg-foreground-200 rounded-full p-3 group-hover:scale-[1] transition-all !duration-500 scale-0">
-                      <NextIcon size={40} />
+                  <Divider /> */}
+                  <CardBody className="flex items-center justify-center p-0 relative">
+                    <div className="flex justify-between p-1 px-3 items-center absolute inset-0">
+                      <div className="flex gap-3 items-center flex-1">
+                        <Image
+                          alt="nextui logo"
+                          height={40}
+                          radius="sm"
+                          src={`https://flagcdn.com/${getFlagCode(
+                            project.translationLanguage
+                          )}.svg`}
+                          width={40}
+                          className="w-6 h-6 rounded-full mr-1"
+                        />
+                        <div className="flex-1 flex items-center">
+                          <p className="w-64 text-center text-foreground overflow-hidden whitespace-nowrap overflow-ellipsis">
+                            {project.projectName}
+                          </p>
+                        </div>
+                      </div>
+                      <Dropdown
+                        isOpen={dropdownStates[index]}
+                        className={`${
+                          isDarkMode ? "dark bg-foreground-100" : "light"
+                        } !w-44 !min-w-0`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <DropdownTrigger>
+                          <Button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleDropDownState(index, "both");
+                            }}
+                            variant="light"
+                            className="min-w-0"
+                          >
+                            <IoEllipsisHorizontalSharp size={20} />
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          variant="faded"
+                          aria-label="Dropdown menu with icons"
+                          className=" text-foreground"
+                        >
+                          <DropdownItem
+                            key="view"
+                            startContent={
+                              <FaEye className="text-gray-400" size={15} />
+                            }
+                            onPress={() => {
+                              handleDropDownState(index, false);
+                              router.push(`/app/projects/${project.id}`);
+                            }}
+                          >
+                            View file
+                          </DropdownItem>
+                          <DropdownItem
+                            key="rename"
+                            startContent={
+                              <MdEditSquare
+                                className="text-gray-400"
+                                size={15}
+                              />
+                            }
+                            onPress={() => {
+                              handleDropDownState(index, false);
+                              setSelectedProject(project);
+                              setNewName(project.projectName);
+                              onOpenRenameModal();
+                            }}
+                          >
+                            Rename file
+                          </DropdownItem>
+                          <DropdownItem
+                            key="download"
+                            startContent={
+                              <MdSimCardDownload
+                                className="text-gray-400"
+                                size={15}
+                              />
+                            }
+                            onPress={() => {
+                              handleDropDownState(index, false);
+                              handleDownload(
+                                project.translatedFileURL,
+                                project.fileName
+                              );
+                            }}
+                          >
+                            Download file
+                          </DropdownItem>
+                          <DropdownItem
+                            key="delete"
+                            className="text-danger"
+                            color="danger"
+                            startContent={<HiTrash size={15} />}
+                            onPress={() => {
+                              handleDropDownState(index, false);
+                              setSelectedProject(project);
+                              onOpenDeleteModal();
+                            }}
+                          >
+                            Delete file
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-foreground-200 rounded-full p-3 group-hover:scale-[1] transition-all !duration-500 scale-0">
+                        <NextIcon size={25} />
+                      </div>
+                    </div>
+                    <Image
+                      src={project.thumbnailURL || "/drakedont.png"}
+                      width={1000}
+                      height={1000}
+                      alt="project_image"
+                      className="max-w-full max-h-full object-cover w-full h-full"
+                    />
                   </CardBody>
                   <Divider />
-                  <CardFooter>
-                    <p className="text-sm text-default-500">
+                  <CardFooter className="py-2 px-5 flex flex-col shrink-0">
+                    <p
+                      className="text-sm text-default-700 w-full"
+                      style={{
+                        maxWidth: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {project.fileName}
+                    </p>
+                    <p className="text-xs w-full mt-1 text-default-500">
+                      {project.date.toDate().toLocaleDateString()}
                     </p>
                   </CardFooter>
                 </Card>
@@ -649,25 +806,13 @@ const Projects = ({ openModal }) => {
                           >
                             Autodetect
                           </SelectItem>
-                          <SelectItem
-                            key={1}
-                            className="text-black"
-                            value={1}
-                          >
+                          <SelectItem key={1} className="text-black" value={1}>
                             1
                           </SelectItem>
-                          <SelectItem
-                            key={2}
-                            className="text-black"
-                            value={2}
-                          >
+                          <SelectItem key={2} className="text-black" value={2}>
                             2
                           </SelectItem>
-                          <SelectItem
-                            key={3}
-                            className="text-black"
-                            value={3}
-                          >
+                          <SelectItem key={3} className="text-black" value={3}>
                             3
                           </SelectItem>
                         </Select>
