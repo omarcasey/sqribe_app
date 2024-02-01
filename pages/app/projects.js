@@ -31,6 +31,18 @@ import {
   CheckboxGroup,
   Checkbox,
 } from "@nextui-org/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  User,
+  Chip,
+  Tooltip,
+  getKeyValue,
+} from "@nextui-org/react";
 import { db, storage } from "@/firebase";
 import {
   collection,
@@ -60,6 +72,8 @@ import { HiTrash } from "react-icons/hi2";
 import { MdSimCardDownload } from "react-icons/md";
 import { MdEditSquare } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
+import { FaList } from "react-icons/fa";
+import { IoGrid } from "react-icons/io5";
 import Image from "next/image";
 
 const Projects = ({ openModal }) => {
@@ -94,6 +108,13 @@ const Projects = ({ openModal }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [AIsummary, setAIsummary] = useState(false);
   const [numOfSpeakers, setNumOfSpeakers] = useState("autodetect");
+  const [gridView, setGridView] = useState(
+    localStorage.getItem("gridView") === "true"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("gridView", gridView);
+  }, [gridView]);
 
   const handleNumOfSpeakers = (e) => {
     setNumOfSpeakers(e.target.value);
@@ -437,134 +458,67 @@ const Projects = ({ openModal }) => {
   return (
     <AppShell>
       <div className="w-full">
-        {/* <Navbar /> */}
         <div className="flex flex-col items-center pb-24 pt-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-10">
-            <div
-              className="border border-dashed border-foreground-400 text-foreground h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
-              onClick={onOpen}
-            >
-              <p className="text-3xl">+</p>
-              <p className="font-semibold text-xl pb-4">Upload video</p>
-            </div>
-            {projects?.map((project, index) => (
-              <Link
-                onMouseLeave={() => {
-                  handleDropDownState(index, false);
-                }}
-                key={project.id}
-                href={`/app/projects/${project.id}`}
-                className="mb-4 h-56 max-w-[24rem] border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
+          <div className="flex flex-row justify-between items-center max-w-[85%] w-full px-10 mb-6">
+            <h1 className="text-xl font-extralight text-foreground mr-10">
+              My Projects
+            </h1>
+            <div className="flex items-center">
+              {!gridView && (
+                <Button
+                  color="primary"
+                  className="mr-4"
+                  size="sm"
+                  onPress={onOpen}
+                >
+                  Upload +
+                </Button>
+              )}
+              <Button
+                className="min-w-0 h-8 rounded-lg px-2 mr-2 bg-foreground bg-opacity-10 hover:bg-opacity-20 transition-all group"
+                onPress={() => setGridView(true)}
               >
-                <Card className="w-full h-full dark:hover:bg-foreground-100 group">
-                  {/* <CardHeader className="flex justify-between p-1 px-3 items-center">
-                    <div className="flex gap-3 items-center flex-1">
-                      <Image
-                        alt="nextui logo"
-                        height={40}
-                        radius="sm"
-                        src={`https://flagcdn.com/${getFlagCode(
-                          project.translationLanguage
-                        )}.svg`}
-                        width={40}
-                        className="w-6 h-6 rounded-full mr-1"
-                      />
-                      <div className="flex-1 flex items-center">
-                        <p className="w-64 text-center text-foreground overflow-hidden whitespace-nowrap overflow-ellipsis">
-                          {project.projectName}
-                        </p>
-                      </div>
-                    </div>
-                    <Dropdown
-                      isOpen={dropdownStates[index]}
-                      className={`${
-                        isDarkMode ? "dark bg-foreground-100" : "light"
-                      } !w-44 !min-w-0`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
-                    >
-                      <DropdownTrigger>
-                        <Button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleDropDownState(index, "both");
-                          }}
-                          variant="light"
-                          className="min-w-0"
-                        >
-                          <IoEllipsisHorizontalSharp size={20} />
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        variant="faded"
-                        aria-label="Dropdown menu with icons"
-                        className=" text-foreground"
-                      >
-                        <DropdownItem
-                          key="view"
-                          startContent={
-                            <FaEye className="text-gray-400" size={15} />
-                          }
-                          onPress={() => {
-                            handleDropDownState(index, false);
-                            router.push(`/app/projects/${project.id}`);
-                          }}
-                        >
-                          View file
-                        </DropdownItem>
-                        <DropdownItem
-                          key="rename"
-                          startContent={
-                            <MdEditSquare className="text-gray-400" size={15} />
-                          }
-                          onPress={() => {
-                            handleDropDownState(index, false);
-                            setSelectedProject(project);
-                            setNewName(project.projectName);
-                            onOpenRenameModal();
-                          }}
-                        >
-                          Rename file
-                        </DropdownItem>
-                        <DropdownItem
-                          key="download"
-                          startContent={
-                            <MdSimCardDownload
-                              className="text-gray-400"
-                              size={15}
-                            />
-                          }
-                          onPress={() => {
-                            handleDropDownState(index, false);
-                            handleDownload(
-                              project.translatedFileURL,
-                              project.fileName
-                            );
-                          }}
-                        >
-                          Download file
-                        </DropdownItem>
-                        <DropdownItem
-                          key="delete"
-                          className="text-danger"
-                          color="danger"
-                          startContent={<HiTrash size={15} />}
-                          onPress={() => {
-                            handleDropDownState(index, false);
-                            setSelectedProject(project);
-                            onOpenDeleteModal();
-                          }}
-                        >
-                          Delete file
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown>
-                  </CardHeader>
-                  <Divider /> */}
-                  <CardBody className="flex items-center justify-center p-0 relative">
-                    <div className="flex justify-between p-1 px-3 items-center absolute inset-0">
-                      <div className="flex gap-3 items-center flex-1">
+                <IoGrid
+                  className={`text-${
+                    gridView ? "foreground" : "foreground-400"
+                  } group-hover:text-foreground transition-all`}
+                  size={17}
+                />
+              </Button>
+              <Button
+                className="min-w-0 h-8 rounded-lg px-2 bg-foreground bg-opacity-10 hover:bg-opacity-20 transition-all"
+                onPress={() => setGridView(false)}
+              >
+                <FaList
+                  className={`text-${
+                    !gridView ? "foreground" : "foreground-400"
+                  } group-hover:text-foreground transition-all`}
+                  size={16}
+                />
+              </Button>
+            </div>
+          </div>
+          {gridView ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-10">
+              <div
+                className="border border-dashed border-foreground-400 text-foreground h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
+                onClick={onOpen}
+              >
+                <p className="text-3xl">+</p>
+                <p className="font-semibold text-xl pb-4">Upload video</p>
+              </div>
+              {projects?.map((project, index) => (
+                <Link
+                  onMouseLeave={() => {
+                    handleDropDownState(index, false);
+                  }}
+                  key={project.id}
+                  href={`/app/projects/${project.id}`}
+                  className="mb-4 h-56 max-w-[24rem] border border-foreground-400 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:border-purple-500 transition-all hover:shadow-xl"
+                >
+                  <Card className="w-full h-full dark:hover:bg-foreground-100 group">
+                    <CardBody className="flex items-center justify-center p-0 relative">
+                      <div className="flex justify-between p-1 px-3 items-center absolute inset-0 h-12">
                         <Image
                           alt="nextui logo"
                           height={40}
@@ -573,137 +527,305 @@ const Projects = ({ openModal }) => {
                             project.translationLanguage
                           )}.svg`}
                           width={40}
-                          className="w-6 h-6 rounded-full mr-1"
+                          className="w-6 h-6 rounded-full mr-5"
                         />
-                        <div className="flex-1 flex items-center">
-                          <p className="w-64 text-center text-foreground overflow-hidden whitespace-nowrap overflow-ellipsis">
-                            {project.projectName}
-                          </p>
+                        <Dropdown
+                          isOpen={dropdownStates[index]}
+                          className={`${
+                            isDarkMode ? "dark bg-foreground-100" : "light"
+                          } !w-44 !min-w-0`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                          }}
+                        >
+                          <DropdownTrigger>
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleDropDownState(index, "both");
+                              }}
+                              variant="light"
+                              size="sm"
+                              className="min-w-0 shrink-0 bg-foreground-50 bg-opacity-50 px-2 h-6 transition-all"
+                            >
+                              <IoEllipsisHorizontalSharp size={20} />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            variant="faded"
+                            aria-label="Dropdown menu with icons"
+                            className=" text-foreground"
+                          >
+                            <DropdownItem
+                              key="view"
+                              startContent={
+                                <FaEye className="text-gray-400" size={15} />
+                              }
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                router.push(`/app/projects/${project.id}`);
+                              }}
+                            >
+                              View file
+                            </DropdownItem>
+                            <DropdownItem
+                              key="rename"
+                              startContent={
+                                <MdEditSquare
+                                  className="text-gray-400"
+                                  size={15}
+                                />
+                              }
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                setSelectedProject(project);
+                                setNewName(project.projectName);
+                                onOpenRenameModal();
+                              }}
+                            >
+                              Rename file
+                            </DropdownItem>
+                            <DropdownItem
+                              key="download"
+                              startContent={
+                                <MdSimCardDownload
+                                  className="text-gray-400"
+                                  size={15}
+                                />
+                              }
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                handleDownload(
+                                  project.translatedFileURL,
+                                  project.fileName
+                                );
+                              }}
+                            >
+                              Download file
+                            </DropdownItem>
+                            <DropdownItem
+                              key="delete"
+                              className="text-danger"
+                              color="danger"
+                              startContent={<HiTrash size={15} />}
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                setSelectedProject(project);
+                                onOpenDeleteModal();
+                              }}
+                            >
+                              Delete file
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="bg-foreground-200 rounded-full p-3 group-hover:scale-[1] transition-all !duration-500 scale-0">
+                          <NextIcon size={25} />
                         </div>
                       </div>
-                      <Dropdown
-                        isOpen={dropdownStates[index]}
-                        className={`${
-                          isDarkMode ? "dark bg-foreground-100" : "light"
-                        } !w-44 !min-w-0`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                        }}
-                      >
-                        <DropdownTrigger>
-                          <Button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleDropDownState(index, "both");
-                            }}
-                            variant="light"
-                            className="min-w-0"
-                          >
-                            <IoEllipsisHorizontalSharp size={20} />
-                          </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                          variant="faded"
-                          aria-label="Dropdown menu with icons"
-                          className=" text-foreground"
-                        >
-                          <DropdownItem
-                            key="view"
-                            startContent={
-                              <FaEye className="text-gray-400" size={15} />
-                            }
-                            onPress={() => {
-                              handleDropDownState(index, false);
-                              router.push(`/app/projects/${project.id}`);
-                            }}
-                          >
-                            View file
-                          </DropdownItem>
-                          <DropdownItem
-                            key="rename"
-                            startContent={
-                              <MdEditSquare
-                                className="text-gray-400"
-                                size={15}
-                              />
-                            }
-                            onPress={() => {
-                              handleDropDownState(index, false);
-                              setSelectedProject(project);
-                              setNewName(project.projectName);
-                              onOpenRenameModal();
-                            }}
-                          >
-                            Rename file
-                          </DropdownItem>
-                          <DropdownItem
-                            key="download"
-                            startContent={
-                              <MdSimCardDownload
-                                className="text-gray-400"
-                                size={15}
-                              />
-                            }
-                            onPress={() => {
-                              handleDropDownState(index, false);
-                              handleDownload(
-                                project.translatedFileURL,
-                                project.fileName
-                              );
-                            }}
-                          >
-                            Download file
-                          </DropdownItem>
-                          <DropdownItem
-                            key="delete"
-                            className="text-danger"
-                            color="danger"
-                            startContent={<HiTrash size={15} />}
-                            onPress={() => {
-                              handleDropDownState(index, false);
-                              setSelectedProject(project);
-                              onOpenDeleteModal();
-                            }}
-                          >
-                            Delete file
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </Dropdown>
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-foreground-200 rounded-full p-3 group-hover:scale-[1] transition-all !duration-500 scale-0">
-                        <NextIcon size={25} />
+                      <Image
+                        src={project.thumbnailURL || "/drakedont.png"}
+                        width={1000}
+                        height={1000}
+                        alt="project_image"
+                        className="max-w-full max-h-full object-cover w-full h-full"
+                      />
+                    </CardBody>
+                    <Divider />
+                    <CardFooter className="py-2 px-5 flex flex-col shrink-0">
+                      <p className="text-sm text-default-700 w-full font-medium overflow-hidden whitespace-nowrap overflow-ellipsis">
+                        {project.projectName}
+                      </p>
+                      <div className="flex justify-between w-full mt-1">
+                        <p className="text-xs text-default-500">
+                          {project.date.toDate().toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-default-500 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[12rem]">
+                          {project.fileName} seconds
+                        </p>
                       </div>
-                    </div>
-                    <Image
-                      src={project.thumbnailURL || "/drakedont.png"}
-                      width={1000}
-                      height={1000}
-                      alt="project_image"
-                      className="max-w-full max-h-full object-cover w-full h-full"
-                    />
-                  </CardBody>
-                  <Divider />
-                  <CardFooter className="py-2 px-5 flex flex-col shrink-0">
-                    <p
-                      className="text-sm text-default-700 w-full"
-                      style={{
-                        maxWidth: "100%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {project.fileName}
-                    </p>
-                    <p className="text-xs w-full mt-1 text-default-500">
+                      {/* <p className="text-xs w-full mt-1 text-default-500">
                       {project.date.toDate().toLocaleDateString()}
-                    </p>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                    </p> */}
+                    </CardFooter>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="mb-10 max-w-[85%] w-full">
+              <Table aria-label="Example table with custom cells" isCompact>
+                <TableHeader>
+                  <TableColumn className="font-bold">Project Name</TableColumn>
+                  <TableColumn className="font-bold">Date Created</TableColumn>
+                  <TableColumn className="font-bold">
+                    Original Language
+                  </TableColumn>
+                  <TableColumn className="font-bold">
+                    Translation Language
+                  </TableColumn>
+                  <TableColumn className="font-bold">Actions</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {projects?.map((project, index) => (
+                    <TableRow key={project.id}>
+                      <TableCell>
+                        <Link href={`/app/projects/${project.id}`} className="">
+                          <div className="flex flex-row hover:bg-foreground-100 rounded-lg p-1 transition-all">
+                            <Image
+                              src={project.thumbnailURL || "/drakedont.png"}
+                              alt="thumbnail"
+                              width={1000}
+                              height={1000}
+                              className="w-auto h-10 mr-3 rounded-lg"
+                            />
+                            <div className="flex flex-col">
+                              <p className="text-foreground font-medium text-base">
+                                {project.projectName}
+                              </p>
+                              <p className="text-default-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis max-w-xs">
+                                {project.fileName}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-foreground tracking-wide text-sm">
+                          {project.date.toDate().toLocaleDateString()}
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Image
+                            alt="nextui logo"
+                            height={40}
+                            radius="sm"
+                            src={`https://flagcdn.com/${getFlagCode(
+                              project.originalLanguage
+                            )}.svg`}
+                            width={40}
+                            className="w-6 h-6 rounded-full mr-2"
+                          />
+                          <p className="text-default-500 text-sm">
+                            {project.originalLanguage}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Image
+                            alt="nextui logo"
+                            height={40}
+                            radius="sm"
+                            src={`https://flagcdn.com/${getFlagCode(
+                              project.translationLanguage
+                            )}.svg`}
+                            width={40}
+                            className="w-6 h-6 rounded-full mr-2"
+                          />
+                          <p className="text-default-500 text-sm">
+                            {project.translationLanguage}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Dropdown
+                          isOpen={dropdownStates[index]}
+                          className={`${
+                            isDarkMode ? "dark bg-foreground-100" : "light"
+                          } !w-44 !min-w-0`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                          }}
+                        >
+                          <DropdownTrigger>
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleDropDownState(index, "both");
+                              }}
+                              variant="light"
+                              className="min-w-0"
+                            >
+                              <IoEllipsisHorizontalSharp size={20} />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            variant="faded"
+                            aria-label="Dropdown menu with icons"
+                            className=" text-foreground"
+                          >
+                            <DropdownItem
+                              key="view"
+                              startContent={
+                                <FaEye className="text-gray-400" size={15} />
+                              }
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                router.push(`/app/projects/${project.id}`);
+                              }}
+                            >
+                              View file
+                            </DropdownItem>
+                            <DropdownItem
+                              key="rename"
+                              startContent={
+                                <MdEditSquare
+                                  className="text-gray-400"
+                                  size={15}
+                                />
+                              }
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                setSelectedProject(project);
+                                setNewName(project.projectName);
+                                onOpenRenameModal();
+                              }}
+                            >
+                              Rename file
+                            </DropdownItem>
+                            <DropdownItem
+                              key="download"
+                              startContent={
+                                <MdSimCardDownload
+                                  className="text-gray-400"
+                                  size={15}
+                                />
+                              }
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                handleDownload(
+                                  project.translatedFileURL,
+                                  project.fileName
+                                );
+                              }}
+                            >
+                              Download file
+                            </DropdownItem>
+                            <DropdownItem
+                              key="delete"
+                              className="text-danger"
+                              color="danger"
+                              startContent={<HiTrash size={15} />}
+                              onPress={() => {
+                                handleDropDownState(index, false);
+                                setSelectedProject(project);
+                                onOpenDeleteModal();
+                              }}
+                            >
+                              Delete file
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
           <>
             <Modal

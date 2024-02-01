@@ -39,6 +39,7 @@ import {
   setAudioPlayerVisible,
   setAutoPlay,
 } from "@/reducers/userSlice";
+import Image from "next/image";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
@@ -122,18 +123,29 @@ const Dashboard = () => {
               <h1 className="text-2xl mb-4">Recent Projects</h1>
               {projects?.slice(0, 2).map((project, index) => (
                 <Card
-                  key={index}
-                  className="p-4 w-full flex flex-row items-center justify-between hover:bg-default-200"
+                  key={project.id}
+                  className="p-4 w-full flex flex-row items-center justify-start hover:bg-default-200"
                   isPressable
                   onPress={() => router.push(`/app/projects/${project.id}`)}
                 >
+                  <Image
+                    src={project.thumbnailURL || "/drakedont.png"}
+                    alt="thumbnail"
+                    width={1000}
+                    height={1000}
+                    className="w-auto h-10 mr-3 rounded-lg"
+                  />
                   <div className="flex flex-col">
-                    <p className="text-md text-left">{project.projectName}</p>
-                    <p className="text-small text-default-500">
-                      {project.date.toDate().toLocaleString()}
+                    <p className="text-foreground font-medium text-start">
+                      {project.projectName}
+                    </p>
+                    <p className="text-default-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis max-w-xs">
+                      {project.fileName}
                     </p>
                   </div>
-                  <Spinner />
+                  <div className="flex flex-row items-center justify-end ml-auto">
+                    <FaCircleInfo className="text-foreground-700 ml-2" size={12} />
+                  </div>
                 </Card>
               ))}
             </div>

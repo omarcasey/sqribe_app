@@ -43,6 +43,7 @@ const SignIn = () => {
           width={1024}
           height={1024}
           className="w-24 contrast-125 mt-10"
+          alt="logo"
         />
         <p className="text-gray-400 font-bold text-xl tracking-widest">
           Sqribe

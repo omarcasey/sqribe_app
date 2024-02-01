@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   return (
-    <main className="min-h-screen" id='home'>
+    <main className="min-h-screen overflow-x-hidden" id='home'>
       <Navbar />
       <Hero />
       <CallToAction />

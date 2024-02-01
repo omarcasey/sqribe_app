@@ -90,7 +90,7 @@ const Navbar = () => {
               title=""
               className={`text-lg font-semibold ${
                 scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-white hover-underline`}
+              } transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
               Use Cases{" "}
@@ -100,7 +100,7 @@ const Navbar = () => {
               href="/pricing"
               className={`text-lg font-semibold ${
                 scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-white ${
+              } transition-all duration-200 hover:text-foreground ${
                 router.pathname === "/pricing"
                   ? "gradient-underline"
                   : "hover-underline"
@@ -115,7 +115,7 @@ const Navbar = () => {
               title=""
               className={`text-lg font-semibold ${
                 scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-white hover-underline`}
+              } transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
               Blog{" "}
