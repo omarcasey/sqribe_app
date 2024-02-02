@@ -36,68 +36,104 @@ const SignIn = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col items-center justify-start dark">
-      <Link className="flex flex-col items-center mb-14" href={"/"}>
-        <Image
-          src={"/abstract.png"}
-          width={1024}
-          height={1024}
-          className="w-24 contrast-125 mt-10"
-          alt="logo"
-        />
-        <p className="text-gray-400 font-bold text-xl tracking-widest">
-          Sqribe
-        </p>
-      </Link>
-      <h1 className="text-3xl font-bold mb-10">Log In</h1>
-      <form
-        onSubmit={signInWithEmail}
-        className="bg-neutral-800 rounded-lg p-10 flex flex-col w-[28rem]"
-      >
-        <Input
-          type="email"
-          variant="underlined"
-          placeholder="Enter your email or username"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          type="password"
-          variant="underlined"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button
-          type="submit" // Ensure that the button type is "submit"
-          className="mt-6 h-unit-14 text-white bg-gradient-to-r from-cyan-500 to-purple-500 font-semibold text-base"
-          isDisabled={email.length <= 4 ? true : false}
-        >
-          Continue
-        </Button>
-        <p className="my-6 text-center text-sm">or</p>
-        <Button
-          className="flex justify-start border-white border px-8 py-unit-7"
-          variant="bordered"
-        >
-          <FaGoogle size={20} className="text-white mr-10" />
-          <p className="text-white font-bold">Continue with Google</p>
-        </Button>
-        <Link className="text-center mt-4" href={"/signup"}>Signup</Link>
-      </form>
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        style={{ width: "400px" }} // Set the width as needed
-      />
+    <div className="h-screen flex flex-row text-foreground">
+      <div className="w-full px-4 lg:w-[45%] bg-white dark:bg-black flex justify-center items-center">
+        <div className="flex flex-col items-center justify-start max-w-sm w-full">
+          <Link href="/" className="flex items-center justify-center -ml-6 lg:-ml-0 lg:justify-start w-full mb-10">
+            <Image
+              className="w-auto h-16 mr-4"
+              src="/new logo transparent.png"
+              alt=""
+              width={1024}
+              height={1024}
+            />
+            <h1 className="text-foreground font-extrabold text-3xl tracking-tight">
+              Sqribe
+            </h1>
+          </Link>
+          <h1 className="text-3xl font-medium mb-4 text-foreground w-full">
+            Sign in
+          </h1>
+          <p className="mb-6 w-full">Continue translating video 🤘</p>
+          <Button
+            variant="bordered"
+            className="flex items-center justify-center border border-foreground-300 px-4 py-1 rounded-xl w-full shadow h-14"
+          >
+            <Image
+              src="/google.png"
+              width={1000}
+              height={1000}
+              alt="Google logo"
+              className="w-10 h-10"
+            />
+            <p className="text-foreground-500 font-semibold ml-2">
+              Sign in with Google
+            </p>
+          </Button>
+          <div className="flex items-center justify-center mt-6 w-full">
+            <div className="border-t border-foreground-300 flex-grow"></div>
+            <p className="text-foreground-500 mx-4">Or sign in with e-mail</p>
+            <div className="border-t border-foreground-300 flex-grow"></div>
+          </div>
+          <form
+            onSubmit={signInWithEmail}
+            className="flex flex-col w-full mt-6"
+          >
+            <p className="mb-2 text-sm font-medium">Email</p>
+            <Input
+              type="email"
+              variant="bordered"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mb-4"
+            />
+            <p className="mb-2 text-sm font-medium">Password</p>
+            <Input
+              type="password"
+              variant="bordered"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mb-4"
+            />
+            <p className="mb-2 text-sm font-bold text-cyan-500">
+              Forgot Password
+            </p>
+            <Button
+              type="submit"
+              className="mt-6 h-unit-14 text-white bg-gradient-to-r from-cyan-500 to-purple-500 font-semibold text-base"
+            >
+              Sign in
+            </Button>
+          </form>
+          <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+            style={{ width: "400px" }}
+          />
+          <p className="text-center text-sm mt-10">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="text-cyan-500 font-bold">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
+      <div className="w-[55%] bg-slate-100 dark:bg-neutral-800 justify-center items-center hidden lg:flex">
+        <div className="flex flex-col items-center justify-start w-full px-16">
+          <p className="text-5xl">Localize videos. Fast. Fun. With AI.</p>
+          <Image src={"/drakedont.png"} height={1000} width={1000} alt="signinidk" className="mt-10 border border-foreground-500 shadow-xl" />
+        </div>
+      </div>
     </div>
   );
 };
