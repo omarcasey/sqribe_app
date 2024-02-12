@@ -12,16 +12,25 @@ import { PlusIcon } from "../Icons/PlusIcon.jsx";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { auth } from "@/firebase";
 import { useDispatch, useSelector } from "react-redux";
+import { setDarkMode } from "@/reducers/userSlice";
 import {
   clearUserData,
   setAuthData,
   setAuthLoading,
 } from "@/reducers/userSlice.js";
+import { MoonIcon } from "../Icons/MoonIcon.jsx";
+import { SunIcon } from "../Icons/SunIcon.jsx";
 
 export default function DropdownMenuIdk({ router }) {
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const user = useSelector((state) => state.user.auth);
   const dispatch = useDispatch();
+
+  const toggleTheme = async () => {
+    const newMode = !isDarkMode;
+    dispatch(setDarkMode(newMode));
+    localStorage.setItem("userDarkModePreference", newMode.toString());
+  };
 
   const signOut = async () => {
     try {
@@ -126,18 +135,18 @@ export default function DropdownMenuIdk({ router }) {
           </DropdownItem>
           <DropdownItem
             isReadOnly
+            onClick={toggleTheme}
             key="theme"
-            className="cursor-default"
             endContent={
-              <select
-                className="z-10 outline-none w-16 py-0.5 rounded-md text-tiny group-data-[hover=true]:border-default-500 border-small border-default-300 dark:border-default-200 bg-transparent text-default-500"
-                id="theme"
-                name="theme"
-              >
-                <option>System</option>
-                <option>Dark</option>
-                <option>Light</option>
-              </select>
+              <div className="border border-foreground-300 p-1 rounded-lg">
+                <div className="w-[15px] h-[15px] flex items-center justify-center text-foreground-500 hover:text-foreground hover:cursor-pointer transition-all">
+                  {isDarkMode ? (
+                    <MoonIcon className="w-full h-full" />
+                  ) : (
+                    <SunIcon className="w-full h-full" />
+                  )}
+                </div>
+              </div>
             }
           >
             Theme

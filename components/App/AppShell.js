@@ -19,6 +19,7 @@ import {
   cn,
   ListboxSection,
   Kbd,
+  Progress,
 } from "@nextui-org/react";
 import Image from "next/image";
 import { RiLayoutMasonryFill } from "react-icons/ri";
@@ -35,13 +36,19 @@ import { TbRewindBackward10, TbRewindForward10 } from "react-icons/tb";
 import { GoThumbsup, GoThumbsdown } from "react-icons/go";
 import { BsDownload, BsChevronDown } from "react-icons/bs";
 import { useState } from "react";
-import { setAudioPlayerVisible, setAutoPlay, setDarkMode } from "@/reducers/userSlice";
+import {
+  setAudioPlayerVisible,
+  setAutoPlay,
+  setDarkMode,
+} from "@/reducers/userSlice";
 import ThemeSwitch from "./ThemeSwitch";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const isDarkMode = useSelector((state) => state.user.darkMode);
+  const userData = useSelector((state) => state.user.data);
+  const subscription = userData?.subscriptions[0];
   const uid = useSelector((state) => state.user.auth.uid);
   const audioPlayerVisible = useSelector(
     (state) => state.user.audio.audioPlayerVisible
@@ -201,13 +208,28 @@ const AppShell = ({ children }) => {
             </Link>
           </div>
           <div className="flex space-x-3 items-center">
-            <ThemeSwitch />
+            <div className="w-32 mr-2">
+              <p className="text-tiny mb-1 text-center text-foreground-600">
+                {(subscription?.usage.usedSeconds / 60).toFixed(
+                  subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
+                )}{" "}
+                / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins used
+              </p>
+              <Progress
+                disableAnimation
+                color="danger"
+                value={
+                  (subscription?.usage.usedSeconds /
+                    subscription?.usage.totalSeconds) *
+                  100
+                }
+              />
+            </div>
             <DropdownMenuIdk router={router} />
             <Button
-              className="px-3"
+              className="px-3 min-w-0"
               startContent={<IoIosHelpCircleOutline size={25} />}
             >
-              Help Center
             </Button>
           </div>
           {/* <Button onClick={signOut} className="text-white">
@@ -359,7 +381,9 @@ const AppShell = ({ children }) => {
           {(onClose) => (
             <>
               <ModalHeader className="py-0 px-0 flex flex-col">
-                <div className="border border-foreground-300 text-foreground-500 rounded-md flex items-center justify-center px-2 pb-[2px] text-tiny w-12 ml-3 mt-4">Home</div>
+                <div className="border border-foreground-300 text-foreground-500 rounded-md flex items-center justify-center px-2 pb-[2px] text-tiny w-12 ml-3 mt-4">
+                  Home
+                </div>
                 <Input
                   className=""
                   variant="underlined"
@@ -504,7 +528,6 @@ const AppShell = ({ children }) => {
                       Delete file
                     </ListboxItem>
                   </ListboxSection>
-                  
                 </Listbox>
               </ModalBody>
             </>

@@ -19,7 +19,17 @@ export const fetchUserData = createAsyncThunk(
     const snapshot = await getDoc(userRef);
 
     if (snapshot.exists()) {
-      return snapshot.data();
+      const userData = snapshot.data();
+      const subscriptionsCollection = collection(db, "users", uid, "subscriptions");
+      const subscriptionsSnapshot = await getDocs(subscriptionsCollection);
+      const subscriptionsData = subscriptionsSnapshot.docs.map((doc) => doc.data());
+
+      console.log("Subscriptions:", subscriptionsData);
+
+      return {
+        ...userData,
+        subscriptions: subscriptionsData,
+      };
     } else {
       throw new Error("User data not found");
     }

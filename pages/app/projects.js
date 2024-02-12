@@ -74,6 +74,7 @@ import { MdEditSquare } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
 import { FaList } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
+import { HiOutlineSparkles } from "react-icons/hi";
 import Image from "next/image";
 
 const Projects = ({ openModal }) => {
@@ -81,6 +82,8 @@ const Projects = ({ openModal }) => {
   const projects = useSelector((state) => state.user.projects);
   const uid = useSelector((state) => state.user.auth.uid);
   const router = useRouter();
+  const userData = useSelector((state) => state.user.data);
+  const subscription = userData?.subscriptions[0];
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const {
@@ -94,6 +97,12 @@ const Projects = ({ openModal }) => {
     onOpen: onOpenDeleteModal,
     onOpenChange: onOpenChangeDeleteModal,
     onClose: onCloseDeleteModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenUnlockModal,
+    onOpen: onOpenUnlockModal,
+    onOpenChange: onOpenChangeUnlockModal,
+    onClose: onCloseUnlockModal,
   } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
   const [selectedFile, setselectedFile] = useState("");
@@ -458,7 +467,27 @@ const Projects = ({ openModal }) => {
   return (
     <AppShell>
       <div className="w-full">
-        <div className="flex flex-col items-center pb-24 pt-16">
+        <div className="flex flex-col items-center pb-24 pt-10">
+          {subscription?.planID == "free_trial" && (
+            <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-10">
+              <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-full bg-foreground-400 p-[6px] mr-4">
+                  <HiOutlineSparkles size={25} className="" />
+                </div>
+                <p className="text-base text-foreground">
+                  Explore full version with advanced features
+                </p>
+              </div>
+              <Button
+                color="secondary"
+                className="font-semibold"
+                size="md"
+                onPress={onOpenUnlockModal}
+              >
+                Unlock Full Version
+              </Button>
+            </div>
+          )}
           <div className="flex flex-row justify-between items-center max-w-[85%] w-full px-10 mb-6">
             <h1 className="text-xl font-extralight text-foreground mr-10">
               My Projects
@@ -501,7 +530,9 @@ const Projects = ({ openModal }) => {
           {gridView ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-10">
               <div
-                className="border border-dashed border-foreground-400 text-foreground h-56 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all"
+                className={`border border-dashed border-foreground-400 text-foreground h-56 ${
+                  projects.length === 0 ? "w-[384px]" : ""
+                } rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all`}
                 onClick={onOpen}
               >
                 <p className="text-3xl">+</p>
@@ -1154,6 +1185,32 @@ const Projects = ({ openModal }) => {
                       </div>
                     </ModalFooter>
                   </>
+                )}
+              </ModalContent>
+            </Modal>
+            <Modal
+              isOpen={isOpenUnlockModal}
+              onOpenChange={onOpenChangeUnlockModal}
+              className={`${isDarkMode ? "dark" : "light"}`}
+              size="3xl"
+            >
+              <ModalContent className="">
+                {(onCloseUnlockModal) => (
+                  <div className="flex">
+                    <div className="w-1/2 bg-foreground-100 p-4">
+                      <p className="text-foreground">
+                        Upgrade plan to enjoy more:
+                      </p>
+                      <div className="flex flex-col text-foreground-500">
+                        <p>Upload files without free trial limits</p>
+                        <p>No watermark</p>
+                        <p>130+ supported languages for translation</p>
+                        <p>29 languages with VoiceClone</p>
+                        <p>Add captions to your video</p>
+                      </div>
+                    </div>
+                    <div className="w-1/2 bg-foreground-300 p-4">ok</div>
+                  </div>
                 )}
               </ModalContent>
             </Modal>

@@ -39,6 +39,7 @@ const withAuth = (WrappedComponent) => {
               if (doc.exists()) {
                 // Update user data in Redux when Firestore data changes
                 dispatch({ type: "user/setUserData", payload: doc.data() });
+                // dispatch(fetchUserData(currentUser.uid));
                 console.log("updated user data");
               }
             });
