@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import React from 'react'
+import ModelViewer from './ModelViewer'
 
 const Hero = () => {
     return (
@@ -42,6 +43,7 @@ const Hero = () => {
                                 src="/new logo transparent.png"
                                 alt="" />
                         </motion.div>
+                        {/* <ModelViewer /> */}
                     </div>
                 </div>
             </div>

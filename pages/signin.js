@@ -1,7 +1,11 @@
-// pages/signin.js
 import { useState } from "react";
 import { auth } from "@/firebase";
-import { Input, Button } from "@nextui-org/react";
+import {
+  Input,
+  Button,
+  Autocomplete,
+  AutocompleteItem,
+} from "@nextui-org/react";
 import { FaGoogle } from "react-icons/fa";
 import Image from "next/image";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -14,9 +18,12 @@ const SignIn = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // State to hold error message
 
   const signInWithEmail = async (e) => {
     e.preventDefault(); // Prevents the default form submission behavior
+    setLoading(true);
 
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -30,16 +37,45 @@ const SignIn = () => {
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
-      console.error(errorCode, errorMessage);
-      toast.error("The credentials you entered are not valid");
+      console.error("Firebase Auth Error:", errorCode, errorMessage);
+
+      // Handle specific error messages based on error code
+      switch (errorCode) {
+        case "auth/invalid-email":
+          setError("Invalid email address");
+          break;
+        case "auth/user-disabled":
+          setError("Your account has been disabled.");
+          break;
+        case "auth/user-not-found":
+          setError("User not found. Please check your email or sign up");
+          break;
+        case "auth/wrong-password":
+          setError("Invalid password. Please try again");
+          break;
+        case "auth/invalid-credential":
+          setError("Invalid credentials. Please try again");
+          break;
+        case "auth/too-many-requests":
+          setError(
+            "Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later."
+          );
+          break;
+        default:
+          setError(errorMessage);
+      }
     }
+    setLoading(false);
   };
 
   return (
     <div className="h-screen flex flex-row text-foreground">
       <div className="w-full px-4 lg:w-[45%] bg-white dark:bg-black flex justify-center items-center">
         <div className="flex flex-col items-center justify-start max-w-sm w-full">
-          <Link href="/" className="flex items-center justify-center -ml-6 lg:-ml-0 lg:justify-start w-full mb-10">
+          <Link
+            href="/"
+            className="flex items-center justify-center -ml-6 lg:-ml-0 lg:justify-start w-full mb-10"
+          >
             <Image
               className="w-auto h-16 mr-4"
               src="/new logo transparent.png"
@@ -95,12 +131,15 @@ const SignIn = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mb-4"
+              className=""
             />
-            <p className="mb-2 text-sm font-bold text-cyan-500">
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}{" "}
+            {/* Render error message */}
+            <p className="mb-2 text-sm font-bold text-cyan-500 mt-4">
               Forgot Password
             </p>
             <Button
+              isLoading={loading}
               type="submit"
               className="mt-6 h-unit-14 text-white bg-gradient-to-r from-cyan-500 to-purple-500 font-semibold text-base"
             >
@@ -131,7 +170,13 @@ const SignIn = () => {
       <div className="w-[55%] bg-slate-100 dark:bg-neutral-800 justify-center items-center hidden lg:flex">
         <div className="flex flex-col items-center justify-start w-full px-16">
           <p className="text-5xl">Localize videos. Fast. Fun. With AI.</p>
-          <Image src={"/drakedont.png"} height={1000} width={1000} alt="signinidk" className="mt-10 border border-foreground-500 shadow-xl" />
+          <Image
+            src={"/drakedont.png"}
+            height={1000}
+            width={1000}
+            alt="signinidk"
+            className="mt-10 border border-foreground-500 shadow-xl"
+          />
         </div>
       </div>
     </div>

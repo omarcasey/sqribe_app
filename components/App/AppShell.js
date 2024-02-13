@@ -41,7 +41,7 @@ import {
   setAutoPlay,
   setDarkMode,
 } from "@/reducers/userSlice";
-import ThemeSwitch from "./ThemeSwitch";
+import SearchBox from "./SearchBox";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
@@ -61,6 +61,19 @@ const AppShell = ({ children }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioElement = document.getElementById("audio-element");
+
+  const [query, setQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const handleSearch = (query) => {
+    // Here you can implement your search logic, 
+    // for example, fetch data from an API based on the query
+    console.log('Searching for:', query);
+    // For demo purposes, just set searchResults to query
+    setSearchResults([query]);
+  };
+
+  const suggestions = ['Apple', 'Banana', 'Orange', 'Grapes', 'Pineapple'];
 
   useEffect(() => {
     if (audioElement) {
@@ -366,6 +379,7 @@ const AppShell = ({ children }) => {
           {/* Content for the semi-transparent bar */}
         </div>
       )}
+      
       <Modal
         size="2xl"
         isOpen={isOpen}
@@ -379,158 +393,7 @@ const AppShell = ({ children }) => {
       >
         <ModalContent>
           {(onClose) => (
-            <>
-              <ModalHeader className="py-0 px-0 flex flex-col">
-                <div className="border border-foreground-300 text-foreground-500 rounded-md flex items-center justify-center px-2 pb-[2px] text-tiny w-12 ml-3 mt-4">
-                  Home
-                </div>
-                <Input
-                  className=""
-                  variant="underlined"
-                  placeholder="What do you need?"
-                  classNames={{
-                    input: ["bg-transparent", "px-3", "text-lg font-medium"],
-                  }}
-                  autoFocus
-                />
-              </ModalHeader>
-              <ModalBody className="px-0 py-0 pt-2 overflow-y-scroll">
-                <Listbox
-                  className="w-full"
-                  variant="faded"
-                  aria-label="Listbox menu with icons"
-                >
-                  <ListboxSection
-                    title="Projects"
-                    classNames={{ heading: "px-4 text-sm" }}
-                  >
-                    <ListboxItem key="new" startContent={<BsChevronDown />}>
-                      New file
-                    </ListboxItem>
-                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
-                      Copy link
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Speech Synthesis"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem
-                      key="edit"
-                      showDivider
-                      startContent={<BsChevronDown />}
-                      classNames={{ base: "font-bold" }}
-                    >
-                      Edit file
-                    </ListboxItem>
-                    <ListboxItem
-                      key="delete"
-                      className="text-danger"
-                      color="danger"
-                      startContent={<BsChevronDown className={"text-danger"} />}
-                    >
-                      Delete file
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Projects"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem key="new" startContent={<BsChevronDown />}>
-                      New file
-                    </ListboxItem>
-                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
-                      Copy link
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Speech Synthesis"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem
-                      key="edit"
-                      showDivider
-                      startContent={<BsChevronDown />}
-                      classNames={{ base: "font-bold" }}
-                    >
-                      Edit file
-                    </ListboxItem>
-                    <ListboxItem
-                      key="delete"
-                      className="text-danger"
-                      color="danger"
-                      startContent={<BsChevronDown className={"text-danger"} />}
-                    >
-                      Delete file
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Projects"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem key="new" startContent={<BsChevronDown />}>
-                      New file
-                    </ListboxItem>
-                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
-                      Copy link
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Speech Synthesis"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem
-                      key="edit"
-                      showDivider
-                      startContent={<BsChevronDown />}
-                      classNames={{ base: "font-bold" }}
-                    >
-                      Edit file
-                    </ListboxItem>
-                    <ListboxItem
-                      key="delete"
-                      className="text-danger"
-                      color="danger"
-                      startContent={<BsChevronDown className={"text-danger"} />}
-                    >
-                      Delete file
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Projects"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem key="new" startContent={<BsChevronDown />}>
-                      New file
-                    </ListboxItem>
-                    <ListboxItem key="copy" startContent={<BsChevronDown />}>
-                      Copy link
-                    </ListboxItem>
-                  </ListboxSection>
-                  <ListboxSection
-                    title="Speech Synthesis"
-                    classNames={{ heading: "px-4 text-sm font-medium" }}
-                  >
-                    <ListboxItem
-                      key="edit"
-                      showDivider
-                      startContent={<BsChevronDown />}
-                      classNames={{ base: "font-bold" }}
-                    >
-                      Edit file
-                    </ListboxItem>
-                    <ListboxItem
-                      key="delete"
-                      className="text-danger"
-                      color="danger"
-                      startContent={<BsChevronDown className={"text-danger"} />}
-                    >
-                      Delete file
-                    </ListboxItem>
-                  </ListboxSection>
-                </Listbox>
-              </ModalBody>
-            </>
+            <SearchBox suggestions={suggestions} onSearch={handleSearch}/>
           )}
         </ModalContent>
       </Modal>

@@ -38,7 +38,7 @@ const SignUp = () => {
         darkMode: false,
         subscriptions: [
           {
-            planID: "free_trial",
+            planID: "Free Trial",
             startDate: Timestamp.now(),
             status: "active",
             usage: {

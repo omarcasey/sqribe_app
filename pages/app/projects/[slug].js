@@ -24,6 +24,7 @@ import {
   Select,
   SelectItem,
   Tooltip,
+  Skeleton,
 } from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -40,12 +41,14 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import Link from "next/link";
 import ThemeSwitch from "@/components/App/ThemeSwitch";
+import DropdownMenuIdk from "@/components/App/DropdownMenuIdk";
 
 const Page = () => {
   const router = useRouter();
   const [project, setProject] = useState(null);
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const userData = useSelector((state) => state.user.data);
+  const subscription = userData?.subscriptions[0];
   const userProjects = useSelector((state) => state.user.projects);
   const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -55,6 +58,7 @@ const Page = () => {
     onOpen: onOpenNewTranslateModal,
     onClose: onCloseNewTranslateModal,
   } = useDisclosure();
+  const [translateLoading, setTranslateLoading] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -123,6 +127,11 @@ const Page = () => {
   };
 
   const translateSegments = async (index) => {
+    setTranslateLoading((prev) => {
+      const updated = [...prev];
+      updated[index] = true;
+      return updated;
+    });
     const inputText = editSegments[index]["text"];
     const translationResponse = await fetch("/api/translate-text", {
       method: "POST",
@@ -160,6 +169,11 @@ const Page = () => {
     } catch (e) {
       console.error("Error updating project segments: ", e);
     }
+    setTranslateLoading((prev) => {
+      const updated = [...prev];
+      updated[index] = false;
+      return updated;
+    });
   };
 
   const updateDubbing = async (e) => {
@@ -202,33 +216,35 @@ const Page = () => {
               <p className="font-medium">{project.projectName}</p>
             </div>
             <div className="flex items-center justify-center gap-3">
-              <div className="mr-5 mt-1">
-                <ThemeSwitch />
-              </div>
-              <div className="w-32 mr-5">
+              <div className="w-32 mr-2">
                 <p className="text-tiny mb-1 text-center text-foreground-600">
-                  {(userData.usedSeconds / 60).toFixed(1)} /{" "}
-                  {(userData.totalSeconds / 60).toFixed(0)} mins used
+                  {(subscription?.usage.usedSeconds / 60).toFixed(
+                    subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
+                  )}{" "}
+                  / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins
+                  used
                 </p>
                 <Progress
+                  disableAnimation
                   color="danger"
-                  value={(userData.usedSeconds / userData.totalSeconds) * 100}
+                  value={
+                    (subscription?.usage.usedSeconds /
+                      subscription?.usage.totalSeconds) *
+                    100
+                  }
                 />
               </div>
+              <DropdownMenuIdk router={router} />
               <Button
-                className="px-3 text-white"
+                className="px-3 text-white min-w-0"
                 startContent={<IoInformationCircleOutline size={25} />}
                 color="primary"
                 onPress={onOpen}
-              >
-                Project Info
-              </Button>
+              ></Button>
               <Button
-                className="px-3"
+                className="px-3 min-w-0"
                 startContent={<IoIosHelpCircleOutline size={25} />}
-              >
-                Help Center
-              </Button>
+              ></Button>
             </div>
           </nav>
           <div className="flex-1 flex overflow-hidden">
@@ -335,9 +351,20 @@ const Page = () => {
                           />
                         </div>
                         <div className="p-3">
-                          <p className={`p-2 text-foreground italic ${project.translationLanguage === "Arabic" ? "text-right":""}`}>
-                            {segment.translatedText}
-                          </p>
+                          <Skeleton
+                            className="rounded-lg"
+                            isLoaded={!translateLoading[index]}
+                          >
+                            <p
+                              className={`p-2 text-foreground italic ${
+                                project.translationLanguage === "Arabic"
+                                  ? "text-right"
+                                  : ""
+                              }`}
+                            >
+                              {segment.translatedText}
+                            </p>
+                          </Skeleton>
                         </div>
                         {isDifferent && (
                           <motion.div

@@ -68,10 +68,10 @@ import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { IoEllipsisHorizontalSharp } from "react-icons/io5";
-import { HiTrash } from "react-icons/hi2";
+import { HiSparkles, HiTrash } from "react-icons/hi2";
 import { MdSimCardDownload } from "react-icons/md";
 import { MdEditSquare } from "react-icons/md";
-import { FaEye } from "react-icons/fa";
+import { FaCheck, FaEye } from "react-icons/fa";
 import { FaList } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { HiOutlineSparkles } from "react-icons/hi";
@@ -531,7 +531,7 @@ const Projects = ({ openModal }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-10">
               <div
                 className={`border border-dashed border-foreground-400 text-foreground h-56 ${
-                  projects.length === 0 ? "w-[384px]" : ""
+                  projects?.length === 0 ? "w-[384px]" : ""
                 } rounded-xl flex flex-col items-center justify-center hover:cursor-pointer hover:bg-white hover:dark:bg-neutral-900 transition-all`}
                 onClick={onOpen}
               >
@@ -913,7 +913,7 @@ const Projects = ({ openModal }) => {
                           placeholder={
                             selectedFile
                               ? "File Selected"
-                              : "Youtube or Google Drive Link"
+                              : "Youtube Video URL"
                           }
                           color={selectedFile ? "danger" : "default"}
                           size="sm"
@@ -951,11 +951,17 @@ const Projects = ({ openModal }) => {
                           aria-label="Number of Speakers"
                           disallowEmptySelection
                           isDisabled={isUploading}
+                          startContent={
+                            numOfSpeakers === "autodetect" && (
+                              <HiSparkles className="text-foreground" />
+                            )
+                          }
                         >
                           <SelectItem
                             key={"autodetect"}
                             className="text-black"
                             value={"autodetect"}
+                            startContent={<HiSparkles className="text-black" />}
                           >
                             Autodetect
                           </SelectItem>
@@ -967,6 +973,12 @@ const Projects = ({ openModal }) => {
                           </SelectItem>
                           <SelectItem key={3} className="text-black" value={3}>
                             3
+                          </SelectItem>
+                          <SelectItem key={4} className="text-black" value={3}>
+                            4
+                          </SelectItem>
+                          <SelectItem key={5} className="text-black" value={3}>
+                            5
                           </SelectItem>
                         </Select>
 
@@ -1197,19 +1209,86 @@ const Projects = ({ openModal }) => {
               <ModalContent className="">
                 {(onCloseUnlockModal) => (
                   <div className="flex">
-                    <div className="w-1/2 bg-foreground-100 p-4">
-                      <p className="text-foreground">
+                    <div className="w-1/2 bg-foreground-100 p-6">
+                      <p className="text-foreground text-xl font-semibold mb-6">
                         Upgrade plan to enjoy more:
                       </p>
-                      <div className="flex flex-col text-foreground-500">
-                        <p>Upload files without free trial limits</p>
-                        <p>No watermark</p>
-                        <p>130+ supported languages for translation</p>
-                        <p>29 languages with VoiceClone</p>
-                        <p>Add captions to your video</p>
+                      <ul className="flex flex-col gap-2 text-sm mb-6 flex-1 text-foreground-600">
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>500 min of translated video</p>
+                        </li>
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>4k Export Quality</p>
+                        </li>
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>No watermark</p>
+                        </li>
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>Translate into 130+ languages</p>
+                        </li>
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>Automatic AI transcription</p>
+                        </li>
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>Advanced AI translation</p>
+                        </li>
+                        <li className="flex flex-row items-center">
+                          <FaCheck
+                            size={12}
+                            className="mr-2 flex-shrink-0 text-blue-500"
+                          />
+                          <p>
+                            Voice cloning for 28 languages with 1000 word
+                            vocabulary
+                          </p>
+                        </li>
+                      </ul>
+                      <div className="w-full flex items-center justify-center">
+                        <Button
+                          color="primary"
+                          size="lg"
+                          onPress={() => router.push("/app/pricing")}
+                        >
+                          View plans
+                        </Button>
                       </div>
                     </div>
-                    <div className="w-1/2 bg-foreground-300 p-4">ok</div>
+                    <div className="w-1/2 bg-foreground-200 p-6 flex flex-col justify-center">
+                      <p className="text-xs text-foreground-500">
+                        Trusted by 600,000+ users
+                      </p>
+                      <Image
+                        src={"/drakedont.png"}
+                        height={1000}
+                        width={1000}
+                        alt="signinidk"
+                        className="mt-3 border border-foreground-500 shadow-xl"
+                      />
+                    </div>
                   </div>
                 )}
               </ModalContent>

@@ -20,10 +20,13 @@ import {
 } from "@/reducers/userSlice.js";
 import { MoonIcon } from "../Icons/MoonIcon.jsx";
 import { SunIcon } from "../Icons/SunIcon.jsx";
+import { HiOutlineSparkles } from "react-icons/hi2";
 
 export default function DropdownMenuIdk({ router }) {
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const user = useSelector((state) => state.user.auth);
+  const userData = useSelector((state) => state.user.data);
+  const subscription = userData?.subscriptions[0];
   const dispatch = useDispatch();
 
   const toggleTheme = async () => {
@@ -91,14 +94,14 @@ export default function DropdownMenuIdk({ router }) {
           >
             <User
               name={user.email}
-              description="@dev"
+              description={subscription?.planID}
               classNames={{
                 name: "text-default-600",
                 description: "text-default-500",
               }}
               avatarProps={{
                 size: "sm",
-                src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+                src: "/png avatar.png",
               }}
             />
           </DropdownItem>
@@ -156,9 +159,27 @@ export default function DropdownMenuIdk({ router }) {
         <DropdownSection aria-label="Help & Feedback">
           <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
           <DropdownItem key="logout" onPress={signOut} color="danger">
-            Log Out
+            <p className="hover:text-red-500 transition-all">Log Out</p>
           </DropdownItem>
         </DropdownSection>
+        {subscription?.planID == "free_trial" && (
+          <DropdownItem
+            key="upgrade"
+            isReadOnly
+            className="hover:cursor-default p-0"
+          >
+            <Button
+              className="w-full bg-green-700"
+              size="sm"
+              onPress={() => {
+                router.push("/app/pricing");
+              }}
+            >
+              <p className="text-white font-semibold">Upgrade</p>
+              <HiOutlineSparkles size={16} className="text-white" />
+            </Button>
+          </DropdownItem>
+        )}
       </DropdownMenu>
     </Dropdown>
   );
