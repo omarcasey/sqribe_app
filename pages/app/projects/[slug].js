@@ -42,6 +42,7 @@ import { db } from "@/firebase";
 import Link from "next/link";
 import ThemeSwitch from "@/components/App/ThemeSwitch";
 import DropdownMenuIdk from "@/components/App/DropdownMenuIdk";
+import SearchBox from "@/components/App/SearchBox";
 
 const Page = () => {
   const router = useRouter();
@@ -562,6 +563,7 @@ const Page = () => {
           )}
         </ModalContent>
       </Modal>
+      <SearchBox />
     </div>
   );
 };

@@ -62,19 +62,6 @@ const AppShell = ({ children }) => {
   const [duration, setDuration] = useState(0);
   const audioElement = document.getElementById("audio-element");
 
-  const [query, setQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-
-  const handleSearch = (query) => {
-    // Here you can implement your search logic, 
-    // for example, fetch data from an API based on the query
-    console.log('Searching for:', query);
-    // For demo purposes, just set searchResults to query
-    setSearchResults([query]);
-  };
-
-  const suggestions = ['Apple', 'Banana', 'Orange', 'Grapes', 'Pineapple'];
-
   useEffect(() => {
     if (audioElement) {
       audioElement.addEventListener("ended", handleAudioEnded);
@@ -87,18 +74,6 @@ const AppShell = ({ children }) => {
       };
     }
   }, [audioElement]);
-
-  document.addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.key === "k") {
-      // Prevent the default action
-      event.preventDefault();
-
-      // User pressed Ctrl+K
-      console.log("Ctrl+K pressedttt");
-      // Add your code here to handle the Ctrl+K key combination
-      onOpen();
-    }
-  });
 
   const handleAudioPause = () => {
     setIsPlaying(false);
@@ -242,8 +217,7 @@ const AppShell = ({ children }) => {
             <Button
               className="px-3 min-w-0"
               startContent={<IoIosHelpCircleOutline size={25} />}
-            >
-            </Button>
+            ></Button>
           </div>
           {/* <Button onClick={signOut} className="text-white">
             Sign Out
@@ -379,24 +353,8 @@ const AppShell = ({ children }) => {
           {/* Content for the semi-transparent bar */}
         </div>
       )}
-      
-      <Modal
-        size="2xl"
-        isOpen={isOpen}
-        onClose={onClose}
-        className={`${
-          isDarkMode ? "dark bg-black border border-foreground-200" : "light"
-        } text-foreground max-h-[30rem]`}
-        hideCloseButton
-        scrollBehavior="normal"
-        backdrop="blur"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <SearchBox suggestions={suggestions} onSearch={handleSearch}/>
-          )}
-        </ModalContent>
-      </Modal>
+
+      <SearchBox />
     </div>
   );
 };
