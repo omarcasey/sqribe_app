@@ -167,203 +167,234 @@ const Projects = ({ openModal }) => {
   };
 
   const handleUpload = async () => {
-    try {
-      setisUploading(true);
+    // Get video duration
+    const video = document.createElement("video");
+    const videoBlob = new Blob([selectedFile], { type: "video/mp4" });
+    video.src = URL.createObjectURL(videoBlob);
 
-      // Upload file to Firebase storage
-      const storageRef = ref(storage, "files/" + selectedFileName);
-      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+    video.addEventListener("loadedmetadata", async () => {
+      console.log("Video duration:", video.duration);
+      console.log("Remaining seconds:", subscription?.usage.remainingSeconds);
 
-      // Register three observers:
-      // 1. 'state_changed' observer, called any time the state changes
-      // 2. Error observer, called on failure
-      // 3. Completion observer, called on successful completion
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          setUploadProgress(progress);
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-          console.error("Error uploading file: ", error);
-          setisUploading(false);
-        },
-        async () => {
-          // Handle successful uploads on complete
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+      const videoDuration = parseFloat(video.duration);
+      const remainingSeconds = parseFloat(subscription?.usage.remainingSeconds);
 
-          const generateThumbnail = async (videoUrl) => {
-            try {
-              const response = await fetch("/api/generateThumbnail", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ videoUrl }), // Send videoUrl in the request body
-              });
+      if (videoDuration > remainingSeconds) {
+        console.log("You dont have enough minutes. Please upgrade your plan.");
+        return;
+      }
 
-              if (!response.ok) {
-                throw new Error("Failed to generate thumbnail");
-              }
+      try {
+        setisUploading(true);
+        // Upload file to Firebase storage
+        const storageRef = ref(storage, "files/" + selectedFileName);
+        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
 
-              const data = await response.json();
-              return data.thumbnailUrl; // Return the generated thumbnail URL
-            } catch (error) {
-              console.error(error);
-              return null;
-            }
-          };
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("Upload is " + progress + "% done");
+            setUploadProgress(progress);
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            console.error("Error uploading file: ", error);
+            setisUploading(false);
+          },
+          async () => {
+            // Handle successful uploads on complete
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-          // Usage example
-          // const mp4Url = 'https://example.com/your_video.mp4';
-          const thumbnailUrl = await generateThumbnail(downloadURL);
-          console.log("Thumbnail URL:", thumbnailUrl);
-
-          const filePath =
-            "files/" +
-            selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
-          console.log("File uploaded at " + filePath);
-
-          try {
-            // Call speech-to-text API
-            const response = await fetch("/api/speech-to-text", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                audioPath: filePath,
-                audioLanguage: getTranslateCode(originalLanguage),
-                numOfSpeakers: numOfSpeakers,
-              }),
-            });
-
-            if (!response.ok) {
-              throw new Error(
-                `Failed to convert speech to text: ${response.statusText}`
-              );
-            }
-
-            // Get speech-to-text result
-            const result = await response.json();
-            const assemblyResult = result;
-            console.log("Speech To Text Converted Successfully!");
-            // console.log(assemblyResult.segments);
-            console.log(assemblyResult.assembly);
-
-            const translatedParagraphs = await Promise.all(
-              assemblyResult.segments.map(async (paragraph) => {
-                // Call Translation API - Translate each paragraph
-                const translationResponse = await fetch("/api/translate-text", {
+            const generateThumbnail = async (videoUrl) => {
+              try {
+                const response = await fetch("/api/generateThumbnail", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
                   },
-                  body: JSON.stringify({
-                    inputText: paragraph.text,
-                    target: getTranslateCode(translationLanguage),
-                  }),
+                  body: JSON.stringify({ videoUrl }), // Send videoUrl in the request body
                 });
 
-                if (!translationResponse.ok) {
-                  throw new Error(
-                    `Failed to translate text: ${translationResponse.statusText}`
-                  );
+                if (!response.ok) {
+                  throw new Error("Failed to generate thumbnail");
                 }
 
-                const translationResult = await translationResponse.json();
-                const translatedText = translationResult.translations[0];
-
-                return {
-                  text: paragraph.text,
-                  translatedText: translatedText,
-                  start: paragraph.startTime,
-                  end: paragraph.endTime,
-                  speaker: paragraph.speaker,
-                  voiceId: "Adam",
-                };
-              })
-            );
-
-            console.log(translatedParagraphs);
-            console.log("Text Translated Successfully!");
-
-            // Call text-to-speech API
-            // console.log("Starting text to speech...")
-            // const ttsResponse = await fetch("/api/text-to-speech", {
-            //   method: "POST",
-            //   headers: {
-            //     "Content-Type": "application/json",
-            //   },
-            //   body: JSON.stringify({ text: translatedText }),
-            // });
-
-            // if (!ttsResponse.ok) {
-            //   throw new Error(
-            //     `Failed to convert text to speech: ${ttsResponse.statusText}`
-            //   );
-            // }
-
-            // // Get text-to-speech result
-            // const ttsResult = await ttsResponse.json();
-            // const audioUrl = ttsResult.audioUrl;
-            // console.log("Text To Speech Converted Successfully!");
-            const audioUrl =
-              "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-
-            // Add the converted text, translation, and audio URL to the audio files collection
-            try {
-              const docRef = await addDoc(collection(db, "projects"), {
-                projectName: projectName,
-                user: uid,
-                fileName: selectedFileName,
-                originalLanguage: originalLanguage,
-                translationLanguage: translationLanguage,
-                date: Timestamp.fromDate(new Date()),
-                fileURL: downloadURL,
-                thumbnailURL: thumbnailUrl,
-                duration: assemblyResult.assembly.audio_duration,
-                transcription: assemblyResult.assembly,
-                segments: translatedParagraphs,
-                translatedFileURL: audioUrl,
-              });
-              console.log("Document written with ID: ", docRef.id);
-              try {
-                const userRef = doc(db, "users", uid);
-                const docSnap = await getDoc(userRef);
-                const currentData = docSnap.data();
-                await updateDoc(userRef, {
-                  usedSeconds:
-                    currentData.usedSeconds +
-                    assemblyResult.assembly.audio_duration,
-                  remainingSeconds:
-                    currentData.remainingSeconds -
-                    assemblyResult.assembly.audio_duration,
-                });
-              } catch (e) {
-                console.error("Error updating credits: ", e);
+                const data = await response.json();
+                return data.thumbnailUrl; // Return the generated thumbnail URL
+              } catch (error) {
+                console.error(error);
+                return null;
               }
-            } catch (e) {
-              console.error("Error adding document: ", e);
-            }
-          } catch (error) {
-            console.error(
-              "Error converting text to speech or translating:",
-              error
-            );
-          }
+            };
 
-          // Close modal
-          handleModalClose();
-        }
-      );
-    } catch (e) {
-      console.error("Error adding document: ", e);
-      handleModalClose();
-    }
+            // Usage example
+            // const mp4Url = 'https://example.com/your_video.mp4';
+            const thumbnailUrl = await generateThumbnail(downloadURL);
+            console.log("Thumbnail URL:", thumbnailUrl);
+
+            const filePath =
+              "files/" +
+              selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
+            console.log("File uploaded at " + filePath);
+
+            try {
+              // Call speech-to-text API
+              const response = await fetch("/api/speech-to-text", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  audioPath: filePath,
+                  audioLanguage: getTranslateCode(originalLanguage),
+                  numOfSpeakers: numOfSpeakers,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error(
+                  `Failed to convert speech to text: ${response.statusText}`
+                );
+              }
+
+              // Get speech-to-text result
+              const result = await response.json();
+              const assemblyResult = result;
+              console.log("Speech To Text Converted Successfully!");
+              // console.log(assemblyResult.segments);
+              console.log(assemblyResult.assembly);
+
+              const translatedParagraphs = await Promise.all(
+                assemblyResult.segments.map(async (paragraph) => {
+                  // Call Translation API - Translate each paragraph
+                  const translationResponse = await fetch(
+                    "/api/translate-text",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        inputText: paragraph.text,
+                        target: getTranslateCode(translationLanguage),
+                      }),
+                    }
+                  );
+
+                  if (!translationResponse.ok) {
+                    throw new Error(
+                      `Failed to translate text: ${translationResponse.statusText}`
+                    );
+                  }
+
+                  const translationResult = await translationResponse.json();
+                  const translatedText = translationResult.translations[0];
+
+                  return {
+                    text: paragraph.text,
+                    translatedText: translatedText,
+                    start: paragraph.startTime,
+                    end: paragraph.endTime,
+                    speaker: paragraph.speaker,
+                    voiceId: "Adam",
+                  };
+                })
+              );
+
+              console.log(translatedParagraphs);
+              console.log("Text Translated Successfully!");
+
+              // Call text-to-speech API
+              console.log("Starting text to speech...");
+              const ttsResponse = await fetch("/api/text-to-speech", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text: translatedText }),
+              });
+
+              if (!ttsResponse.ok) {
+                throw new Error(
+                  `Failed to convert text to speech: ${ttsResponse.statusText}`
+                );
+              }
+
+              // Get text-to-speech result
+              const ttsResult = await ttsResponse.json();
+              const audioUrl = ttsResult.audioUrl;
+              console.log("Text To Speech Converted Successfully!");
+              // const audioUrl =
+              //     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+              // Add the converted text, translation, and audio URL to the audio files collection
+              try {
+                const docRef = await addDoc(collection(db, "projects"), {
+                  projectName: projectName,
+                  user: uid,
+                  fileName: selectedFileName,
+                  originalLanguage: originalLanguage,
+                  translationLanguage: translationLanguage,
+                  date: Timestamp.fromDate(new Date()),
+                  fileURL: downloadURL,
+                  thumbnailURL: thumbnailUrl,
+                  duration: assemblyResult.assembly.audio_duration,
+                  transcription: assemblyResult.assembly,
+                  segments: translatedParagraphs,
+                  translatedFileURL: audioUrl,
+                });
+                console.log("Document written with ID: ", docRef.id);
+                try {
+                  const userRef = doc(db, "users", uid);
+                  const docSnap = await getDoc(userRef);
+                  const currentData = docSnap.data();
+                  const updatedUsedSeconds =
+                    currentData.subscriptions[0].usage.usedSeconds +
+                    assemblyResult.assembly.audio_duration;
+                  const updatedRemainingSeconds =
+                    currentData.subscriptions[0].usage.remainingSeconds -
+                    assemblyResult.assembly.audio_duration;
+                  await updateDoc(userRef, {
+                    subscriptions: [
+                      {
+                        ...currentData.subscriptions[0],
+                        usage: {
+                          ...currentData.subscriptions[0].usage,
+                          usedSeconds: updatedUsedSeconds,
+                          remainingSeconds: updatedRemainingSeconds,
+                        },
+                      },
+                      ...currentData.subscriptions.slice(1),
+                    ],
+                  });
+                } catch (e) {
+                  console.error("Error updating credits: ", e);
+                }
+              } catch (e) {
+                console.error("Error adding document: ", e);
+              }
+            } catch (error) {
+              console.error(
+                "Error converting text to speech or translating:",
+                error
+              );
+            }
+
+            // Close modal
+            handleModalClose();
+          }
+        );
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        handleModalClose();
+      }
+    });
   };
 
   const handleDownload = async (fileUrl, fileName) => {
@@ -468,7 +499,7 @@ const Projects = ({ openModal }) => {
     <AppShell>
       <div className="w-full">
         <div className="flex flex-col items-center pb-24 pt-10">
-          {subscription?.planID == "free_trial" && (
+          {subscription?.planID == "Free Trial" && (
             <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-10">
               <div className="flex items-center justify-center">
                 <div className="flex items-center justify-center rounded-full bg-foreground-400 p-[6px] mr-4">
@@ -704,13 +735,15 @@ const Projects = ({ openModal }) => {
                       <TableCell>
                         <Link href={`/app/projects/${project.id}`} className="">
                           <div className="flex flex-row hover:bg-foreground-100 rounded-lg p-1 transition-all">
-                            <Image
-                              src={project.thumbnailURL || "/drakedont.png"}
-                              alt="thumbnail"
-                              width={1000}
-                              height={1000}
-                              className="w-auto h-10 mr-3 rounded-lg"
-                            />
+                            <div className="flex items-center justify-center w-20">
+                              <Image
+                                src={project.thumbnailURL || "/drakedont.png"}
+                                alt="thumbnail"
+                                width={1000}
+                                height={1000}
+                                className="w-auto h-10 mr-3 rounded-lg"
+                              />
+                            </div>
                             <div className="flex flex-col">
                               <p className="text-foreground font-medium text-base">
                                 {project.projectName}
@@ -911,9 +944,7 @@ const Projects = ({ openModal }) => {
                         </p>
                         <Input
                           placeholder={
-                            selectedFile
-                              ? "File Selected"
-                              : "Youtube Video URL"
+                            selectedFile ? "File Selected" : "Youtube Video URL"
                           }
                           color={selectedFile ? "danger" : "default"}
                           size="sm"

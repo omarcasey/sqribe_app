@@ -162,7 +162,7 @@ export default function DropdownMenuIdk({ router }) {
             <p className="hover:text-red-500 transition-all">Log Out</p>
           </DropdownItem>
         </DropdownSection>
-        {subscription?.planID == "free_trial" && (
+        {subscription?.planID == "Free Trial" && (
           <DropdownItem
             key="upgrade"
             isReadOnly

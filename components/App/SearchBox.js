@@ -1,4 +1,4 @@
-import { Input, Modal, ModalContent, useDisclosure } from "@nextui-org/react";
+import { Divider, Input, Modal, ModalContent, useDisclosure } from "@nextui-org/react";
 import { useState, useEffect, useRef } from "react";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { useSelector } from "react-redux";
@@ -25,7 +25,26 @@ const SearchBox = ({}) => {
       // User pressed Ctrl+K
       console.log("Ctrl+K pressed");
       // Add your code here to handle the Ctrl+K key combination
+      setQuery("");
       onOpen();
+    }
+    if (event.shiftKey && event.key === "D") {
+      // Prevent the default action
+      event.preventDefault();
+
+      // User pressed Ctrl+K
+      console.log("Shift+D pressed");
+      // Add your code here to handle the Ctrl+K key combination
+      router.push("/app/dashboard");
+    }
+    if (event.shiftKey && event.key === "P") {
+      // Prevent the default action
+      event.preventDefault();
+
+      // User pressed Ctrl+K
+      console.log("Shift+P pressed");
+      // Add your code here to handle the Ctrl+K key combination
+      router.push("/app/projects");
     }
   });
 
@@ -96,20 +115,88 @@ const SearchBox = ({}) => {
     >
       <ModalContent>
         {(onClose) => (
+          // <>
+          //   <div className="border border-foreground-300 text-foreground-500 flex items-center justify-center w-12 text-tiny rounded-md mt-4 ml-3 pb-[2px] mb-2">
+          //     Home
+          //   </div>
+          //   <div className="flex flex-row">
+          //     <input
+          //       autoFocus
+          //       value={query}
+          //       onChange={handleChange}
+          //       onKeyDown={handleKeyDown}
+          //       placeholder="What are you looking for?"
+          //       className="text-lg font-medium w-full bg-black focus:outline-none pl-4"
+          //     />
+          //     <div className="border border-foreground-300 text-sm flex items-center justify-center px-2 text-white rounded-md pb-[2px] mr-3 ml-2">
+          //       Esc
+          //     </div>
+          //   </div>
+          //   <Divider className="mt-2" />
+
+          //   <ul className="p-3 flex flex-col gap-2 overflow-auto">
+          //     {filteredProjects.map((project, index) => (
+          //       <li
+          //         key={project.id} // Assuming project objects have unique identifiers
+          //         ref={index === selectedProjectIndex ? selectedRef : null}
+          //         onClick={() => handleProjectClick(project)}
+          //         onMouseEnter={() => handleMouseEnter(index)}
+          //         className={`flex flex-row gap-2 hover:cursor-pointer items-center justify-between rounded-lg p-2 py-3 ${
+          //           index === selectedProjectIndex
+          //             ? "bg-blue-500"
+          //             : "bg-foreground-100"
+          //         }`}
+          //       >
+          //         <div className="flex flex-row gap-2 items-center">
+          //           <PiVideoFill size={20} />
+          //           <p className="text-base font-light">
+          //             {project.projectName}
+          //           </p>
+          //         </div>
+          //         <div className="flex flex-row gap-4 items-center">
+          //           <p
+          //             className={`text-xs font-light ${
+          //               index === selectedProjectIndex
+          //                 ? "text-white"
+          //                 : "text-foreground-500"
+          //             }`}
+          //           >
+          //             {project.date.toDate().toLocaleDateString()}
+          //           </p>
+          //           <Image
+          //             alt="nextui logo"
+          //             height={40}
+          //             radius="sm"
+          //             src={`https://flagcdn.com/${getFlagCode(
+          //               project.translationLanguage
+          //             )}.svg`}
+          //             width={40}
+          //             className="w-6 h-6 rounded-full mr-5"
+          //           />
+          //         </div>
+          //       </li>
+          //     ))}
+          //   </ul>
+          // </>
           <>
-            <div className="border border-foreground-300 text-foreground-500 flex items-center justify-center w-12 text-tiny rounded-md mt-4 ml-3 pb-[2px]">
-              Home
+            {/* <div className="border border-foreground-300 text-foreground-500 flex items-center justify-center px-[6px] max-w-min text-tiny rounded-md mt-4 ml-3 pb-[2px] mb-2">
+              Dashboard
+            </div> */}
+            <div className="flex flex-row mt-3">
+              <input
+                autoFocus
+                value={query}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                placeholder="What are you looking for?"
+                className="text-lg font-medium w-full bg-black focus:outline-none pl-4"
+              />
+              <div className="border border-foreground-300 text-sm flex items-center justify-center px-2 text-white rounded-md pb-[2px] mr-3 ml-2">
+                Esc
+              </div>
             </div>
-            <Input
-              variant="underlined"
-              autoFocus
-              value={query}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              placeholder="What are you looking for?"
-              className=""
-              classNames={{ input: "px-3 text-lg font-medium" }}
-            />
+            <Divider className="mt-2" />
+
             <ul className="p-3 flex flex-col gap-2 overflow-auto">
               {filteredProjects.map((project, index) => (
                 <li
@@ -130,7 +217,13 @@ const SearchBox = ({}) => {
                     </p>
                   </div>
                   <div className="flex flex-row gap-4 items-center">
-                    <p className={`text-xs font-light ${index === selectedProjectIndex ? "text-white" : "text-foreground-500"}`}>
+                    <p
+                      className={`text-xs font-light ${
+                        index === selectedProjectIndex
+                          ? "text-white"
+                          : "text-foreground-500"
+                      }`}
+                    >
                       {project.date.toDate().toLocaleDateString()}
                     </p>
                     <Image
