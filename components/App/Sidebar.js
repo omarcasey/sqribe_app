@@ -6,6 +6,7 @@ import React from "react";
 import { FaFolder, FaHistory } from "react-icons/fa";
 import { RiLayoutMasonryFill } from "react-icons/ri";
 import { SiAudiomack } from "react-icons/si";
+import { FaRegCreditCard } from "react-icons/fa6";
 import DropdownMenuIdk from "./DropdownMenuIdk";
 
 const Sidebar = () => {
@@ -28,7 +29,7 @@ const Sidebar = () => {
         <div className="flex flex-col gap-2 max-w-2xl justify-evenly">
           <Link
             href="/app/dashboard"
-            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 ${
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
               router.pathname === "/app/dashboard" ? "bg-foreground-100" : ""
             }`}
           >
@@ -49,7 +50,7 @@ const Sidebar = () => {
           </Link>
           <Link
             href="/app/projects"
-            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 ${
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
               router.pathname === "/app/projects" ? "bg-foreground-100" : ""
             }`}
           >
@@ -58,7 +59,7 @@ const Sidebar = () => {
           </Link>
           <Link
             href="/app/makespeech"
-            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 ${
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
               router.pathname === "/app/makespeech" ? "bg-foreground-100" : ""
             }`}
           >
@@ -80,13 +81,25 @@ const Sidebar = () => {
           </Link>
           <Link
             href="/app/history"
-            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 ${
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
               router.pathname === "/app/history" ? "bg-foreground-100" : ""
             }`}
           >
             <FaHistory className="w-5 mr-2" />
             <p className="">History</p>
           </Link>
+
+          <Link
+            href="/app/subscription"
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
+              router.pathname === "/app/subscription" ? "bg-foreground-100" : ""
+            }`}
+          >
+            <FaRegCreditCard className="w-5 mr-2" />
+            <p className="">Subscription</p>
+          </Link>
+
+          
         </div>
       </div>
 
