@@ -131,7 +131,7 @@ const AppShell = ({ children }) => {
     >
       <Sidebar />
       <div className="flex flex-col flex-1">
-        <nav className="dark:bg-neutral-900 bg-white px-6 py-3">
+        <nav className="dark:bg-neutral-900 bg-white px-6 py-3 border-b border-foreground-300">
           <div className="flex justify-between items-center">
             {/* <Link href="/" className="flex items-center">
               <Image
@@ -200,15 +200,19 @@ const AppShell = ({ children }) => {
                 <p className="">History</p>
               </Link>
             </div> */}
-            <Input
+            <Button
               startContent={<SearchIcon />}
-              placeholder="Command Center"
-              className="max-w-[16rem]"
-              classNames={{ inputWrapper: "h-10" }}
-              size="sm"
-              onClick={() => dispatch(setOpenCommandCenter(true))}
-              isReadOnly
-            />
+              endContent={
+                <div className="ml-2 border border-foreground-400 dark:border-foreground-300 bg-white dark:bg-foreground-100 text-xs flex items-center justify-center px-1 text-foreground-500 rounded-lg pt-[3px] pb-[2px]">
+                  <span className="text-[10px]">⌘</span>K
+                </div>
+              }
+              className="text-foreground-500 bg-foreground-200 dark:bg-foreground-200"
+              size="md"
+              onPress={() => dispatch(setOpenCommandCenter(true))}
+            >
+              Command Center...
+            </Button>
             <div className="flex space-x-3 items-center">
               <div className="w-32 mr-2">
                 <p className="text-tiny mb-1 text-center text-foreground-600">

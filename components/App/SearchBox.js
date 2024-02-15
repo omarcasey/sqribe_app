@@ -1,4 +1,10 @@
-import { Divider, Input, Modal, ModalContent, useDisclosure } from "@nextui-org/react";
+import {
+  Divider,
+  Input,
+  Modal,
+  ModalContent,
+  useDisclosure,
+} from "@nextui-org/react";
 import { useState, useEffect, useRef } from "react";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +24,9 @@ const SearchBox = ({}) => {
   const dispatch = useDispatch();
   const selectedRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const openCommandCenter = useSelector((state) => state.user.openCommandCenter);
+  const openCommandCenter = useSelector(
+    (state) => state.user.openCommandCenter
+  );
 
   useEffect(() => {
     if (openCommandCenter) {
@@ -26,7 +34,6 @@ const SearchBox = ({}) => {
       dispatch(setOpenCommandCenter(false));
     }
   }, [dispatch, onOpen, openCommandCenter]);
-  
 
   document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.key === "k") {
@@ -118,91 +125,27 @@ const SearchBox = ({}) => {
       isOpen={isOpen}
       onClose={onClose}
       className={`${
-        isDarkMode ? "dark bg-black border border-foreground-200" : "light"
+        isDarkMode
+          ? "dark bg-black border border-foreground-200"
+          : "light bg-foreground-200"
       } text-foreground max-h-[30rem]`}
       hideCloseButton
       scrollBehavior="normal"
-      backdrop="blur"
+      // backdrop="blur"
     >
       <ModalContent>
         {(onClose) => (
-          // <>
-          //   <div className="border border-foreground-300 text-foreground-500 flex items-center justify-center w-12 text-tiny rounded-md mt-4 ml-3 pb-[2px] mb-2">
-          //     Home
-          //   </div>
-          //   <div className="flex flex-row">
-          //     <input
-          //       autoFocus
-          //       value={query}
-          //       onChange={handleChange}
-          //       onKeyDown={handleKeyDown}
-          //       placeholder="What are you looking for?"
-          //       className="text-lg font-medium w-full bg-black focus:outline-none pl-4"
-          //     />
-          //     <div className="border border-foreground-300 text-sm flex items-center justify-center px-2 text-white rounded-md pb-[2px] mr-3 ml-2">
-          //       Esc
-          //     </div>
-          //   </div>
-          //   <Divider className="mt-2" />
-
-          //   <ul className="p-3 flex flex-col gap-2 overflow-auto">
-          //     {filteredProjects.map((project, index) => (
-          //       <li
-          //         key={project.id} // Assuming project objects have unique identifiers
-          //         ref={index === selectedProjectIndex ? selectedRef : null}
-          //         onClick={() => handleProjectClick(project)}
-          //         onMouseEnter={() => handleMouseEnter(index)}
-          //         className={`flex flex-row gap-2 hover:cursor-pointer items-center justify-between rounded-lg p-2 py-3 ${
-          //           index === selectedProjectIndex
-          //             ? "bg-blue-500"
-          //             : "bg-foreground-100"
-          //         }`}
-          //       >
-          //         <div className="flex flex-row gap-2 items-center">
-          //           <PiVideoFill size={20} />
-          //           <p className="text-base font-light">
-          //             {project.projectName}
-          //           </p>
-          //         </div>
-          //         <div className="flex flex-row gap-4 items-center">
-          //           <p
-          //             className={`text-xs font-light ${
-          //               index === selectedProjectIndex
-          //                 ? "text-white"
-          //                 : "text-foreground-500"
-          //             }`}
-          //           >
-          //             {project.date.toDate().toLocaleDateString()}
-          //           </p>
-          //           <Image
-          //             alt="nextui logo"
-          //             height={40}
-          //             radius="sm"
-          //             src={`https://flagcdn.com/${getFlagCode(
-          //               project.translationLanguage
-          //             )}.svg`}
-          //             width={40}
-          //             className="w-6 h-6 rounded-full mr-5"
-          //           />
-          //         </div>
-          //       </li>
-          //     ))}
-          //   </ul>
-          // </>
           <>
-            {/* <div className="border border-foreground-300 text-foreground-500 flex items-center justify-center px-[6px] max-w-min text-tiny rounded-md mt-4 ml-3 pb-[2px] mb-2">
-              Dashboard
-            </div> */}
-            <div className="flex flex-row mt-3">
+            <div className="flex flex-row mt-3 mb-2">
               <input
                 autoFocus
                 value={query}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
                 placeholder="What are you looking for?"
-                className="text-lg font-medium w-full bg-black focus:outline-none pl-4"
+                className="text-lg w-full bg-foreground-200 dark:bg-black focus:outline-none pl-4"
               />
-              <div className="border border-foreground-300 text-sm flex items-center justify-center px-2 text-white rounded-md pb-[2px] mr-3 ml-2">
+              <div className="border border-foreground-300 text-sm flex items-center justify-center px-2 text-foreground dark:bg-foreground-100 rounded-lg pb-[2px] mr-3 ml-2">
                 Esc
               </div>
             </div>
@@ -217,8 +160,8 @@ const SearchBox = ({}) => {
                   onMouseEnter={() => handleMouseEnter(index)}
                   className={`flex flex-row gap-2 hover:cursor-pointer items-center justify-between rounded-lg p-2 py-3 ${
                     index === selectedProjectIndex
-                      ? "bg-blue-500"
-                      : "bg-foreground-100"
+                      ? "bg-foreground-50"
+                      : ""
                   }`}
                 >
                   <div className="flex flex-row gap-2 items-center">
@@ -250,6 +193,16 @@ const SearchBox = ({}) => {
                   </div>
                 </li>
               ))}
+              {filteredProjects.length === 0 && (
+                <div className="py-6">
+                  <li className="text-center text-foreground">
+                    No results found for &quot;{query}&quot;
+                  </li>
+                  <p className="text-foreground-400 text-center">
+                    Try searching something else.
+                  </p>
+                </div>
+              )}
             </ul>
           </>
         )}
