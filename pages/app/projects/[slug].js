@@ -420,16 +420,6 @@ const Page = () => {
                   </Tab>
                   <Tab key="translated" title="Translated" className="">
                     <div className="p-4 px-5">
-                      {project.needsUpdate === true && (
-                        <div className="bg-blue-500 w-full flex items-center justify-center rounded-xl mb-2 px-4 py-3">
-                          <p className="text-sm text-white text-center">
-                            <span className="font-semibold">
-                              This is an old version!{" "}
-                            </span>
-                            Click Redub to see the updates 👀
-                          </p>
-                        </div>
-                      )}
                       {project.fileName.endsWith(".mp4") ? (
                         <VideoPlayer url={project.fileURL} />
                       ) : (
@@ -438,6 +428,16 @@ const Page = () => {
                           name={project.projectName}
                           filename={project.fileName}
                         />
+                      )}
+                      {project.needsUpdate === true && (
+                        <div className="bg-blue-500 w-full flex items-center justify-center rounded-xl mt-2 px-4 py-3">
+                          <p className="text-sm text-white text-center">
+                            <span className="font-semibold">
+                              This is an old version!{" "}
+                            </span>
+                            Click Redub to see the updates 👀
+                          </p>
+                        </div>
                       )}
                     </div>
                   </Tab>

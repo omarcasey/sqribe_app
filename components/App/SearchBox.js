@@ -1,6 +1,7 @@
 import {
   Divider,
   Input,
+  Kbd,
   Modal,
   ModalContent,
   useDisclosure,
@@ -13,6 +14,9 @@ import { PiVideoFill } from "react-icons/pi";
 import Image from "next/image";
 import { getFlagCode } from "@/helpers/getFlag";
 import { setOpenCommandCenter } from "@/reducers/userSlice";
+import { GrProjects } from "react-icons/gr";
+import { ImShift } from "react-icons/im";
+import { Commands } from "@/helpers/Commands";
 
 const SearchBox = ({}) => {
   const [query, setQuery] = useState("");
@@ -136,7 +140,7 @@ const SearchBox = ({}) => {
       <ModalContent>
         {(onClose) => (
           <>
-            <div className="flex flex-row mt-3 mb-2">
+            <div className="flex flex-row items-center mt-3">
               <input
                 autoFocus
                 value={query}
@@ -145,23 +149,21 @@ const SearchBox = ({}) => {
                 placeholder="What are you looking for?"
                 className="text-lg w-full bg-foreground-200 dark:bg-black focus:outline-none pl-4"
               />
-              <div className="border border-foreground-300 text-sm flex items-center justify-center px-2 text-foreground dark:bg-foreground-100 rounded-lg pb-[2px] mr-3 ml-2">
+              <div className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2">
                 Esc
               </div>
             </div>
             <Divider className="mt-2" />
 
-            <ul className="p-3 flex flex-col gap-2 overflow-auto">
-              {filteredProjects.map((project, index) => (
+            <ul className="p-3 flex flex-col gap-1 overflow-auto">
+              {/* {filteredProjects.map((project, index) => (
                 <li
                   key={project.id} // Assuming project objects have unique identifiers
                   ref={index === selectedProjectIndex ? selectedRef : null}
                   onClick={() => handleProjectClick(project)}
                   onMouseEnter={() => handleMouseEnter(index)}
                   className={`flex flex-row gap-2 hover:cursor-pointer items-center justify-between rounded-lg p-2 py-3 ${
-                    index === selectedProjectIndex
-                      ? "bg-foreground-50"
-                      : ""
+                    index === selectedProjectIndex ? "bg-foreground-50" : ""
                   }`}
                 >
                   <div className="flex flex-row gap-2 items-center">
@@ -202,7 +204,53 @@ const SearchBox = ({}) => {
                     Try searching something else.
                   </p>
                 </div>
-              )}
+              )} */}
+              {Commands.map((command, index) => (
+                <>
+                  {index === 0 || command.category !== Commands[index - 1].category ? (
+                    <p className="text-sm text-foreground-500 ml-2 mt-1 mb-2">
+                      {command.category}
+                    </p>
+                  ) : null}
+                  <li
+                    key={index}
+                    ref={index === selectedProjectIndex ? selectedRef : null}
+                    onMouseEnter={() => handleMouseEnter(index)}
+                    className={`flex flex-row gap-2 hover:cursor-pointer items-center justify-between rounded-lg px-3 py-2 ${
+                      index === selectedProjectIndex ? "bg-foreground-50" : ""
+                    }`}
+                  >
+                    <div className="flex flex-row gap-2 items-center">
+                      {command.icon}
+                      <p className="text-base text-[15px] font-normal">{command.text}</p>
+                    </div>
+                    {command.endContent && <>{command.endContent}</>}
+                  </li>
+                </>
+              ))}
+              {/* <p className="text-sm text-foreground-500 ml-2 mt-2">Projects</p>
+              <li
+                ref={0 === selectedProjectIndex ? selectedRef : null}
+                onMouseEnter={() => handleMouseEnter(index)}
+                className={`flex flex-row gap-2 hover:cursor-pointer items-center justify-between rounded-lg px-3 py-3 ${
+                  0 === selectedProjectIndex ? "bg-foreground-50" : ""
+                }`}
+              >
+                <div className="flex flex-row gap-4 items-center">
+                  <GrProjects size={15} className="text-foreground-500" />
+                  <p className="text-base text-[15px] font-medium">
+                    Search Projects...
+                  </p>
+                </div>
+                <div className="flex flex-row items-center gap-1">
+                  <Kbd className="h-7 w-6 px-0 flex items-center justify-center">
+                    <ImShift size={16} />
+                  </Kbd>
+                  <Kbd className="h-7 w-6 px-0 flex items-center justify-center font-medium">
+                    P
+                  </Kbd>
+                </div>
+              </li> */}
             </ul>
           </>
         )}

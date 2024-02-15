@@ -1,4 +1,4 @@
-import { Divider } from "@nextui-org/react";
+import { Divider, User } from "@nextui-org/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -7,10 +7,14 @@ import { FaFolder, FaHistory } from "react-icons/fa";
 import { RiLayoutMasonryFill } from "react-icons/ri";
 import { SiAudiomack } from "react-icons/si";
 import { FaRegCreditCard } from "react-icons/fa6";
-import DropdownMenuIdk from "./DropdownMenuIdk";
+import { useSelector } from "react-redux";
 
 const Sidebar = () => {
   const router = useRouter();
+  const user = useSelector((state) => state.user.auth);
+  const userData = useSelector((state) => state.user.data);
+  const subscription = userData?.subscriptions[0];
+
   return (
     <div className="w-[17.5rem] dark:bg-neutral-900 bg-white py-4 px-4 border-r border-foreground-200 flex flex-col">
       <Link href="/" className="flex items-center mb-10 p-1">
@@ -35,13 +39,13 @@ const Sidebar = () => {
           >
             <RiLayoutMasonryFill
               className={`w-5 mr-2 ${
-                router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
+                router.pathname === "/app/dashboard" ? "text-cyan-500 dark:text-cyan-300" : ""
               }`}
             />
             <p
               className={`${
                 router.pathname === "/app/dashboard"
-                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
                   : ""
               }`}
             >
@@ -54,8 +58,18 @@ const Sidebar = () => {
               router.pathname === "/app/projects" ? "bg-foreground-100" : ""
             }`}
           >
-            <FaFolder className="w-5 mr-2" />
-            <p className="">Projects</p>
+            <FaFolder className={`w-5 mr-2 ${
+                router.pathname === "/app/projects" ? "text-cyan-500 dark:text-cyan-300" : ""
+              }`} />
+            <p
+              className={`${
+                router.pathname === "/app/projects"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
+                  : ""
+              }`}
+            >
+              Projects
+            </p>
           </Link>
           <Link
             href="/app/makespeech"
@@ -66,13 +80,13 @@ const Sidebar = () => {
             <SiAudiomack
               size={20}
               className={`w-5 mr-2 ${
-                router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
+                router.pathname === "/app/makespeech" ? "text-cyan-500 dark:text-cyan-300" : ""
               }`}
             />
             <p
               className={`${
                 router.pathname === "/app/makespeech"
-                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
                   : ""
               }`}
             >
@@ -85,8 +99,18 @@ const Sidebar = () => {
               router.pathname === "/app/history" ? "bg-foreground-100" : ""
             }`}
           >
-            <FaHistory className="w-5 mr-2" />
-            <p className="">History</p>
+            <FaHistory className={`w-5 mr-2 ${
+                router.pathname === "/app/history" ? "text-cyan-500 dark:text-cyan-300" : ""
+              }`} />
+            <p
+              className={`${
+                router.pathname === "/app/history"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
+                  : ""
+              }`}
+            >
+              History
+            </p>
           </Link>
 
           <Link
@@ -95,8 +119,18 @@ const Sidebar = () => {
               router.pathname === "/app/subscription" ? "bg-foreground-100" : ""
             }`}
           >
-            <FaRegCreditCard className="w-5 mr-2" />
-            <p className="">Subscription</p>
+            <FaRegCreditCard className={`w-5 mr-2 ${
+                router.pathname === "/app/subscription" ? "text-cyan-500 dark:text-cyan-300" : ""
+              }`} />
+            <p
+              className={`${
+                router.pathname === "/app/subscription"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
+                  : ""
+              }`}
+            >
+              Subscription
+            </p>
           </Link>
 
           
@@ -104,7 +138,18 @@ const Sidebar = () => {
       </div>
 
       <Divider className="bg-foreground-300 mb-3" />
-      <DropdownMenuIdk router={router} />
+      <User
+              name={user.email}
+              description={subscription?.planID}
+              classNames={{
+                name: "text-default-600",
+                description: "text-default-500",
+              }}
+              avatarProps={{
+                size: "sm",
+                src: "/png avatar.png",
+              }}
+            />
       {/* <p className="text-foreground text-sm mt-3 ml-2 mb-4">Omar Casey</p> */}
     </div>
   );

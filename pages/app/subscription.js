@@ -1,6 +1,13 @@
 import AppShell from "@/components/App/AppShell";
 import withAuth from "@/components/App/withAuth";
-import { Button, Card, Divider, Switch } from "@nextui-org/react";
+import {
+  Accordion,
+  AccordionItem,
+  Button,
+  Card,
+  Divider,
+  Switch,
+} from "@nextui-org/react";
 import React, { useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -85,7 +92,9 @@ const Subscription = () => {
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Billing Period</p>
               <p className="mr-5">Monthly</p>
-              <p className="text-blue-400 font-medium text-xs border rounded-lg px-2 py-[2px] border-indigo-800 hover:cursor-pointer">Switch to Yearly</p>
+              <p className="text-blue-400 font-medium text-xs border rounded-lg px-2 py-[2px] border-indigo-800 hover:cursor-pointer">
+                Switch to Yearly
+              </p>
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
@@ -112,7 +121,9 @@ const Subscription = () => {
               />
             </div>
           </Card>
-          <h1 className="w-[90%] mt-16 text-2xl font-semibold ml-5">Plans</h1>
+          <h1 className="w-[90%] mt-16 text-2xl font-semibold ml-5 text-foreground">
+            Plans
+          </h1>
           <div className="mx-auto max-w-[90%] text-foreground pt-4 flex-1">
             <div className="flex justify-center items-center mb-8">
               <p
@@ -329,6 +340,48 @@ const Subscription = () => {
                 <Button color="default">{businessButtonLabel}</Button>
               </Card>
             </div>
+          </div>
+          <h2 className="w-[90%] mt-16 text-2xl font-semibold ml-5 text-foreground mb-6">
+            Pricing FAQ
+          </h2>
+          <div className="max-w-[90%] w-full">
+            <Accordion selectionMode="multiple" className="">
+              <AccordionItem
+                key="1"
+                aria-label="Accordion 1"
+                title="What are the main features of Sqribe?"
+                className=""
+              >
+                <p className="text-foreground-500">The following features are currently available in our product:
+                Automated speech-to-text, translation and voiceover: Create a
+                transcript, translation, and voice-over for your video. Voice
+                cloning: Copy the voice from the original video to the
+                translated version. Multiple speakers: Assign a unique voice to
+                each speaker in the video. ubtitles: Download the transcript
+                and translation in SRT format. AI rewriting: Adjust the speed
+                of speech by rewriting segments that are too long in the
+                translation. Multi-lingual projects: Translate your video into
+                several languages in one click.Upload SRT: Upload SRT Files
+                for achieving more accuracy in translation or transcription.
+                Lip-sync in Beta: Get synchronized mouth movements with the
+                audio track in a translated video.</p>
+
+              </AccordionItem>
+              <AccordionItem
+                key="2"
+                aria-label="Accordion 2"
+                title="How many languages do you support?"
+              >
+                <p className="text-foreground-500">With Rask AI, you can translate from nearly any language to over 130 languages. Our Voice Cloning feature offers a human-like experience and is currently available when dubbing from any source language to the following 29 languages: English, Japanese, Chinese, German, Hindi, French, Korean, Portuguese, Italian, Spanish, Indonesian, Dutch, Turkish, Filipino, Polish, Ukrainian, Swedish, Bulgarian, Romanian, Arabic, Czech, Greek, Finnish, Croatian, Malay, Slovak, Danish, Tamil, Russian.</p>
+              </AccordionItem>
+              <AccordionItem
+                key="3"
+                aria-label="Accordion 3"
+                title="Accordion 3"
+              >
+                3
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </div>
