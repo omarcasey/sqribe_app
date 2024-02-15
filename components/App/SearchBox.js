@@ -1,11 +1,12 @@
 import { Divider, Input, Modal, ModalContent, useDisclosure } from "@nextui-org/react";
 import { useState, useEffect, useRef } from "react";
 import { SearchIcon } from "../Icons/SearchIcon";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { PiVideoFill } from "react-icons/pi";
 import Image from "next/image";
 import { getFlagCode } from "@/helpers/getFlag";
+import { setOpenCommandCenter } from "@/reducers/userSlice";
 
 const SearchBox = ({}) => {
   const [query, setQuery] = useState("");
@@ -14,8 +15,18 @@ const SearchBox = ({}) => {
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
   const projects = useSelector((state) => state.user.projects);
   const router = useRouter();
+  const dispatch = useDispatch();
   const selectedRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const openCommandCenter = useSelector((state) => state.user.openCommandCenter);
+
+  useEffect(() => {
+    if (openCommandCenter) {
+      onOpen();
+      dispatch(setOpenCommandCenter(false));
+    }
+  }, [dispatch, onOpen, openCommandCenter]);
+  
 
   document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.key === "k") {

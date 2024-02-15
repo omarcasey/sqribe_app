@@ -40,8 +40,11 @@ import {
   setAudioPlayerVisible,
   setAutoPlay,
   setDarkMode,
+  setOpenCommandCenter,
 } from "@/reducers/userSlice";
 import SearchBox from "./SearchBox";
+import Sidebar from "./Sidebar";
+import { SearchIcon } from "../Icons/SearchIcon";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
@@ -122,109 +125,123 @@ const AppShell = ({ children }) => {
 
   return (
     <div
-      className={`flex flex-col h-screen ${
+      className={`flex flex-row h-screen ${
         isDarkMode ? "dark" : "light"
       } bg-default-100`}
     >
-      <nav className="dark:bg-neutral-900 bg-white px-6 py-3">
-        <div className="flex justify-between items-center">
-          <Link href="/" className="flex items-center">
-            <Image
-              className="w-auto h-10 mr-4"
-              src="/new logo transparent.png"
-              alt=""
-              width={1024}
-              height={1024}
+      <Sidebar />
+      <div className="flex flex-col flex-1">
+        <nav className="dark:bg-neutral-900 bg-white px-6 py-3">
+          <div className="flex justify-between items-center">
+            {/* <Link href="/" className="flex items-center">
+              <Image
+                className="w-auto h-10 mr-4"
+                src="/new logo transparent.png"
+                alt=""
+                width={1024}
+                height={1024}
+              />
+              <h1 className="text-foreground font-extrabold text-2xl tracking-tight">
+                Sqribe
+              </h1>
+            </Link>
+            <div className="flex flex-1 max-w-2xl justify-evenly">
+              <Link
+                href="/app/dashboard"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+              >
+                <RiLayoutMasonryFill
+                  className={`mr-2 ${
+                    router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
+                  }`}
+                />
+                <p
+                  className={`${
+                    router.pathname === "/app/dashboard"
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
+                      : ""
+                  }`}
+                >
+                  Dashboard
+                </p>
+              </Link>
+              <Link
+                href="/app/projects"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+              >
+                <FaFolder className="mr-2" />
+                <p className="">Projects</p>
+              </Link>
+              <Link
+                href="/app/makespeech"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+              >
+                <SiAudiomack
+                  size={20}
+                  className={`mr-2 ${
+                    router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
+                  }`}
+                />
+                <p
+                  className={`${
+                    router.pathname === "/app/makespeech"
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
+                      : ""
+                  }`}
+                >
+                  Speech Synthesis
+                </p>
+              </Link>
+              <Link
+                href="/app/history"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+              >
+                <FaHistory className="mr-2" />
+                <p className="">History</p>
+              </Link>
+            </div> */}
+            <Input
+              startContent={<SearchIcon />}
+              placeholder="Command Center"
+              className="max-w-[16rem]"
+              classNames={{ inputWrapper: "h-10" }}
+              size="sm"
+              onClick={() => dispatch(setOpenCommandCenter(true))}
+              isReadOnly
             />
-            <h1 className="text-foreground font-extrabold text-2xl tracking-tight">
-              Sqribe
-            </h1>
-          </Link>
-          <div className="flex flex-1 max-w-2xl justify-evenly">
-            <Link
-              href="/app/dashboard"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <RiLayoutMasonryFill
-                className={`mr-2 ${
-                  router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
-                }`}
-              />
-              <p
-                className={`${
-                  router.pathname === "/app/dashboard"
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
-                    : ""
-                }`}
-              >
-                Dashboard
-              </p>
-            </Link>
-            <Link
-              href="/app/projects"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <FaFolder className="mr-2" />
-              <p className="">Projects</p>
-            </Link>
-            <Link
-              href="/app/makespeech"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <SiAudiomack
-                size={20}
-                className={`mr-2 ${
-                  router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
-                }`}
-              />
-              <p
-                className={`${
-                  router.pathname === "/app/makespeech"
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
-                    : ""
-                }`}
-              >
-                Speech Synthesis
-              </p>
-            </Link>
-            <Link
-              href="/app/history"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <FaHistory className="mr-2" />
-              <p className="">History</p>
-            </Link>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <div className="w-32 mr-2">
-              <p className="text-tiny mb-1 text-center text-foreground-600">
-                {(subscription?.usage.usedSeconds / 60).toFixed(
-                  subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
-                )}{" "}
-                / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins used
-              </p>
-              <Progress
-                disableAnimation
-                color="danger"
-                value={
-                  (subscription?.usage.usedSeconds /
-                    subscription?.usage.totalSeconds) *
-                  100
-                }
-              />
+            <div className="flex space-x-3 items-center">
+              <div className="w-32 mr-2">
+                <p className="text-tiny mb-1 text-center text-foreground-600">
+                  {(subscription?.usage.usedSeconds / 60).toFixed(
+                    subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
+                  )}{" "}
+                  / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins
+                  used
+                </p>
+                <Progress
+                  disableAnimation
+                  color="danger"
+                  value={
+                    (subscription?.usage.usedSeconds /
+                      subscription?.usage.totalSeconds) *
+                    100
+                  }
+                />
+              </div>
+              <DropdownMenuIdk router={router} />
+              <Button
+                className="px-3 min-w-0"
+                startContent={<IoIosHelpCircleOutline size={25} />}
+              ></Button>
             </div>
-            <DropdownMenuIdk router={router} />
-            <Button
-              className="px-3 min-w-0"
-              startContent={<IoIosHelpCircleOutline size={25} />}
-            ></Button>
           </div>
-          {/* <Button onClick={signOut} className="text-white">
-            Sign Out
-          </Button> */}
-        </div>
-      </nav>
-      <main className="flex flex-1 bg-default-100">{children}</main>
+        </nav>
+        <main className="flex flex-1 bg-default-100 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+
+      {/* <main className="flex flex-1 bg-default-100">{children}</main> */}
       {audioFile && (
         <div
           className={`fixed bottom-0 right-0 z-50 w-10 h-10 mr-6 mb-4 rounded-full ${
@@ -353,7 +370,6 @@ const AppShell = ({ children }) => {
           {/* Content for the semi-transparent bar */}
         </div>
       )}
-
       <SearchBox />
     </div>
   );
