@@ -12,7 +12,7 @@ import { PlusIcon } from "../Icons/PlusIcon.jsx";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { auth } from "@/firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { setDarkMode } from "@/reducers/userSlice";
+import { setDarkMode, setOpenCommandCenter } from "@/reducers/userSlice";
 import {
   clearUserData,
   setAuthData,
@@ -133,7 +133,7 @@ export default function DropdownMenuIdk({ router }) {
         </DropdownSection>
 
         <DropdownSection aria-label="Preferences" showDivider>
-          <DropdownItem key="quick_search" shortcut="⌘K">
+          <DropdownItem key="quick_search" shortcut="⌘K" onClick={() => dispatch(setOpenCommandCenter(true))}>
             Quick search
           </DropdownItem>
           <DropdownItem

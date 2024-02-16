@@ -91,6 +91,7 @@ const userSlice = createSlice({
     error: null,
     audio: { audioPlayerVisible: false, audioFile: null, autoPlay: false },
     darkMode: null,
+    openCommandCenter: false,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -117,6 +118,9 @@ const userSlice = createSlice({
     setDarkMode: (state, action) => {
       state.darkMode = action.payload;
     }, // New reducer to update dark mode
+    setOpenCommandCenter: (state, action) => {
+      state.openCommandCenter = action.payload;
+    }, // New reducer to update command center visibility
   },
   extraReducers: (builder) => {
     builder
@@ -174,5 +178,6 @@ export const {
   setAudioFile,
   setAutoPlay,
   setDarkMode,
+  setOpenCommandCenter,
 } = userSlice.actions;
 export default userSlice.reducer;

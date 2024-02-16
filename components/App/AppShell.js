@@ -40,8 +40,11 @@ import {
   setAudioPlayerVisible,
   setAutoPlay,
   setDarkMode,
+  setOpenCommandCenter,
 } from "@/reducers/userSlice";
 import SearchBox from "./SearchBox";
+import Sidebar from "./Sidebar";
+import { SearchIcon } from "../Icons/SearchIcon";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
@@ -62,19 +65,6 @@ const AppShell = ({ children }) => {
   const [duration, setDuration] = useState(0);
   const audioElement = document.getElementById("audio-element");
 
-  const [query, setQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-
-  const handleSearch = (query) => {
-    // Here you can implement your search logic, 
-    // for example, fetch data from an API based on the query
-    console.log('Searching for:', query);
-    // For demo purposes, just set searchResults to query
-    setSearchResults([query]);
-  };
-
-  const suggestions = ['Apple', 'Banana', 'Orange', 'Grapes', 'Pineapple'];
-
   useEffect(() => {
     if (audioElement) {
       audioElement.addEventListener("ended", handleAudioEnded);
@@ -87,18 +77,6 @@ const AppShell = ({ children }) => {
       };
     }
   }, [audioElement]);
-
-  document.addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.key === "k") {
-      // Prevent the default action
-      event.preventDefault();
-
-      // User pressed Ctrl+K
-      console.log("Ctrl+K pressedttt");
-      // Add your code here to handle the Ctrl+K key combination
-      onOpen();
-    }
-  });
 
   const handleAudioPause = () => {
     setIsPlaying(false);
@@ -147,110 +125,127 @@ const AppShell = ({ children }) => {
 
   return (
     <div
-      className={`flex flex-col h-screen ${
+      className={`flex flex-row h-screen ${
         isDarkMode ? "dark" : "light"
       } bg-default-100`}
     >
-      <nav className="dark:bg-neutral-900 bg-white px-6 py-3">
-        <div className="flex justify-between items-center">
-          <Link href="/" className="flex items-center">
-            <Image
-              className="w-auto h-10 mr-4"
-              src="/new logo transparent.png"
-              alt=""
-              width={1024}
-              height={1024}
-            />
-            <h1 className="text-foreground font-extrabold text-2xl tracking-tight">
-              Sqribe
-            </h1>
-          </Link>
-          <div className="flex flex-1 max-w-2xl justify-evenly">
-            <Link
-              href="/app/dashboard"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <RiLayoutMasonryFill
-                className={`mr-2 ${
-                  router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
-                }`}
+      <Sidebar />
+      <div className="flex flex-col flex-1">
+        <nav className="dark:bg-neutral-900 bg-white px-6 py-3 border-b border-foreground-300">
+          <div className="flex justify-between items-center">
+            {/* <Link href="/" className="flex items-center">
+              <Image
+                className="w-auto h-10 mr-4"
+                src="/new logo transparent.png"
+                alt=""
+                width={1024}
+                height={1024}
               />
-              <p
-                className={`${
-                  router.pathname === "/app/dashboard"
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
-                    : ""
-                }`}
+              <h1 className="text-foreground font-extrabold text-2xl tracking-tight">
+                Sqribe
+              </h1>
+            </Link>
+            <div className="flex flex-1 max-w-2xl justify-evenly">
+              <Link
+                href="/app/dashboard"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
               >
-                Dashboard
-              </p>
-            </Link>
-            <Link
-              href="/app/projects"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <FaFolder className="mr-2" />
-              <p className="">Projects</p>
-            </Link>
-            <Link
-              href="/app/makespeech"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <SiAudiomack
-                size={20}
-                className={`mr-2 ${
-                  router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
-                }`}
-              />
-              <p
-                className={`${
-                  router.pathname === "/app/makespeech"
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
-                    : ""
-                }`}
+                <RiLayoutMasonryFill
+                  className={`mr-2 ${
+                    router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
+                  }`}
+                />
+                <p
+                  className={`${
+                    router.pathname === "/app/dashboard"
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
+                      : ""
+                  }`}
+                >
+                  Dashboard
+                </p>
+              </Link>
+              <Link
+                href="/app/projects"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
               >
-                Speech Synthesis
-              </p>
-            </Link>
-            <Link
-              href="/app/history"
-              className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-            >
-              <FaHistory className="mr-2" />
-              <p className="">History</p>
-            </Link>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <div className="w-32 mr-2">
-              <p className="text-tiny mb-1 text-center text-foreground-600">
-                {(subscription?.usage.usedSeconds / 60).toFixed(
-                  subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
-                )}{" "}
-                / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins used
-              </p>
-              <Progress
-                disableAnimation
-                color="danger"
-                value={
-                  (subscription?.usage.usedSeconds /
-                    subscription?.usage.totalSeconds) *
-                  100
-                }
-              />
-            </div>
-            <DropdownMenuIdk router={router} />
+                <FaFolder className="mr-2" />
+                <p className="">Projects</p>
+              </Link>
+              <Link
+                href="/app/makespeech"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+              >
+                <SiAudiomack
+                  size={20}
+                  className={`mr-2 ${
+                    router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
+                  }`}
+                />
+                <p
+                  className={`${
+                    router.pathname === "/app/makespeech"
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
+                      : ""
+                  }`}
+                >
+                  Speech Synthesis
+                </p>
+              </Link>
+              <Link
+                href="/app/history"
+                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
+              >
+                <FaHistory className="mr-2" />
+                <p className="">History</p>
+              </Link>
+            </div> */}
             <Button
-              className="px-3 min-w-0"
-              startContent={<IoIosHelpCircleOutline size={25} />}
+              startContent={<SearchIcon />}
+              endContent={
+                <div className="ml-2 border border-foreground-400 dark:border-foreground-300 bg-white dark:bg-foreground-100 text-xs flex items-center justify-center px-1 text-foreground-500 rounded-lg pt-[3px] pb-[2px]">
+                  <span className="text-[10px]">⌘</span>K
+                </div>
+              }
+              className="text-foreground-500 bg-foreground-200 dark:bg-foreground-200"
+              size="md"
+              onPress={() => dispatch(setOpenCommandCenter(true))}
             >
+              Command Center...
             </Button>
+            <div className="flex space-x-3 items-center">
+              <div className="w-32 mr-2">
+                <p className="text-tiny mb-1 text-center text-foreground-600">
+                  {(subscription?.usage.usedSeconds / 60).toFixed(
+                    subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
+                  )}{" "}
+                  / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins
+                  used
+                </p>
+                <Progress
+                  disableAnimation
+                  color="danger"
+                  value={
+                    (subscription?.usage.usedSeconds /
+                      subscription?.usage.totalSeconds) *
+                    100
+                  }
+                />
+              </div>
+              <DropdownMenuIdk router={router} />
+              <Button
+                className="px-3 min-w-0"
+                startContent={<IoIosHelpCircleOutline size={25} />}
+              ></Button>
+            </div>
           </div>
-          {/* <Button onClick={signOut} className="text-white">
-            Sign Out
-          </Button> */}
-        </div>
-      </nav>
-      <main className="flex flex-1 bg-default-100">{children}</main>
+        </nav>
+        <main className="flex flex-1 bg-default-100 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+
+      {/* <main className="flex flex-1 bg-default-100">{children}</main> */}
       {audioFile && (
         <div
           className={`fixed bottom-0 right-0 z-50 w-10 h-10 mr-6 mb-4 rounded-full ${
@@ -379,24 +374,7 @@ const AppShell = ({ children }) => {
           {/* Content for the semi-transparent bar */}
         </div>
       )}
-      
-      <Modal
-        size="2xl"
-        isOpen={isOpen}
-        onClose={onClose}
-        className={`${
-          isDarkMode ? "dark bg-black border border-foreground-200" : "light"
-        } text-foreground max-h-[30rem]`}
-        hideCloseButton
-        scrollBehavior="normal"
-        backdrop="blur"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <SearchBox suggestions={suggestions} onSearch={handleSearch}/>
-          )}
-        </ModalContent>
-      </Modal>
+      <SearchBox />
     </div>
   );
 };
