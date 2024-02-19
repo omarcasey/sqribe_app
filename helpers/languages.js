@@ -16,6 +16,7 @@ export const languageOptions = [
   { label: "Korean", translateCode: "ko", flagCode: "kr" },
   { label: "Turkish", translateCode: "tr", flagCode: "tr" },
   { label: "Vietnamese", translateCode: "vi", flagCode: "vn" },
+  { label: "Ukrainian", translateCode: "uk", flagCode: "ua" },
   
   // Add more languages as needed
 ];

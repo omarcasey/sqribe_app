@@ -1,7 +1,7 @@
 // Commands.js
 
 import { Kbd } from "@nextui-org/react";
-import { Router } from "next/router";
+import { Router, useRouter } from "next/router";
 import { GrProjects } from "react-icons/gr";
 import { ImShift } from "react-icons/im";
 import { IoAddSharp } from "react-icons/io5";
@@ -69,7 +69,7 @@ export const Commands = [
       <SlLogout size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />
     ),
     text: "Logout",
-    action: "/app/projects",
+    action: "logout",
   },
   {
     category: "Help",
@@ -84,12 +84,7 @@ export const Commands = [
   },
   {
     category: "Help",
-    icon: (
-      <CiChat1
-        size={20}
-        className="text-foreground-500 w-8 h-6 p-[2px]"
-      />
-    ),
+    icon: <CiChat1 size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />,
     text: "Send Feedback...",
     action: "/app/projects",
   },
@@ -107,34 +102,71 @@ export const Commands = [
   {
     category: "Navigation",
     icon: (
-      <GoArrowRight
-        size={20}
-        className="text-foreground-500 w-8 h-6 p-[2px]"
-      />
+      <GoArrowRight size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />
+    ),
+    render: (
+      <p className="text-base text-[15px] font-normal">
+        Go to <span className="font-medium">Dashboard</span>
+      </p>
     ),
     text: "Go to Dashboard",
-    action: "/app/dashboard",
+    action: "link",
+    route: "/app/dashboard",
   },
   {
     category: "Navigation",
     icon: (
-      <GoArrowRight
-        size={20}
-        className="text-foreground-500 w-8 h-6 p-[2px]"
-      />
+      <GoArrowRight size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />
+    ),
+    render: (
+      <p className="text-base text-[15px] font-normal">
+        Go to <span className="font-medium">Projects</span>
+      </p>
     ),
     text: "Go to Projects",
-    action: "/app/dashboard",
+    action: "link",
+    route: "/app/projects",
   },
   {
     category: "Navigation",
     icon: (
-      <GoArrowRight
-        size={20}
-        className="text-foreground-500 w-8 h-6 p-[2px]"
-      />
+      <GoArrowRight size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />
+    ),
+    render: (
+      <p className="text-base text-[15px] font-normal">
+        Go to <span className="font-medium">Speech</span>
+      </p>
     ),
     text: "Go to Speech",
-    action: "/app/dashboard",
+    action: "link",
+    route: "/app/makespeech",
+  },
+  {
+    category: "Navigation",
+    icon: (
+      <GoArrowRight size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />
+    ),
+    render: (
+      <p className="text-base text-[15px] font-normal">
+        Go to <span className="font-medium">History</span>
+      </p>
+    ),
+    text: "Go to History",
+    action: "link",
+    route: "/app/history",
+  },
+  {
+    category: "Navigation",
+    icon: (
+      <GoArrowRight size={20} className="text-foreground-500 w-8 h-6 p-[2px]" />
+    ),
+    render: (
+      <p className="text-base text-[15px] font-normal">
+        Go to <span className="font-medium">Subscription</span>
+      </p>
+    ),
+    text: "Go to Subscription",
+    action: "link",
+    route: "/app/subscription",
   },
 ];
