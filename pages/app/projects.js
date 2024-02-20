@@ -60,7 +60,10 @@ import {
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/Icons/NextIcon";
 import { getFlagCode, getTranslateCode } from "@/helpers/getFlag";
-import { languageOptions } from "@/helpers/languages";
+import {
+  originallanguageOptions,
+  targetLanguageOptions,
+} from "@/helpers/languages";
 import withAuth from "@/components/App/withAuth";
 import AppShell from "@/components/App/AppShell";
 import { useAuth } from "@/components/App/authContext";
@@ -294,7 +297,7 @@ const Projects = ({ openModal }) => {
                   }
 
                   const translationResult = await translationResponse.json();
-                  const translatedText = translationResult.translations[0];
+                  const translatedText = translationResult.result;
 
                   return {
                     text: paragraph.text,
@@ -312,26 +315,26 @@ const Projects = ({ openModal }) => {
 
               // Call text-to-speech API
               console.log("Starting text to speech...");
-              const ttsResponse = await fetch("/api/text-to-speech", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ text: translatedText }),
-              });
+              // const ttsResponse = await fetch("/api/text-to-speech", {
+              //   method: "POST",
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //   },
+              //   body: JSON.stringify({ text: translatedText }),
+              // });
 
-              if (!ttsResponse.ok) {
-                throw new Error(
-                  `Failed to convert text to speech: ${ttsResponse.statusText}`
-                );
-              }
+              // if (!ttsResponse.ok) {
+              //   throw new Error(
+              //     `Failed to convert text to speech: ${ttsResponse.statusText}`
+              //   );
+              // }
 
               // Get text-to-speech result
-              const ttsResult = await ttsResponse.json();
-              const audioUrl = ttsResult.audioUrl;
+              // const ttsResult = await ttsResponse.json();
+              // const audioUrl = ttsResult.audioUrl;
               console.log("Text To Speech Converted Successfully!");
-              // const audioUrl =
-              //     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+              const audioUrl =
+                "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
               // Add the converted text, translation, and audio URL to the audio files collection
               try {
@@ -1038,22 +1041,26 @@ const Projects = ({ openModal }) => {
                             />
                           }
                         >
-                          {languageOptions.map((option) => (
-                            <SelectItem
-                              key={option.label}
-                              startContent={
-                                <Avatar
-                                  alt={option.label}
-                                  className="w-6 h-6 mr-1"
-                                  src={`https://flagcdn.com/${option.flagCode}.svg`}
-                                />
-                              }
-                              className="text-black"
-                              value={option.label}
-                            >
-                              {option.label}
-                            </SelectItem>
-                          ))}
+                          {originallanguageOptions
+                            .filter(
+                              (option) => option.label !== translationLanguage
+                            ) // Filter out the original language
+                            .map((option) => (
+                              <SelectItem
+                                key={option.label}
+                                startContent={
+                                  <Avatar
+                                    alt={option.label}
+                                    className="w-6 h-6 mr-1"
+                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                  />
+                                }
+                                className="text-black"
+                                value={option.label}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
                         </Select>
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Translate to
@@ -1078,24 +1085,28 @@ const Projects = ({ openModal }) => {
                             />
                           }
                         >
-                          {languageOptions.map((option) => (
-                            <SelectItem
-                              key={option.label}
-                              startContent={
-                                <Avatar
-                                  alt={option.label}
-                                  className="w-6 h-6 mr-1"
-                                  src={`https://flagcdn.com/${option.flagCode}.svg`}
-                                />
-                              }
-                              className="text-black"
-                              value={option.label}
-                            >
-                              {option.label}
-                            </SelectItem>
-                          ))}
+                          {targetLanguageOptions
+                            .filter(
+                              (option) => option.label !== originalLanguage
+                            ) // Filter out the original language
+                            .map((option) => (
+                              <SelectItem
+                                key={option.label}
+                                startContent={
+                                  <Avatar
+                                    alt={option.label}
+                                    className="w-6 h-6 mr-1"
+                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                  />
+                                }
+                                className="text-black"
+                                value={option.label}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
                         </Select>
-                        <div className="w-full mt-2 mb-2">
+                        {/* <div className="w-full mt-2 mb-2">
                           <CheckboxGroup
                             orientation="horizontal"
                             color="danger"
@@ -1121,7 +1132,7 @@ const Projects = ({ openModal }) => {
                               </div>
                             </Checkbox>
                           </CheckboxGroup>
-                        </div>
+                        </div> */}
                       </div>
                     </ModalBody>
                     <ModalFooter>

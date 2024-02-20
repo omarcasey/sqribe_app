@@ -45,6 +45,7 @@ import {
 import SearchBox from "./SearchBox";
 import Sidebar from "./Sidebar";
 import { SearchIcon } from "../Icons/SearchIcon";
+import ProjectSearch from "./ProjectSearch";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
@@ -375,6 +376,7 @@ const AppShell = ({ children }) => {
         </div>
       )}
       <SearchBox />
+      <ProjectSearch />
     </div>
   );
 };

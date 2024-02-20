@@ -92,6 +92,7 @@ const userSlice = createSlice({
     audio: { audioPlayerVisible: false, audioFile: null, autoPlay: false },
     darkMode: null,
     openCommandCenter: false,
+    openProjectSearch: false,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -121,6 +122,9 @@ const userSlice = createSlice({
     setOpenCommandCenter: (state, action) => {
       state.openCommandCenter = action.payload;
     }, // New reducer to update command center visibility
+    setOpenProjectSearch: (state, action) => {
+      state.openProjectSearch = action.payload;
+    }, // New reducer to update project search visibility
   },
   extraReducers: (builder) => {
     builder
@@ -179,5 +183,6 @@ export const {
   setAutoPlay,
   setDarkMode,
   setOpenCommandCenter,
+  setOpenProjectSearch,
 } = userSlice.actions;
 export default userSlice.reducer;

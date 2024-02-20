@@ -1,22 +1,75 @@
 // languages.js
-export const languageOptions = [
+export const originallanguageOptions = [
   { label: "English", translateCode: "en", flagCode: "us" },
   { label: "Spanish", translateCode: "es", flagCode: "es" },
   { label: "Portuguese", translateCode: "pt", flagCode: "pt" },
-  { label: "Arabic", translateCode: "ar", flagCode: "sa" },
+  // { label: "Arabic", translateCode: "ar", flagCode: "sa" }, no AssemblyAI support
   { label: "Polish", translateCode: "pl", flagCode: "pl" },
-  { label: "Bahasa", translateCode: "id", flagCode: "id" },
   { label: "Chinese", translateCode: "zh", flagCode: "cn" },
   { label: "French", translateCode: "fr", flagCode: "fr" },
   { label: "German", translateCode: "de", flagCode: "de" },
   { label: "Italian", translateCode: "it", flagCode: "it" },
   { label: "Japanese", translateCode: "ja", flagCode: "jp" },
   { label: "Russian", translateCode: "ru", flagCode: "ru" },
-  { label: "Hindi", translateCode: "hi", flagCode: "in" },
+  // { label: "Hindi", translateCode: "hi", flagCode: "in" }, no DeepL support
   { label: "Korean", translateCode: "ko", flagCode: "kr" },
   { label: "Turkish", translateCode: "tr", flagCode: "tr" },
-  { label: "Vietnamese", translateCode: "vi", flagCode: "vn" },
   { label: "Ukrainian", translateCode: "uk", flagCode: "ua" },
-  
-  // Add more languages as needed
+  { label: "Dutch", translateCode: "nl", flagCode: "nl" },
+  { label: "Finnish", translateCode: "fi", flagCode: "fi" },
+];
+
+export const targetLanguageOptions = [
+  { label: "English", translateCode: "en", flagCode: "us" },
+  { label: "Spanish", translateCode: "es", flagCode: "es" },
+  { label: "Portuguese", translateCode: "pt", flagCode: "pt" },
+  { label: "Arabic", translateCode: "ar", flagCode: "sa" },
+  { label: "Polish", translateCode: "pl", flagCode: "pl" },
+  { label: "Chinese", translateCode: "zh", flagCode: "cn" },
+  { label: "French", translateCode: "fr", flagCode: "fr" },
+  { label: "German", translateCode: "de", flagCode: "de" },
+  { label: "Italian", translateCode: "it", flagCode: "it" },
+  { label: "Japanese", translateCode: "ja", flagCode: "jp" },
+  { label: "Russian", translateCode: "ru", flagCode: "ru" },
+  // { label: "Hindi", translateCode: "hi", flagCode: "in" }, ELEVENLABS
+  { label: "Korean", translateCode: "ko", flagCode: "kr" },
+  { label: "Turkish", translateCode: "tr", flagCode: "tr" },
+  { label: "Ukrainian", translateCode: "uk", flagCode: "ua" },
+  { label: "Bulgarian", translateCode: "bg", flagCode: "bg" },
+  { label: "Czech", translateCode: "cs", flagCode: "cz" },
+  { label: "Danish", translateCode: "da", flagCode: "dk" },
+  { label: "Greek", translateCode: "el", flagCode: "gr" },
+  { label: "Finnish", translateCode: "fi", flagCode: "fi" },
+  { label: "Indonesian", translateCode: "id", flagCode: "id" },
+  { label: "Dutch", translateCode: "nl", flagCode: "nl" },
+  { label: "Romanian", translateCode: "ro", flagCode: "ro" },
+  { label: "Slovak", translateCode: "sk", flagCode: "sk" },
+  { label: "Swedish", translateCode: "sv", flagCode: "se" },
+];
+
+export const allLanguageOptions = [
+  { label: "English", translateCode: "en", flagCode: "us" },
+  { label: "Spanish", translateCode: "es", flagCode: "es" },
+  { label: "Portuguese", translateCode: "pt", flagCode: "pt" },
+  { label: "Arabic", translateCode: "ar", flagCode: "sa" },
+  { label: "Polish", translateCode: "pl", flagCode: "pl" },
+  { label: "Chinese", translateCode: "zh", flagCode: "cn" },
+  { label: "French", translateCode: "fr", flagCode: "fr" },
+  { label: "German", translateCode: "de", flagCode: "de" },
+  { label: "Italian", translateCode: "it", flagCode: "it" },
+  { label: "Japanese", translateCode: "ja", flagCode: "jp" },
+  { label: "Russian", translateCode: "ru", flagCode: "ru" },
+  { label: "Korean", translateCode: "ko", flagCode: "kr" },
+  { label: "Turkish", translateCode: "tr", flagCode: "tr" },
+  { label: "Ukrainian", translateCode: "uk", flagCode: "ua" },
+  { label: "Bulgarian", translateCode: "bg", flagCode: "bg" },
+  { label: "Czech", translateCode: "cs", flagCode: "cz" },
+  { label: "Danish", translateCode: "da", flagCode: "dk" },
+  { label: "Greek", translateCode: "el", flagCode: "gr" },
+  { label: "Finnish", translateCode: "fi", flagCode: "fi" },
+  { label: "Indonesian", translateCode: "id", flagCode: "id" },
+  { label: "Dutch", translateCode: "nl", flagCode: "nl" },
+  { label: "Romanian", translateCode: "ro", flagCode: "ro" },
+  { label: "Slovak", translateCode: "sk", flagCode: "sk" },
+  { label: "Swedish", translateCode: "sv", flagCode: "se" },
 ];

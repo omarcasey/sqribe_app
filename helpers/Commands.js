@@ -28,13 +28,14 @@ export const Commands = [
         </Kbd>
       </div>
     ),
-    action: "/app/projects",
+    action: "openProjectSearch",
   },
   {
     category: "Projects",
     icon: <IoAddSharp size={20} className="text-foreground-500 w-8 h-6" />,
     text: "Create New Project...",
-    action: "/app/projects",
+    action: "link",
+    route: "/app/projects?openModal=true",
   },
   {
     category: "General",

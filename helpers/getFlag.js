@@ -1,9 +1,9 @@
 // helpers.js
-import { languageOptions } from "./languages";
+import { allLanguageOptions } from "./languages";
 
 export const getFlagCode = (label) => {
   // Find the language object based on label or value
-  const languageObject = languageOptions.find(
+  const languageObject = allLanguageOptions.find(
     (option) => option.label === label
   );
 
@@ -13,7 +13,7 @@ export const getFlagCode = (label) => {
 
 export const getTranslateCode = (label) => {
   // Find the language object based on label or value
-  const languageObject = languageOptions.find(
+  const languageObject = allLanguageOptions.find(
     (option) => option.label === label
   );
 

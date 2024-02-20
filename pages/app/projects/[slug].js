@@ -43,6 +43,7 @@ import Link from "next/link";
 import ThemeSwitch from "@/components/App/ThemeSwitch";
 import DropdownMenuIdk from "@/components/App/DropdownMenuIdk";
 import SearchBox from "@/components/App/SearchBox";
+import ProjectSearch from "@/components/App/ProjectSearch";
 
 const Page = () => {
   const router = useRouter();
@@ -152,7 +153,7 @@ const Page = () => {
     }
 
     const translationResult = await translationResponse.json();
-    const translatedText = translationResult.translations[0];
+    const translatedText = translationResult.result;
     const updatedSegments = [...editSegments];
     updatedSegments[index]["translatedText"] = translatedText;
     setEditSegments(updatedSegments);
@@ -564,6 +565,7 @@ const Page = () => {
         </ModalContent>
       </Modal>
       <SearchBox />
+      <ProjectSearch />
     </div>
   );
 };
