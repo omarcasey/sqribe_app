@@ -59,7 +59,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/Icons/NextIcon";
-import { getFlagCode, getTranslateCode } from "@/helpers/getFlag";
+import { getFlagCode, getLabelfromCode, getTranslateCode } from "@/helpers/getFlag";
 import {
   originallanguageOptions,
   targetLanguageOptions,
@@ -255,7 +255,7 @@ const Projects = ({ openModal }) => {
                 },
                 body: JSON.stringify({
                   audioPath: filePath,
-                  audioLanguage: getTranslateCode(originalLanguage),
+                  audioLanguage: originalLanguage === "autodetect" ? "autodetect" : getTranslateCode(originalLanguage),
                   numOfSpeakers: numOfSpeakers,
                 }),
               });
@@ -342,7 +342,7 @@ const Projects = ({ openModal }) => {
                   projectName: projectName,
                   user: uid,
                   fileName: selectedFileName,
-                  originalLanguage: originalLanguage,
+                  originalLanguage: originalLanguage === "autodetect" ? getLabelfromCode(assemblyResult.assembly.language_code) : originalLanguage,
                   translationLanguage: translationLanguage,
                   date: Timestamp.fromDate(new Date()),
                   fileURL: downloadURL,
@@ -1032,15 +1032,27 @@ const Projects = ({ openModal }) => {
                           disallowEmptySelection
                           isDisabled={isUploading}
                           startContent={
-                            <Avatar
-                              alt={originalLanguage}
-                              className="w-7 h-6 mr-1"
-                              src={`https://flagcdn.com/${getFlagCode(
-                                originalLanguage
-                              )}.svg`}
-                            />
+                            originalLanguage === "autodetect" ? (
+                              <HiSparkles className="text-foreground" />
+                            ) : (
+                              <Avatar
+                                alt={originalLanguage}
+                                className="w-7 h-6 mr-1"
+                                src={`https://flagcdn.com/${getFlagCode(
+                                  originalLanguage
+                                )}.svg`}
+                              />
+                            )
                           }
                         >
+                          <SelectItem
+                            key={"autodetect"}
+                            className="text-black"
+                            value={"autodetect"}
+                            startContent={<HiSparkles className="text-black" />}
+                          >
+                            Autodetect
+                          </SelectItem>
                           {originallanguageOptions
                             .filter(
                               (option) => option.label !== translationLanguage
@@ -1062,6 +1074,12 @@ const Projects = ({ openModal }) => {
                               </SelectItem>
                             ))}
                         </Select>
+                        {originalLanguage === "autodetect" && (
+                          <p className="w-full text-left text-blue-600 font-medium text-xs pb-4">
+                            *Autodetect only supports English, Spanish, French,
+                            German, Italian, Portuguese, and Dutch.
+                          </p>
+                        )}
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Translate to
                         </p>

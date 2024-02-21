@@ -7,6 +7,8 @@ import { FaFolder, FaHistory } from "react-icons/fa";
 import { RiLayoutMasonryFill } from "react-icons/ri";
 import { SiAudiomack } from "react-icons/si";
 import { FaRegCreditCard } from "react-icons/fa6";
+import { TfiVideoClapper } from "react-icons/tfi";
+import { MdOndemandVideo } from "react-icons/md";
 import { useSelector } from "react-redux";
 
 const Sidebar = () => {
@@ -110,6 +112,26 @@ const Sidebar = () => {
               }`}
             >
               History
+            </p>
+          </Link>
+
+          <Link
+            href="/app/sqribeclips"
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
+              router.pathname === "/app/sqribeclips" ? "bg-foreground-100" : ""
+            }`}
+          >
+            <MdOndemandVideo className={`w-5 mr-2 ${
+                router.pathname === "/app/sqribeclips" ? "text-cyan-500 dark:text-cyan-300" : ""
+              }`} />
+            <p
+              className={`${
+                router.pathname === "/app/sqribeclips"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
+                  : ""
+              }`}
+            >
+              Sqribe Clips
             </p>
           </Link>
 

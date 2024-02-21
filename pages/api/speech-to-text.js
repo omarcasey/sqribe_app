@@ -101,10 +101,10 @@ export default async function handler(req, res) {
       params.speakers_expected = parseInt(numOfSpeakers);
     }
 
-    if (audioLanguage) {
-      params.language_code = audioLanguage;
-    } else {
+    if (audioLanguage === "autodetect") {
       params.language_detection = true;
+    } else {
+      params.language_code = audioLanguage;
     }
 
     console.log(params);
