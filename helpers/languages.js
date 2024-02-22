@@ -20,7 +20,7 @@ export const originallanguageOptions = [
 ];
 
 export const targetLanguageOptions = [
-  { label: "English", translateCode: "en", flagCode: "us" },
+  { label: "English", translateCode: "en-US", flagCode: "us" },
   { label: "Spanish", translateCode: "es", flagCode: "es" },
   { label: "Portuguese", translateCode: "pt", flagCode: "pt" },
   { label: "Arabic", translateCode: "ar", flagCode: "sa" },
