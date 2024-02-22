@@ -14,6 +14,8 @@ import {
   Avatar,
   Progress,
   Spinner,
+  Autocomplete,
+  AutocompleteItem,
 } from "@nextui-org/react";
 import {
   Dropdown,
@@ -59,7 +61,11 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/Icons/NextIcon";
-import { getFlagCode, getLabelfromCode, getTranslateCode } from "@/helpers/getFlag";
+import {
+  getFlagCode,
+  getLabelfromCode,
+  getTranslateCode,
+} from "@/helpers/getFlag";
 import {
   originallanguageOptions,
   targetLanguageOptions,
@@ -161,12 +167,12 @@ const Projects = ({ openModal }) => {
     setPasteLink(e.target.value);
   };
 
-  const handleOriginalLanguage = (e) => {
-    setoriginalLanguage(e.target.value);
+  const handleOriginalLanguage = (key) => {
+    setoriginalLanguage(key);
   };
 
-  const handleTranslationLanguage = (e) => {
-    settranslationLanguage(e.target.value);
+  const handleTranslationLanguage = (key) => {
+    settranslationLanguage(key);
   };
 
   const handleUpload = async () => {
@@ -255,7 +261,10 @@ const Projects = ({ openModal }) => {
                 },
                 body: JSON.stringify({
                   audioPath: filePath,
-                  audioLanguage: originalLanguage === "autodetect" ? "autodetect" : getTranslateCode(originalLanguage),
+                  audioLanguage:
+                    originalLanguage === "autodetect"
+                      ? "autodetect"
+                      : getTranslateCode(originalLanguage),
                   numOfSpeakers: numOfSpeakers,
                 }),
               });
@@ -342,7 +351,10 @@ const Projects = ({ openModal }) => {
                   projectName: projectName,
                   user: uid,
                   fileName: selectedFileName,
-                  originalLanguage: originalLanguage === "autodetect" ? getLabelfromCode(assemblyResult.assembly.language_code) : originalLanguage,
+                  originalLanguage:
+                    originalLanguage === "autodetect"
+                      ? getLabelfromCode(assemblyResult.assembly.language_code)
+                      : originalLanguage,
                   translationLanguage: translationLanguage,
                   date: Timestamp.fromDate(new Date()),
                   fileURL: downloadURL,
@@ -987,7 +999,7 @@ const Projects = ({ openModal }) => {
                           isDisabled={isUploading}
                           startContent={
                             numOfSpeakers === "autodetect" && (
-                              <HiSparkles className="text-foreground" />
+                              <HiSparkles className="text-foreground w-5" />
                             )
                           }
                         >
@@ -1019,7 +1031,7 @@ const Projects = ({ openModal }) => {
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Original Language
                         </p>
-                        <Select
+                        {/* <Select
                           size="sm"
                           placeholder="Select a Language"
                           color="default"
@@ -1073,7 +1085,59 @@ const Projects = ({ openModal }) => {
                                 {option.label}
                               </SelectItem>
                             ))}
-                        </Select>
+                        </Select> */}
+                        <Autocomplete
+                          variant="flat"
+                          placeholder="Select a language"
+                          size="sm"
+                          className="text-foreground pb-4"
+                          selectedKeys={[originalLanguage]}
+                          onSelectionChange={handleOriginalLanguage}
+                          isDisabled={isUploading}
+                          defaultSelectedKey={originalLanguage}
+                          startContent={
+                            originalLanguage === "autodetect" ? (
+                              <HiSparkles className="text-foreground w-5" />
+                            ) : (
+                              <Avatar
+                                alt={originalLanguage}
+                                className="w-8 h-6 mr-1"
+                                src={`https://flagcdn.com/${getFlagCode(
+                                  originalLanguage
+                                )}.svg`}
+                              />
+                            )
+                          }
+                        >
+                          <AutocompleteItem
+                            key={"autodetect"}
+                            className="text-black"
+                            value={"autodetect"}
+                            startContent={<HiSparkles className="text-black w-6 h-6 mr-1" />}
+                          >
+                            Autodetect
+                          </AutocompleteItem>
+                          {originallanguageOptions
+                            .filter(
+                              (option) => option.label !== translationLanguage
+                            ) // Filter out the original language
+                            .map((option) => (
+                              <AutocompleteItem
+                                key={option.label}
+                                textValue={option.label}
+                                className="text-black"
+                              >
+                                <div className="flex gap-2 items-center">
+                                  <Avatar
+                                    alt={option.label}
+                                    className="w-6 h-6 mr-1"
+                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                  />
+                                  <p>{option.label}</p>
+                                </div>
+                              </AutocompleteItem>
+                            ))}
+                        </Autocomplete>
                         {originalLanguage === "autodetect" && (
                           <p className="w-full text-left text-blue-600 font-medium text-xs pb-4">
                             *Autodetect only supports English, Spanish, French,
@@ -1083,7 +1147,7 @@ const Projects = ({ openModal }) => {
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Translate to
                         </p>
-                        <Select
+                        {/* <Select
                           size="sm"
                           placeholder="Select a Language"
                           className=" text-black pb-4"
@@ -1123,7 +1187,47 @@ const Projects = ({ openModal }) => {
                                 {option.label}
                               </SelectItem>
                             ))}
-                        </Select>
+                        </Select> */}
+                        <Autocomplete
+                          variant="flat"
+                          placeholder="Select a language"
+                          size="sm"
+                          className="text-foreground pb-4"
+                          selectedKeys={[translationLanguage]}
+                          onSelectionChange={handleTranslationLanguage}
+                          defaultSelectedKey={translationLanguage}
+                          isDisabled={isUploading}
+                          startContent={
+                            <Avatar
+                              alt={originalLanguage}
+                              className="w-8 h-6 mr-1"
+                              src={`https://flagcdn.com/${getFlagCode(
+                                translationLanguage
+                              )}.svg`}
+                            />
+                          }
+                        >
+                          {targetLanguageOptions
+                            .filter(
+                              (option) => option.label !== originalLanguage
+                            ) // Filter out the original language
+                            .map((option) => (
+                              <AutocompleteItem
+                                key={option.label}
+                                textValue={option.label}
+                                className="text-black"
+                              >
+                                <div className="flex gap-2 items-center">
+                                  <Avatar
+                                    alt={option.label}
+                                    className="w-6 h-6 mr-1"
+                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                  />
+                                  <p>{option.label}</p>
+                                </div>
+                              </AutocompleteItem>
+                            ))}
+                        </Autocomplete>
                         {/* <div className="w-full mt-2 mb-2">
                           <CheckboxGroup
                             orientation="horizontal"
@@ -1158,7 +1262,7 @@ const Projects = ({ openModal }) => {
                         <Button
                           className="w-full font-semibold text-base py-5"
                           color="secondary"
-                          isDisabled={!selectedFile || !projectName}
+                          isDisabled={!selectedFile || !projectName || !translationLanguage || !originalLanguage}
                           isLoading={isUploading}
                           onPress={handleUpload}
                         >

@@ -16,6 +16,8 @@ export default async function handler(req, res) {
 
   const { inputText, target } = req.body;
 
+  const modifiedTarget = target === "en" ? "en-US" : target;
+
   if (!inputText) {
     return res.status(400).json({ error: "Missing 'inputText' parameter" });
   }
@@ -31,8 +33,8 @@ export default async function handler(req, res) {
     const translator = new deepl.Translator(deeplCredentials);
 
     async function translateTextAsync() {
-      try {
-        const result = await translator.translateText(inputText, null, target);
+      try {        
+        const result = await translator.translateText(inputText, null, modifiedTarget);
         console.log(result.text); // Bonjour, le monde !
         res.status(200).json({ result: result.text }); // Add a comma after 'result.text'
       } catch (error) {
