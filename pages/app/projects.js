@@ -322,8 +322,51 @@ const Projects = ({ openModal }) => {
               console.log(translatedParagraphs);
               console.log("Text Translated Successfully!");
 
+              //Cloning voice to ElevenLabs
+              console.log("Cloning voice to ElevenLabs...");
+              const addVoiceResponse = await fetch("/api/addVoice", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: projectName,
+                  fileURL: downloadURL,
+                }),
+              });
+              const addVoiceResult = await addVoiceResponse.json();
+              const newVoiceId = addVoiceResult.voiceId;
+              console.log("Voice Cloned Successfully!");
+
+
               // Call text-to-speech API
               console.log("Starting text to speech...");
+              // go through translatedParagraphs and do a textToSpeech for each translated text
+              translatedParagraphs.forEach(async (paragraph) => {
+                const ttsResponse = await fetch("/api/text-to-speech", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    text: paragraph.translatedText,
+                    voiceId: newVoiceId,
+                  }),
+                });
+
+                if (!ttsResponse.ok) {
+                  throw new Error(
+                    `Failed to convert text to speech: ${ttsResponse.statusText}`
+                  );
+                }
+
+                const ttsResult = await ttsResponse.json();
+                const audioUrl = ttsResult.audioUrl;
+                paragraph.translatedAudioURL = audioUrl;
+
+                // Do something with the audio URL
+              });
+
               // const ttsResponse = await fetch("/api/text-to-speech", {
               //   method: "POST",
               //   headers: {
@@ -1113,30 +1156,28 @@ const Projects = ({ openModal }) => {
                             key={"autodetect"}
                             className="text-black"
                             value={"autodetect"}
-                            startContent={<HiSparkles className="text-black w-6 h-6 mr-1" />}
+                            startContent={
+                              <HiSparkles className="text-black w-6 h-6 mr-1" />
+                            }
                           >
                             Autodetect
                           </AutocompleteItem>
-                          {originallanguageOptions
-                            .filter(
-                              (option) => option.label !== translationLanguage
-                            ) // Filter out the original language
-                            .map((option) => (
-                              <AutocompleteItem
-                                key={option.label}
-                                textValue={option.label}
-                                className="text-black"
-                              >
-                                <div className="flex gap-2 items-center">
-                                  <Avatar
-                                    alt={option.label}
-                                    className="w-6 h-6 mr-1"
-                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
-                                  />
-                                  <p>{option.label}</p>
-                                </div>
-                              </AutocompleteItem>
-                            ))}
+                          {originallanguageOptions.map((option) => (
+                            <AutocompleteItem
+                              key={option.label}
+                              textValue={option.label}
+                              className="text-black"
+                            >
+                              <div className="flex gap-2 items-center">
+                                <Avatar
+                                  alt={option.label}
+                                  className="w-6 h-6 mr-1"
+                                  src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                />
+                                <p>{option.label}</p>
+                              </div>
+                            </AutocompleteItem>
+                          ))}
                         </Autocomplete>
                         {originalLanguage === "autodetect" && (
                           <p className="w-full text-left text-blue-600 font-medium text-xs pb-4">
@@ -1207,26 +1248,22 @@ const Projects = ({ openModal }) => {
                             />
                           }
                         >
-                          {targetLanguageOptions
-                            .filter(
-                              (option) => option.label !== originalLanguage
-                            ) // Filter out the original language
-                            .map((option) => (
-                              <AutocompleteItem
-                                key={option.label}
-                                textValue={option.label}
-                                className="text-black"
-                              >
-                                <div className="flex gap-2 items-center">
-                                  <Avatar
-                                    alt={option.label}
-                                    className="w-6 h-6 mr-1"
-                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
-                                  />
-                                  <p>{option.label}</p>
-                                </div>
-                              </AutocompleteItem>
-                            ))}
+                          {targetLanguageOptions.map((option) => (
+                            <AutocompleteItem
+                              key={option.label}
+                              textValue={option.label}
+                              className="text-black"
+                            >
+                              <div className="flex gap-2 items-center">
+                                <Avatar
+                                  alt={option.label}
+                                  className="w-6 h-6 mr-1"
+                                  src={`https://flagcdn.com/${option.flagCode}.svg`}
+                                />
+                                <p>{option.label}</p>
+                              </div>
+                            </AutocompleteItem>
+                          ))}
                         </Autocomplete>
                         {/* <div className="w-full mt-2 mb-2">
                           <CheckboxGroup
@@ -1262,7 +1299,12 @@ const Projects = ({ openModal }) => {
                         <Button
                           className="w-full font-semibold text-base py-5"
                           color="secondary"
-                          isDisabled={!selectedFile || !projectName || !translationLanguage || !originalLanguage}
+                          isDisabled={
+                            !selectedFile ||
+                            !projectName ||
+                            !translationLanguage ||
+                            !originalLanguage
+                          }
                           isLoading={isUploading}
                           onPress={handleUpload}
                         >

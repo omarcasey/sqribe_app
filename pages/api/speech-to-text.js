@@ -97,6 +97,10 @@ export default async function handler(req, res) {
       summary_type: "bullets",
     };
 
+    if (audioLanguage === "ru" || audioLanguage === "es" || audioLanguage === "zh") {
+      params.summarization = false;
+    }
+
     if (numOfSpeakers !== "autodetect") {
       params.speakers_expected = parseInt(numOfSpeakers);
     }

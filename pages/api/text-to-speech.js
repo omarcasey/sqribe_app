@@ -34,9 +34,9 @@ export default async function handler(req, res) {
       textInput: text,
       responseType: "stream",
       modelId: "eleven_multilingual_v2",
-      stability: stabilityValue,
-      similarityBoost: similarityValue,
-      style: styleValue,
+      stability: stabilityValue || 0.5,
+      similarityBoost: similarityValue || 0.75,
+      style: styleValue || 0,
       speakerBoost: speakerBoostValue,
     });
 
