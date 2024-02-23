@@ -97,7 +97,7 @@ export default async function handler(req, res) {
       summary_type: "bullets",
     };
 
-    if (audioLanguage === "ru" || audioLanguage === "es" || audioLanguage === "zh") {
+    if (audioLanguage === "ru" || audioLanguage === "es" || audioLanguage === "de") {
       params.summarization = false;
     }
 

@@ -25,9 +25,13 @@ import {
   SelectItem,
   Tooltip,
   Skeleton,
+  Autocomplete,
+  AutocompleteItem,
 } from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
+import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { FaPlay } from "react-icons/fa";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { PiWaveform } from "react-icons/pi";
@@ -44,6 +48,8 @@ import ThemeSwitch from "@/components/App/ThemeSwitch";
 import DropdownMenuIdk from "@/components/App/DropdownMenuIdk";
 import SearchBox from "@/components/App/SearchBox";
 import ProjectSearch from "@/components/App/ProjectSearch";
+import { targetLanguageOptions } from "@/helpers/languages";
+import { voiceOverVoices } from "@/helpers/voices";
 
 const Page = () => {
   const router = useRouter();
@@ -55,12 +61,27 @@ const Page = () => {
   const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editSegments, setEditSegments] = useState([]);
+  const [translationLanguage, settranslationLanguage] = useState(null);
   const {
     isOpen: isOpenNewTranslateModal,
     onOpen: onOpenNewTranslateModal,
     onClose: onCloseNewTranslateModal,
   } = useDisclosure();
+  const {
+    isOpen: isOpenVoiceoverModal,
+    onOpen: onOpenVoiceoverModal,
+    onClose: onCloseVoiceoverModal,
+  } = useDisclosure();
   const [translateLoading, setTranslateLoading] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState("Clone");
+
+  const handleSelectedVoice = (e) => {
+    setSelectedVoice(e.target.value);
+  };
+
+  const handleTranslationLanguage = (key) => {
+    settranslationLanguage(key);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,8 +129,25 @@ const Page = () => {
   };
 
   const handleSpeakerChange = async (e, index) => {
+    const speakers = project.speakers;
+    const newSpeaker = {
+      speaker: String.fromCharCode(65 + speakers.length),
+    };
+    let newSpeakers = [...speakers]; // Declare newSpeakers outside the if statement
+
+    if (e === "Add") {
+      newSpeakers = [...speakers, newSpeaker]; // Assign the updated value
+      setProject((prev) => ({
+        ...prev,
+        speakers: newSpeakers,
+      }));
+    }
+
     const newSegments = [...editSegments];
-    const updatedSegment = { ...newSegments[index], speaker: e };
+    const updatedSegment = {
+      ...newSegments[index],
+      speaker: e === "Add" ? newSpeaker.speaker : e,
+    };
     newSegments[index] = updatedSegment;
     setEditSegments(newSegments);
     setProject((prev) => ({
@@ -120,6 +158,7 @@ const Page = () => {
     try {
       const projectRef = doc(db, "projects", project.id);
       await updateDoc(projectRef, {
+        speakers: newSpeakers,
         segments: newSegments,
         needsUpdate: true,
       });
@@ -306,7 +345,11 @@ const Page = () => {
                     >
                       <div className="flex flex-row text-foreground-500 justify-center items-center gap-8 mb-4">
                         <div>
-                          <Dropdown className={isDarkMode ? "dark" : "light"}>
+                          <Dropdown
+                            className={`${
+                              isDarkMode ? "dark" : "light"
+                            } border border-foreground-300 w-40 !min-w-0`}
+                          >
                             <DropdownTrigger>
                               <div className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all">
                                 <p className="mr-1">
@@ -322,14 +365,31 @@ const Page = () => {
                                 handleSpeakerChange(key, index)
                               }
                             >
-                              {Array.from({ length: 5 }, (_, index) => (
+                              {project.speakers?.map((speaker) => (
                                 <DropdownItem
-                                  key={index + 1}
+                                  key={speaker.speaker}
                                   className="text-foreground"
                                 >
-                                  Speaker {index + 1}
+                                  <p>Speaker {speaker.speaker}</p>
                                 </DropdownItem>
                               ))}
+                              <DropdownItem
+                                key={"Add"}
+                                className="text-blue-600 data-[hover=true]:text-blue-500"
+                              >
+                                <div className="flex flex-row items-center">
+                                  <GoPlus size={20} className="w-5 mr-1" />{" "}
+                                  <p className="font-medium">Add Speaker</p>
+                                </div>
+                              </DropdownItem>
+                              {/* {Array.from({ length: 5 }, (_, index) => (
+                                <DropdownItem
+                                  key={String.fromCharCode(65 + index)}
+                                  className="text-foreground"
+                                >
+                                  Speaker {String.fromCharCode(65 + index)}
+                                </DropdownItem>
+                              ))} */}
                             </DropdownMenu>
                           </Dropdown>
                         </div>
@@ -337,7 +397,10 @@ const Page = () => {
                           {formatTime(segment.start)} —{" "}
                           {formatTime(segment.end)}
                         </p>
-                        <div className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all">
+                        <div
+                          className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all"
+                          onClick={onOpenVoiceoverModal}
+                        >
                           <p className="mr-1 ">{segment.voiceId}</p>
                           <PiWaveform size={18} />
                         </div>
@@ -422,7 +485,7 @@ const Page = () => {
                   <Tab key="translated" title="Translated" className="">
                     <div className="p-4 px-5">
                       {project.fileName.endsWith(".mp4") ? (
-                        <VideoPlayer url={project.fileURL} />
+                        <VideoPlayer url={project.translatedFileURL} />
                       ) : (
                         <ReusableAudioPlayer
                           audioUrl={project.fileURL}
@@ -533,22 +596,48 @@ const Page = () => {
               <ModalBody>
                 <div className="text-sm">
                   <p>
-                    We&apos;ll reuse the original video transcription so you
-                    don&apos;t need to proofread it twice.{" "}
+                    We&apos;ll reuse this project&apos;s video transcription so
+                    you don&apos;t need to proofread it twice.{" "}
                     <Link href="#" className="text-blue-600 font-semibold">
                       Learn more
                     </Link>{" "}
                     how to effectively utilize this feature.
                   </p>
                   <p className="mt-5 font-semibold mb-2">Translate to</p>
-                  <Select
+                  <Autocomplete
+                    variant="flat"
+                    placeholder="Select a language"
                     size="sm"
-                    placeholder="Select a Language"
-                    className=" text-black pb-4"
-                    color="default"
-                    aria-label="Translation Language"
-                    disallowEmptySelection
-                  ></Select>
+                    className="text-foreground pb-4"
+                    selectedKeys={[translationLanguage]}
+                    onSelectionChange={handleTranslationLanguage}
+                    startContent={
+                      <Avatar
+                        alt={translationLanguage}
+                        className="w-8 h-6 mr-1"
+                        src={`https://flagcdn.com/${getFlagCode(
+                          translationLanguage
+                        )}.svg`}
+                      />
+                    }
+                  >
+                    {targetLanguageOptions.map((option) => (
+                      <AutocompleteItem
+                        key={option.label}
+                        textValue={option.label}
+                        className="text-black"
+                      >
+                        <div className="flex gap-2 items-center">
+                          <Avatar
+                            alt={option.label}
+                            className="w-6 h-6 mr-1"
+                            src={`https://flagcdn.com/${option.flagCode}.svg`}
+                          />
+                          <p>{option.label}</p>
+                        </div>
+                      </AutocompleteItem>
+                    ))}
+                  </Autocomplete>
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -558,6 +647,93 @@ const Page = () => {
                   className="w-full"
                 >
                   Translate
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        size={"md"}
+        isOpen={isOpenVoiceoverModal}
+        onClose={onCloseVoiceoverModal}
+        className={`${isDarkMode ? "dark" : "light"} text-foreground`}
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onCloseVoiceoverModal) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1 text-center">
+                Choose voiceover for speakers
+              </ModalHeader>
+              <ModalBody>
+                <div className="">
+                  <div className="flex flex-row mb-2 text-sm">
+                    <p className="w-1/2">Original Speaker</p>
+                    <p className="w-1/2">VoiceOver</p>
+                  </div>
+                  <div className="flex flex-row gap-3">
+                    <div className="border-2 border-foreground-200 flex-1 rounded-md p-2 flex items-center text-sm pl-4">
+                      Speaker A
+                    </div>
+                    <Select
+                      size="sm"
+                      color="default"
+                      variant="bordered"
+                      className={`${
+                        isDarkMode ? "dark" : "light"
+                      } text-foreground w-1/2`}
+                      selectedKeys={[selectedVoice]}
+                      onChange={handleSelectedVoice}
+                      aria-label="Voiceover Selection"
+                      disallowEmptySelection
+                      startContent={
+                        selectedVoice === "Clone" ? (
+                          <HiSparkles className="text-foreground w-5" />
+                        ) : (
+                          <FaPlay className="text-foreground w-3 mr-1 ml-1" />
+                        )
+                      }
+                    >
+                      <SelectItem
+                        key={"Clone"}
+                        className="text-black"
+                        value={"Clone"}
+                        startContent={<HiSparkles className="text-black w-4" />}
+                      >
+                        Clone
+                      </SelectItem>
+                      {voiceOverVoices.map((voice) => (
+                        <SelectItem
+                          key={voice.label}
+                          className="text-black"
+                          value={voice.label}
+                          startContent={
+                            <FaPlay className="text-black w-2 mx-1" />
+                          }
+                        >
+                          {voice.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onPress={onCloseVoiceoverModal}
+                  className="w-full"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={onCloseVoiceoverModal}
+                  className="w-full"
+                >
+                  Confirm
                 </Button>
               </ModalFooter>
             </>

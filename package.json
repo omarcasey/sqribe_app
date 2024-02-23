@@ -20,6 +20,7 @@
     "chart.js": "^4.4.1",
     "child_process": "^1.0.2",
     "cloudinary": "^2.0.0",
+    "crunker": "^2.4.0",
     "deepl-node": "^1.11.1",
     "elevenlabs-node": "^2.0.1",
     "eslint": "8.38.0",

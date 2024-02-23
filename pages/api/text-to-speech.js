@@ -51,22 +51,6 @@ export default async function handler(req, res) {
       // Get the download URL
       const audioURL = await getDownloadURL(storageRef);
 
-      // Replace the original audio of fileURL with the new audio from audioUrl
-      const mergeAudioWithVideo = async (fileURL, audioUrl, outputFilePath) => {
-        try {
-          // Run FFmpeg command to remove the original audio and merge the video with the new audio
-          const command = `${ffmpeg} -i ${fileURL} -i ${audioUrl} -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ${outputFilePath}`;
-          await exec(command);
-
-          console.log("Audio merged successfully!");
-        } catch (error) {
-          console.error("Failed to merge audio with video:", error);
-        }
-      };
-
-      const outputFilePath = "public/video_with_audio.mp4";
-      mergeAudioWithVideo(fileURL, audioURL, outputFilePath);
-
       res.status(200).json({ audioUrl: audioURL });
     });
   } catch (error) {

@@ -14,3 +14,11 @@ export const getVoices = async () => {
         return console.error(err);
     }
 };
+
+export const voiceOverVoices = [
+    { label: "Natasha", voiceId: "gKudNzYSuD2TXBq0fV7A"},
+    { label: "Marcus", voiceId: "g40ERfon1UOYXq0t5W5J"},
+    { label: "Victoria", voiceId: "i8oJQmHsoK7h9nvT29EP"},
+    { label: "Joanne", voiceId: "wtmgNfg9pBwzZiFeS1Gm"},
+    { label: "Knightley", voiceId: "z7PuneW6l0vpT2tllezi"},
+  ];

@@ -85,6 +85,7 @@ import { FaList } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { HiOutlineSparkles } from "react-icons/hi";
 import Image from "next/image";
+import { mergeAndManipulateAudioClips } from "@/helpers/audioUtils";
 
 const Projects = ({ openModal }) => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
@@ -254,6 +255,7 @@ const Projects = ({ openModal }) => {
 
             try {
               // Call speech-to-text API
+              console.log("Starting speech to text...");
               const response = await fetch("/api/speech-to-text", {
                 method: "POST",
                 headers: {
@@ -279,9 +281,24 @@ const Projects = ({ openModal }) => {
               const result = await response.json();
               const assemblyResult = result;
               console.log("Speech To Text Converted Successfully!");
-              // console.log(assemblyResult.segments);
-              console.log(assemblyResult.assembly);
 
+              //Cloning voice to ElevenLabs
+              console.log("Cloning voice to ElevenLabs...");
+              const addVoiceResponse = await fetch("/api/addVoice", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: projectName,
+                  fileURL: downloadURL,
+                }),
+              });
+              const addVoiceResult = await addVoiceResponse.json();
+              const newVoiceId = addVoiceResult.voiceId;
+              console.log("Voice Cloned Successfully - Voice ID: ", newVoiceId);
+
+              console.log("Starting translation and text to speech...");
               const translatedParagraphs = await Promise.all(
                 assemblyResult.segments.map(async (paragraph) => {
                   // Call Translation API - Translate each paragraph
@@ -308,85 +325,60 @@ const Projects = ({ openModal }) => {
                   const translationResult = await translationResponse.json();
                   const translatedText = translationResult.result;
 
+                  // Call text-to-speech API
+                  const ttsResponse = await fetch("/api/text-to-speech", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      text: translatedText,
+                      voiceId: newVoiceId,
+                    }),
+                  });
+
+                  if (!ttsResponse.ok) {
+                    throw new Error(
+                      `Failed to convert text to speech: ${ttsResponse.statusText}`
+                    );
+                  }
+
+                  const ttsResult = await ttsResponse.json();
+                  const audioUrl = ttsResult.audioUrl;
+
                   return {
                     text: paragraph.text,
                     translatedText: translatedText,
+                    translatedAudioURL: audioUrl,
                     start: paragraph.startTime,
                     end: paragraph.endTime,
                     speaker: paragraph.speaker,
-                    voiceId: "Adam",
+                    voiceId: newVoiceId,
                   };
                 })
               );
 
               console.log(translatedParagraphs);
-              console.log("Text Translated Successfully!");
+              console.log(
+                "Translation and Text To Speech Converted Successfully!"
+              );
 
-              //Cloning voice to ElevenLabs
-              console.log("Cloning voice to ElevenLabs...");
-              const addVoiceResponse = await fetch("/api/addVoice", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  name: projectName,
-                  fileURL: downloadURL,
-                }),
-              });
-              const addVoiceResult = await addVoiceResponse.json();
-              const newVoiceId = addVoiceResult.voiceId;
-              console.log("Voice Cloned Successfully!");
+              //create speakers array
+              const speakerCount = new Set(
+                translatedParagraphs.map((paragraph) => paragraph.speaker)
+              ).size;
+              const speakers = Array.from(
+                { length: speakerCount },
+                (_, index) => ({
+                  speaker: String.fromCharCode(65 + index),
+                  voiceId: newVoiceId,
+                })
+              );
 
-
-              // Call text-to-speech API
-              console.log("Starting text to speech...");
-              // go through translatedParagraphs and do a textToSpeech for each translated text
-              translatedParagraphs.forEach(async (paragraph) => {
-                const ttsResponse = await fetch("/api/text-to-speech", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    text: paragraph.translatedText,
-                    voiceId: newVoiceId,
-                  }),
-                });
-
-                if (!ttsResponse.ok) {
-                  throw new Error(
-                    `Failed to convert text to speech: ${ttsResponse.statusText}`
-                  );
-                }
-
-                const ttsResult = await ttsResponse.json();
-                const audioUrl = ttsResult.audioUrl;
-                paragraph.translatedAudioURL = audioUrl;
-
-                // Do something with the audio URL
-              });
-
-              // const ttsResponse = await fetch("/api/text-to-speech", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json",
-              //   },
-              //   body: JSON.stringify({ text: translatedText }),
-              // });
-
-              // if (!ttsResponse.ok) {
-              //   throw new Error(
-              //     `Failed to convert text to speech: ${ttsResponse.statusText}`
-              //   );
-              // }
-
-              // Get text-to-speech result
-              // const ttsResult = await ttsResponse.json();
-              // const audioUrl = ttsResult.audioUrl;
-              console.log("Text To Speech Converted Successfully!");
-              const audioUrl =
-                "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+              // Merge audio clips
+              const audioUrl = await mergeAndManipulateAudioClips(
+                translatedParagraphs
+              );
 
               // Add the converted text, translation, and audio URL to the audio files collection
               try {
@@ -406,6 +398,7 @@ const Projects = ({ openModal }) => {
                   transcription: assemblyResult.assembly,
                   segments: translatedParagraphs,
                   translatedFileURL: audioUrl,
+                  speakers: speakers,
                 });
                 console.log("Document written with ID: ", docRef.id);
                 try {
