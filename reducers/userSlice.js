@@ -93,6 +93,7 @@ const userSlice = createSlice({
     darkMode: null,
     openCommandCenter: false,
     openProjectSearch: false,
+    openThemeSearch: false,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -125,6 +126,9 @@ const userSlice = createSlice({
     setOpenProjectSearch: (state, action) => {
       state.openProjectSearch = action.payload;
     }, // New reducer to update project search visibility
+    setOpenThemeSearch: (state, action) => {
+      state.openThemeSearch = action.payload;
+    }, // New reducer to update theme search visibility
   },
   extraReducers: (builder) => {
     builder
@@ -184,5 +188,6 @@ export const {
   setDarkMode,
   setOpenCommandCenter,
   setOpenProjectSearch,
+  setOpenThemeSearch,
 } = userSlice.actions;
 export default userSlice.reducer;

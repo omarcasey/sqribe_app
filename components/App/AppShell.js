@@ -46,6 +46,7 @@ import SearchBox from "./SearchBox";
 import Sidebar from "./Sidebar";
 import { SearchIcon } from "../Icons/SearchIcon";
 import ProjectSearch from "./ProjectSearch";
+import ThemeSearch from "./ThemeSearch";
 
 const AppShell = ({ children }) => {
   const router = useRouter();
@@ -377,6 +378,7 @@ const AppShell = ({ children }) => {
       )}
       <SearchBox />
       <ProjectSearch />
+      <ThemeSearch />
     </div>
   );
 };

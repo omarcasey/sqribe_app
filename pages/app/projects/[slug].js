@@ -50,6 +50,7 @@ import SearchBox from "@/components/App/SearchBox";
 import ProjectSearch from "@/components/App/ProjectSearch";
 import { targetLanguageOptions } from "@/helpers/languages";
 import { voiceOverVoices } from "@/helpers/voices";
+import ThemeSearch from "@/components/App/ThemeSearch";
 
 const Page = () => {
   const router = useRouter();
@@ -742,6 +743,7 @@ const Page = () => {
       </Modal>
       <SearchBox />
       <ProjectSearch />
+      <ThemeSearch />
     </div>
   );
 };

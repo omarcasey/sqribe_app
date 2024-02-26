@@ -12,6 +12,9 @@ import { CiChat1 } from "react-icons/ci";
 import { LuFileSearch2 } from "react-icons/lu";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { GoArrowRight } from "react-icons/go";
+import { PiSun } from "react-icons/pi";
+import { PiMoon } from "react-icons/pi";
+
 
 export const Commands = [
   {
@@ -51,7 +54,7 @@ export const Commands = [
         T
       </Kbd>
     ),
-    action: "/app/projects",
+    action: "openThemeSearch",
   },
   {
     category: "General",
@@ -169,5 +172,28 @@ export const Commands = [
     text: "Go to Subscription",
     action: "link",
     route: "/app/subscription",
+  },
+];
+
+export const ThemeCommands = [
+  {
+    icon: (
+      <PiSun
+        size={20}
+        className="text-foreground-500 w-8 h-6 p-[2px]"
+      />
+    ),
+    text: "Change Theme to Light Mode",
+    action: "setLightMode",
+  },
+  {
+    icon: (
+      <PiMoon
+        size={20}
+        className="text-foreground-500 w-8 h-6 p-[2px]"
+      />
+    ),
+    text: "Change Theme to Dark Mode",
+    action: "setDarkMode",
   },
 ];

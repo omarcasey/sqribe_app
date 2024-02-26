@@ -13,13 +13,13 @@ import { useRouter } from "next/router";
 import { PiVideoFill } from "react-icons/pi";
 import Image from "next/image";
 import { getFlagCode } from "@/helpers/getFlag";
-import { clearUserData, setOpenCommandCenter, setOpenProjectSearch, setOpenThemeSearch } from "@/reducers/userSlice";
+import { setDarkMode, setOpenThemeSearch } from "@/reducers/userSlice";
 import { GrProjects } from "react-icons/gr";
 import { ImShift } from "react-icons/im";
-import { Commands } from "@/helpers/Commands";
-import { auth } from "@/firebase";
+import { ThemeCommands } from "@/helpers/Commands";
+import { HiMiniArrowLongRight } from "react-icons/hi2";
 
-const SearchBox = ({}) => {
+const ThemeSearch = ({}) => {
   const [query, setQuery] = useState("");
   const [filteredCommands, setFilteredCommands] = useState([]);
   const isDarkMode = useSelector((state) => state.user.darkMode);
@@ -28,24 +28,24 @@ const SearchBox = ({}) => {
   const dispatch = useDispatch();
   const selectedRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const openCommandCenter = useSelector(
-    (state) => state.user.openCommandCenter
-  );
+  const openThemeSearch = useSelector((state) => state.user.openThemeSearch);
 
   useEffect(() => {
-    if (openCommandCenter) {
+    if (openThemeSearch) {
+      setQuery("");
+      setFilteredCommands(ThemeCommands);
+      setSelectedCommandIndex(0);
       onOpen();
-      dispatch(setOpenCommandCenter(false));
+      dispatch(setOpenThemeSearch(false));
     }
-  }, [dispatch, onOpen, openCommandCenter]);
+  }, [dispatch, onOpen, openThemeSearch]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === "k") {
+      if (event.shiftKey && event.key === "P") {
         event.preventDefault();
         setQuery("");
-        setFilteredCommands(Commands);
-        setSelectedCommandIndex(0);
+        setFilteredCommands(ThemeCommands);
         onOpen();
       } else if (event.shiftKey && event.key === "D") {
         event.preventDefault();
@@ -78,10 +78,6 @@ const SearchBox = ({}) => {
   }, [isOpen, selectedCommandIndex, filteredCommands]);
 
   useEffect(() => {
-    setFilteredCommands(Commands);
-  }, []);
-
-  useEffect(() => {
     if (selectedRef.current) {
       selectedRef.current.scrollIntoView({
         behavior: "smooth",
@@ -93,7 +89,7 @@ const SearchBox = ({}) => {
   const handleChange = (event) => {
     const query = event.target.value;
     setQuery(query);
-    const filtered = Commands.filter((command) =>
+    const filtered = ThemeCommands.filter((command) =>
       command.text.toLowerCase().includes(query.toLowerCase())
     );
     setFilteredCommands(filtered);
@@ -101,37 +97,16 @@ const SearchBox = ({}) => {
   };
 
   const handleCommandClick = (command) => {
-    if (command.action === "link") {
-      router.push(command.route);
-    } else if (command.action === "logout") {
-      signOut();
-    } else if (command.action === "openProjectSearch") {
-      dispatch(setOpenProjectSearch(true));
-    } else if (command.action === "openThemeSearch") {
-      dispatch(setOpenThemeSearch(true));
+    if (command.action === "setLightMode") {
+      dispatch(setDarkMode(false));
+    } else if (command.action === "setDarkMode") {
+        dispatch(setDarkMode(true));
     }
     onClose();
   };
 
   const handleMouseEnter = (index) => {
     setSelectedCommandIndex(index);
-  };
-
-  const signOut = async () => {
-    try {
-      router.push("/signin");
-      await auth.signOut();
-      // Dispatch the fetchUserData action
-      dispatch(clearUserData())
-        .then(() => {
-          console.log("User Data Cleared");
-        })
-        .catch((error) => {
-          console.error("Error Clearing User Data:", error);
-        });
-    } catch (error) {
-      console.error("Error signing out:", error.message);
-    }
   };
 
   return (
@@ -156,7 +131,7 @@ const SearchBox = ({}) => {
                 autoFocus
                 value={query}
                 onChange={handleChange}
-                placeholder="What are you looking for?"
+                placeholder="Search for a project..."
                 className="text-lg w-full bg-white dark:bg-black focus:outline-none pl-4"
               />
               <div className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2">
@@ -165,14 +140,8 @@ const SearchBox = ({}) => {
             </div>
             <Divider className="mt-2" />
             <ul className="p-3 flex flex-col gap-1 overflow-auto">
-              {filteredCommands.map((command, index) => (
+              {filteredCommands?.map((command, index) => (
                 <>
-                  {index === 0 ||
-                  command.category !== filteredCommands[index - 1].category ? (
-                    <p className="text-sm text-foreground-500 ml-2 mt-1 mb-2">
-                      {command.category}
-                    </p>
-                  ) : null}
                   <li
                     key={index}
                     ref={index === selectedCommandIndex ? selectedRef : null}
@@ -186,13 +155,12 @@ const SearchBox = ({}) => {
                   >
                     <div className="flex flex-row gap-2 items-center">
                       {command.icon}
-                      {command.render || command.text}
+                      <p className="text-sm font-medium">{command.text}</p>
                     </div>
-                    {command.endContent && <>{command.endContent}</>}
                   </li>
                 </>
               ))}
-              {filteredCommands.length === 0 && (
+              {filteredCommands?.length === 0 && (
                 <>
                   <p className="text-foreground-500 text-center mt-4">
                     No results found for &quot;
@@ -211,4 +179,4 @@ const SearchBox = ({}) => {
   );
 };
 
-export default SearchBox;
+export default ThemeSearch;
