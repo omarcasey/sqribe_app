@@ -22,7 +22,7 @@ import { MoonIcon } from "../Icons/MoonIcon.jsx";
 import { SunIcon } from "../Icons/SunIcon.jsx";
 import { HiOutlineSparkles } from "react-icons/hi2";
 
-export default function DropdownMenuIdk({ router }) {
+export default function DropdownMenuIdk({ router, sidebar }) {
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const user = useSelector((state) => state.user.auth);
   const userData = useSelector((state) => state.user.data);
@@ -56,17 +56,36 @@ export default function DropdownMenuIdk({ router }) {
     <Dropdown
       showArrow
       radius="sm"
-      className={`${isDarkMode ? "dark" : "light"}`}
+      className={`${isDarkMode ? "dark" : "light"} ${sidebar ? "w-[15rem]" : ""}`}
       classNames={{
         base: "before:bg-default-200", // change arrow background
         content: "p-0 border-small border-divider bg-background",
       }}
     >
       <DropdownTrigger>
-        <Button variant="ghost" disableRipple>
-          Account
-          <IoMdArrowDropdown />
-        </Button>
+        {sidebar ? (
+          <Button variant="light" className="h-unit-14">
+            <div className="p-6">
+              <User
+                name={user.email}
+                description={subscription?.planID}
+                classNames={{
+                  name: "text-default-600",
+                  description: "text-default-500",
+                }}
+                avatarProps={{
+                  size: "sm",
+                  src: "/png avatar.png",
+                }}
+              />
+            </div>
+          </Button>
+        ) : (
+          <Button variant="ghost" disableRipple>
+            Account
+            <IoMdArrowDropdown />
+          </Button>
+        )}
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Custom item styles"
@@ -87,24 +106,26 @@ export default function DropdownMenuIdk({ router }) {
         }}
       >
         <DropdownSection aria-label="Profile & Actions" showDivider>
-          <DropdownItem
-            isReadOnly
-            key="profile"
-            className="h-14 gap-2 opacity-100"
-          >
-            <User
-              name={user.email}
-              description={subscription?.planID}
-              classNames={{
-                name: "text-default-600",
-                description: "text-default-500",
-              }}
-              avatarProps={{
-                size: "sm",
-                src: "/png avatar.png",
-              }}
-            />
-          </DropdownItem>
+          {!sidebar && (
+            <DropdownItem
+              isReadOnly
+              key="profile"
+              className="h-14 gap-2 opacity-100"
+            >
+              <User
+                name={user.email}
+                description={subscription?.planID}
+                classNames={{
+                  name: "text-default-600",
+                  description: "text-default-500",
+                }}
+                avatarProps={{
+                  size: "sm",
+                  src: "/png avatar.png",
+                }}
+              />
+            </DropdownItem>
+          )}
           <DropdownItem
             key="dashboard"
             onPress={() => {
@@ -122,6 +143,14 @@ export default function DropdownMenuIdk({ router }) {
             Settings
           </DropdownItem>
           <DropdownItem
+            key="subscription"
+            onPress={() => {
+              router.push("/app/subscription");
+            }}
+          >
+            Subscription
+          </DropdownItem>
+          <DropdownItem
             key="new_project"
             endContent={<PlusIcon className="text-large" />}
             onPress={() => {
@@ -133,7 +162,11 @@ export default function DropdownMenuIdk({ router }) {
         </DropdownSection>
 
         <DropdownSection aria-label="Preferences" showDivider>
-          <DropdownItem key="quick_search" shortcut="⌘K" onClick={() => dispatch(setOpenCommandCenter(true))}>
+          <DropdownItem
+            key="quick_search"
+            shortcut="⌘K"
+            onClick={() => dispatch(setOpenCommandCenter(true))}
+          >
             Quick search
           </DropdownItem>
           <DropdownItem

@@ -139,7 +139,10 @@ const ProjectSearch = ({}) => {
                 placeholder="Search for a project..."
                 className="text-lg w-full bg-white dark:bg-black focus:outline-none pl-4"
               />
-              <div className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2">
+              <div
+                className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2 hover:cursor-pointer dark:hover:bg-foreground-100 hover:bg-foreground-100 transition-all"
+                onClick={onClose}
+              >
                 Esc
               </div>
             </div>
@@ -167,7 +170,9 @@ const ProjectSearch = ({}) => {
                         width={1000}
                         className="w-6 h-6 rounded-full mr-2"
                       />
-                      <p className="text-sm font-medium">{project.projectName}</p>
+                      <p className="text-sm font-medium">
+                        {project.projectName}
+                      </p>
                     </div>
                     <div className="flex flex-row items-center">
                       <p className="mr-8 text-foreground-500 text-sm">

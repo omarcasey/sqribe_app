@@ -74,7 +74,7 @@ const Page = () => {
     onClose: onCloseVoiceoverModal,
   } = useDisclosure();
   const [translateLoading, setTranslateLoading] = useState([]);
-  const [selectedVoice, setSelectedVoice] = useState("Clone");
+  const [selectedVoices, setSelectedVoices] = useState({});
 
   const handleSelectedVoice = (e) => {
     setSelectedVoice(e.target.value);
@@ -133,6 +133,7 @@ const Page = () => {
     const speakers = project.speakers;
     const newSpeaker = {
       speaker: String.fromCharCode(65 + speakers.length),
+      label: "Clone",
     };
     let newSpeakers = [...speakers]; // Declare newSpeakers outside the if statement
 
@@ -383,14 +384,6 @@ const Page = () => {
                                   <p className="font-medium">Add Speaker</p>
                                 </div>
                               </DropdownItem>
-                              {/* {Array.from({ length: 5 }, (_, index) => (
-                                <DropdownItem
-                                  key={String.fromCharCode(65 + index)}
-                                  className="text-foreground"
-                                >
-                                  Speaker {String.fromCharCode(65 + index)}
-                                </DropdownItem>
-                              ))} */}
                             </DropdownMenu>
                           </Dropdown>
                         </div>
@@ -402,7 +395,11 @@ const Page = () => {
                           className="flex flex-row items-center hover:text-foreground hover:cursor-pointer transition-all"
                           onClick={onOpenVoiceoverModal}
                         >
-                          <p className="mr-1 ">{segment.voiceId}</p>
+                          <p className="mr-1 ">
+                            {voiceOverVoices.find(
+                              (voice) => voice.voiceId === segment.voiceId
+                            ) || "Clone"}
+                          </p>
                           <PiWaveform size={18} />
                         </div>
                       </div>
@@ -668,56 +665,60 @@ const Page = () => {
                 Choose voiceover for speakers
               </ModalHeader>
               <ModalBody>
-                <div className="">
-                  <div className="flex flex-row mb-2 text-sm">
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-row text-sm">
                     <p className="w-1/2">Original Speaker</p>
                     <p className="w-1/2">VoiceOver</p>
                   </div>
-                  <div className="flex flex-row gap-3">
-                    <div className="border-2 border-foreground-200 flex-1 rounded-md p-2 flex items-center text-sm pl-4">
-                      Speaker A
-                    </div>
-                    <Select
-                      size="sm"
-                      color="default"
-                      variant="bordered"
-                      className={`${
-                        isDarkMode ? "dark" : "light"
-                      } text-foreground w-1/2`}
-                      selectedKeys={[selectedVoice]}
-                      onChange={handleSelectedVoice}
-                      aria-label="Voiceover Selection"
-                      disallowEmptySelection
-                      startContent={
-                        selectedVoice === "Clone" ? (
-                          <HiSparkles className="text-foreground w-5" />
-                        ) : (
-                          <FaPlay className="text-foreground w-3 mr-1 ml-1" />
-                        )
-                      }
-                    >
-                      <SelectItem
-                        key={"Clone"}
-                        className="text-black"
-                        value={"Clone"}
-                        startContent={<HiSparkles className="text-black w-4" />}
+                  {project.speakers.map((speaker, index) => (
+                    <div className="flex flex-row gap-3" key={index}>
+                      <div className="border-2 border-foreground-200 flex-1 rounded-md p-2 flex items-center text-sm pl-4">
+                        Speaker {speaker.speaker}
+                      </div>
+                      <Select
+                        size="sm"
+                        color="default"
+                        variant="bordered"
+                        className={`${
+                          isDarkMode ? "dark" : "light"
+                        } text-foreground w-1/2`}
+                        selectedKeys={[selectedVoices[speaker.speaker]]}
+                        onChange={handleSelectedVoice}
+                        aria-label="Voiceover Selection"
+                        disallowEmptySelection
+                        startContent={
+                          selectedVoice === "Clone" ? (
+                            <HiSparkles className="text-foreground w-5" />
+                          ) : (
+                            <FaPlay className="text-foreground w-3 mr-1 ml-1" />
+                          )
+                        }
                       >
-                        Clone
-                      </SelectItem>
-                      {voiceOverVoices.map((voice) => (
                         <SelectItem
-                          key={voice.label}
+                          key={"Clone"}
                           className="text-black"
-                          value={voice.label}
+                          value={"Clone"}
                           startContent={
-                            <FaPlay className="text-black w-2 mx-1" />
+                            <HiSparkles className="text-black w-4" />
                           }
                         >
-                          {voice.label}
+                          Clone
                         </SelectItem>
-                      ))}
-                    </Select>
-                  </div>
+                        {voiceOverVoices.map((voice) => (
+                          <SelectItem
+                            key={voice.label}
+                            className="text-black"
+                            value={voice.label}
+                            startContent={
+                              <FaPlay className="text-black w-2 mx-1" />
+                            }
+                          >
+                            {voice.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    </div>
+                  ))}
                 </div>
               </ModalBody>
               <ModalFooter>

@@ -42,7 +42,7 @@ const ThemeSearch = ({}) => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.shiftKey && event.key === "P") {
+      if (event.shiftKey && event.key === "T") {
         event.preventDefault();
         setQuery("");
         setFilteredCommands(ThemeCommands);
@@ -134,7 +134,10 @@ const ThemeSearch = ({}) => {
                 placeholder="Search for a project..."
                 className="text-lg w-full bg-white dark:bg-black focus:outline-none pl-4"
               />
-              <div className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2">
+              <div
+                className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2 hover:cursor-pointer dark:hover:bg-foreground-100 hover:bg-foreground-100 transition-all"
+                onClick={onClose}
+              >
                 Esc
               </div>
             </div>

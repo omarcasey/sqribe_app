@@ -1,4 +1,12 @@
 import { Divider, User } from "@nextui-org/react";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+  cn,
+} from "@nextui-org/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -10,11 +18,13 @@ import { FaRegCreditCard } from "react-icons/fa6";
 import { TfiVideoClapper } from "react-icons/tfi";
 import { MdOndemandVideo } from "react-icons/md";
 import { useSelector } from "react-redux";
+import DropdownMenuIdk from "./DropdownMenuIdk";
 
 const Sidebar = () => {
   const router = useRouter();
   const user = useSelector((state) => state.user.auth);
   const userData = useSelector((state) => state.user.data);
+  const isDarkMode = useSelector((state) => state.user.darkMode);
   const subscription = userData?.subscriptions[0];
 
   return (
@@ -41,7 +51,9 @@ const Sidebar = () => {
           >
             <RiLayoutMasonryFill
               className={`w-5 mr-2 ${
-                router.pathname === "/app/dashboard" ? "text-cyan-500 dark:text-cyan-300" : ""
+                router.pathname === "/app/dashboard"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
               }`}
             />
             <p
@@ -60,9 +72,13 @@ const Sidebar = () => {
               router.pathname === "/app/projects" ? "bg-foreground-100" : ""
             }`}
           >
-            <FaFolder className={`w-5 mr-2 ${
-                router.pathname === "/app/projects" ? "text-cyan-500 dark:text-cyan-300" : ""
-              }`} />
+            <FaFolder
+              className={`w-5 mr-2 ${
+                router.pathname === "/app/projects"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
+              }`}
+            />
             <p
               className={`${
                 router.pathname === "/app/projects"
@@ -82,7 +98,9 @@ const Sidebar = () => {
             <SiAudiomack
               size={20}
               className={`w-5 mr-2 ${
-                router.pathname === "/app/makespeech" ? "text-cyan-500 dark:text-cyan-300" : ""
+                router.pathname === "/app/makespeech"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
               }`}
             />
             <p
@@ -101,9 +119,13 @@ const Sidebar = () => {
               router.pathname === "/app/history" ? "bg-foreground-100" : ""
             }`}
           >
-            <FaHistory className={`w-5 mr-2 ${
-                router.pathname === "/app/history" ? "text-cyan-500 dark:text-cyan-300" : ""
-              }`} />
+            <FaHistory
+              className={`w-5 mr-2 ${
+                router.pathname === "/app/history"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
+              }`}
+            />
             <p
               className={`${
                 router.pathname === "/app/history"
@@ -121,9 +143,13 @@ const Sidebar = () => {
               router.pathname === "/app/sqribeclips" ? "bg-foreground-100" : ""
             }`}
           >
-            <MdOndemandVideo className={`w-5 mr-2 ${
-                router.pathname === "/app/sqribeclips" ? "text-cyan-500 dark:text-cyan-300" : ""
-              }`} />
+            <MdOndemandVideo
+              className={`w-5 mr-2 ${
+                router.pathname === "/app/sqribeclips"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
+              }`}
+            />
             <p
               className={`${
                 router.pathname === "/app/sqribeclips"
@@ -135,15 +161,19 @@ const Sidebar = () => {
             </p>
           </Link>
 
-          <Link
+          {/* <Link
             href="/app/subscription"
             className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
               router.pathname === "/app/subscription" ? "bg-foreground-100" : ""
             }`}
           >
-            <FaRegCreditCard className={`w-5 mr-2 ${
-                router.pathname === "/app/subscription" ? "text-cyan-500 dark:text-cyan-300" : ""
-              }`} />
+            <FaRegCreditCard
+              className={`w-5 mr-2 ${
+                router.pathname === "/app/subscription"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
+              }`}
+            />
             <p
               className={`${
                 router.pathname === "/app/subscription"
@@ -153,25 +183,13 @@ const Sidebar = () => {
             >
               Subscription
             </p>
-          </Link>
-
-          
+          </Link> */}
         </div>
       </div>
 
       <Divider className="bg-foreground-300 mb-3" />
-      <User
-              name={user.email}
-              description={subscription?.planID}
-              classNames={{
-                name: "text-default-600",
-                description: "text-default-500",
-              }}
-              avatarProps={{
-                size: "sm",
-                src: "/png avatar.png",
-              }}
-            />
+      <DropdownMenuIdk router={router} sidebar={true} />
+
       {/* <p className="text-foreground text-sm mt-3 ml-2 mb-4">Omar Casey</p> */}
     </div>
   );

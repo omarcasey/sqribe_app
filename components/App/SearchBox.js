@@ -13,7 +13,12 @@ import { useRouter } from "next/router";
 import { PiVideoFill } from "react-icons/pi";
 import Image from "next/image";
 import { getFlagCode } from "@/helpers/getFlag";
-import { clearUserData, setOpenCommandCenter, setOpenProjectSearch, setOpenThemeSearch } from "@/reducers/userSlice";
+import {
+  clearUserData,
+  setOpenCommandCenter,
+  setOpenProjectSearch,
+  setOpenThemeSearch,
+} from "@/reducers/userSlice";
 import { GrProjects } from "react-icons/gr";
 import { ImShift } from "react-icons/im";
 import { Commands } from "@/helpers/Commands";
@@ -106,9 +111,13 @@ const SearchBox = ({}) => {
     } else if (command.action === "logout") {
       signOut();
     } else if (command.action === "openProjectSearch") {
-      dispatch(setOpenProjectSearch(true));
+      setTimeout(() => {
+        dispatch(setOpenProjectSearch(true));
+      }, 400);
     } else if (command.action === "openThemeSearch") {
-      dispatch(setOpenThemeSearch(true));
+      setTimeout(() => {
+        dispatch(setOpenThemeSearch(true));
+      }, 400);
     }
     onClose();
   };
@@ -159,7 +168,10 @@ const SearchBox = ({}) => {
                 placeholder="What are you looking for?"
                 className="text-lg w-full bg-white dark:bg-black focus:outline-none pl-4"
               />
-              <div className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2">
+              <div
+                className="border border-foreground-300 text-sm flex items-center justify-center px-1 h-5 text-foreground dark:bg-black rounded-md mr-3 ml-2 hover:cursor-pointer dark:hover:bg-foreground-100 hover:bg-foreground-100 transition-all"
+                onClick={onClose}
+              >
                 Esc
               </div>
             </div>
