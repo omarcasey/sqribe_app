@@ -114,6 +114,35 @@ const Dashboard = () => {
     };
   }, []);
 
+  async function fetchDataFromCloudFunction() {
+    try {
+      const response = await fetch(
+        "https://us-central1-sqribe-app.cloudfunctions.net/speech-to-text",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // Include any data or parameters required by your Cloud Function
+            name: "John Doe",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const data = await response.json();
+      console.log("Data from Cloud Function:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching data from Cloud Function:", error);
+      // Handle error gracefully
+    }
+  }
+
   return (
     <AppShell>
       <div className="w-full px-4 sm:px-10">
@@ -144,7 +173,10 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="flex flex-row items-center justify-end ml-auto">
-                    <FaCircleInfo className="text-foreground-700 ml-2" size={12} />
+                    <FaCircleInfo
+                      className="text-foreground-700 ml-2"
+                      size={12}
+                    />
                   </div>
                 </Card>
               ))}
@@ -158,9 +190,12 @@ const Dashboard = () => {
                 <IoSparkles />
                 AI Text To Speech
               </Button>
-              <Button className="bg-gradient-to-r from-blue-400 to-emerald-400 w-full h-unit-18 mb-2 text-lg text-white">
+              <Button
+                onPress={fetchDataFromCloudFunction}
+                className="bg-gradient-to-r from-blue-400 to-emerald-400 w-full h-unit-18 mb-2 text-lg text-white"
+              >
                 <IoSparkles />
-                AI Thumbnail Generator
+                Test Button
               </Button>
             </div>
           </div>

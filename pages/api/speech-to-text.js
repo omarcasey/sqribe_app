@@ -114,14 +114,6 @@ export default async function handler(req, res) {
     console.log(params);
 
     const transcript = await client.transcripts.transcribe(params);
-    // const { sentences } = await client.transcripts.sentences(transcript.id);
-    // for (const sentence of sentences) {
-    //   console.log(sentence.text);
-    // }
-
-    // const { paragraphs } = await client.transcripts.paragraphs(transcript.id);
-    // console.log(paragraphs)
-
     const segments = splitIntoParagraphs(transcript.words);
 
     res.status(200).json({ segments: segments, assembly: transcript });

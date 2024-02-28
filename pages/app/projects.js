@@ -243,8 +243,6 @@ const Projects = ({ openModal }) => {
               }
             };
 
-            // Usage example
-            // const mp4Url = 'https://example.com/your_video.mp4';
             const thumbnailUrl = await generateThumbnail(downloadURL);
             console.log("Thumbnail URL:", thumbnailUrl);
 
@@ -252,6 +250,60 @@ const Projects = ({ openModal }) => {
               "files/" +
               selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
             console.log("File uploaded at " + filePath);
+
+            // Create firestore doc with basic data and processing starts
+            try {
+              const docRef = await addDoc(collection(db, "projects"), {
+                projectName: projectName,
+                user: uid,
+                fileName: selectedFileName,
+                originalLanguage:
+                  originalLanguage === "autodetect"
+                    ? null
+                    : originalLanguage,
+                translationLanguage: translationLanguage,
+                date: Timestamp.fromDate(new Date()),
+                fileURL: downloadURL,
+                thumbnailURL: thumbnailUrl,
+                processing: true,
+                // duration: assemblyResult.assembly.audio_duration,
+                // transcription: assemblyResult.assembly,
+                // segments: translatedParagraphs,
+                // translatedFileURL: audioUrl,
+                // speakers: speakers,
+              });
+              console.log("Document written with ID: ", docRef.id);
+              try {
+                const userRef = doc(db, "users", uid);
+                const docSnap = await getDoc(userRef);
+                const currentData = docSnap.data();
+                const updatedUsedSeconds =
+                  currentData.subscriptions[0].usage.usedSeconds +
+                  assemblyResult.assembly.audio_duration;
+                const updatedRemainingSeconds =
+                  currentData.subscriptions[0].usage.remainingSeconds -
+                  assemblyResult.assembly.audio_duration;
+                await updateDoc(userRef, {
+                  subscriptions: [
+                    {
+                      ...currentData.subscriptions[0],
+                      usage: {
+                        ...currentData.subscriptions[0].usage,
+                        usedSeconds: updatedUsedSeconds,
+                        remainingSeconds: updatedRemainingSeconds,
+                      },
+                    },
+                    ...currentData.subscriptions.slice(1),
+                  ],
+                });
+              } catch (e) {
+                console.error("Error updating credits: ", e);
+              }
+            } catch (e) {
+              console.error("Error adding document: ", e);
+            }
+
+            
 
             try {
               // Call speech-to-text API
