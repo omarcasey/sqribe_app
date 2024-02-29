@@ -257,10 +257,7 @@ const Projects = ({ openModal }) => {
                 projectName: projectName,
                 user: uid,
                 fileName: selectedFileName,
-                originalLanguage:
-                  originalLanguage === "autodetect"
-                    ? null
-                    : originalLanguage,
+                originalLanguage: originalLanguage,
                 translationLanguage: translationLanguage,
                 date: Timestamp.fromDate(new Date()),
                 fileURL: downloadURL,
@@ -303,198 +300,47 @@ const Projects = ({ openModal }) => {
               console.error("Error adding document: ", e);
             }
 
-            
-
-            try {
-              // Call speech-to-text API
-              console.log("Starting speech to text...");
-              const response = await fetch("/api/speech-to-text", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  audioPath: filePath,
-                  audioLanguage:
+            // Function to start processing video
+            async function startProcessingVideo() {
+              try {
+                // Parameters to be passed to the API
+                const params = {
+                  filePath: filePath,
+                  audioLanguageCode:
                     originalLanguage === "autodetect"
                       ? "autodetect"
                       : getTranslateCode(originalLanguage),
                   numOfSpeakers: numOfSpeakers,
-                }),
-              });
-
-              if (!response.ok) {
-                throw new Error(
-                  `Failed to convert speech to text: ${response.statusText}`
-                );
-              }
-
-              // Get speech-to-text result
-              const result = await response.json();
-              const assemblyResult = result;
-              console.log("Speech To Text Converted Successfully!");
-
-              //Cloning voice to ElevenLabs
-              console.log("Cloning voice to ElevenLabs...");
-              const addVoiceResponse = await fetch("/api/addVoice", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  name: projectName,
-                  fileURL: downloadURL,
-                }),
-              });
-              const addVoiceResult = await addVoiceResponse.json();
-              const newVoiceId = addVoiceResult.voiceId;
-              console.log("Voice Cloned Successfully - Voice ID: ", newVoiceId);
-
-              console.log("Starting translation and text to speech...");
-              const translatedParagraphs = await Promise.all(
-                assemblyResult.segments.map(async (paragraph) => {
-                  // Call Translation API - Translate each paragraph
-                  const translationResponse = await fetch(
-                    "/api/translate-text",
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        inputText: paragraph.text,
-                        target: getTranslateCode(translationLanguage),
-                      }),
-                    }
-                  );
-
-                  if (!translationResponse.ok) {
-                    throw new Error(
-                      `Failed to translate text: ${translationResponse.statusText}`
-                    );
-                  }
-
-                  const translationResult = await translationResponse.json();
-                  const translatedText = translationResult.result;
-
-                  // Call text-to-speech API
-                  const ttsResponse = await fetch("/api/text-to-speech", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      text: translatedText,
-                      voiceId: newVoiceId,
-                    }),
-                  });
-
-                  if (!ttsResponse.ok) {
-                    throw new Error(
-                      `Failed to convert text to speech: ${ttsResponse.statusText}`
-                    );
-                  }
-
-                  const ttsResult = await ttsResponse.json();
-                  const audioUrl = ttsResult.audioUrl;
-
-                  return {
-                    text: paragraph.text,
-                    translatedText: translatedText,
-                    translatedAudioURL: audioUrl,
-                    start: paragraph.startTime,
-                    end: paragraph.endTime,
-                    speaker: paragraph.speaker,
-                    voiceId: newVoiceId,
-                  };
-                })
-              );
-
-              console.log(translatedParagraphs);
-              console.log(
-                "Translation and Text To Speech Converted Successfully!"
-              );
-
-              //create speakers array
-              const speakerCount = new Set(
-                translatedParagraphs.map((paragraph) => paragraph.speaker)
-              ).size;
-              const speakers = Array.from(
-                { length: speakerCount },
-                (_, index) => ({
-                  speaker: String.fromCharCode(65 + index),
-                  voiceId: newVoiceId,
-                })
-              );
-
-              // Merge audio clips
-              const audioUrl = await mergeAndManipulateAudioClips(
-                translatedParagraphs
-              );
-
-              // Add the converted text, translation, and audio URL to the audio files collection
-              try {
-                const docRef = await addDoc(collection(db, "projects"), {
                   projectName: projectName,
-                  user: uid,
-                  fileName: selectedFileName,
-                  originalLanguage:
-                    originalLanguage === "autodetect"
-                      ? getLabelfromCode(assemblyResult.assembly.language_code)
-                      : originalLanguage,
-                  translationLanguage: translationLanguage,
-                  date: Timestamp.fromDate(new Date()),
-                  fileURL: downloadURL,
-                  thumbnailURL: thumbnailUrl,
-                  duration: assemblyResult.assembly.audio_duration,
-                  transcription: assemblyResult.assembly,
-                  segments: translatedParagraphs,
-                  translatedFileURL: audioUrl,
-                  speakers: speakers,
+                  downloadURL: downloadURL,
+                };
+
+                // Send POST request to the server-side API with parameters
+                const response = await fetch("/api/process-video", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(params),
                 });
-                console.log("Document written with ID: ", docRef.id);
-                try {
-                  const userRef = doc(db, "users", uid);
-                  const docSnap = await getDoc(userRef);
-                  const currentData = docSnap.data();
-                  const updatedUsedSeconds =
-                    currentData.subscriptions[0].usage.usedSeconds +
-                    assemblyResult.assembly.audio_duration;
-                  const updatedRemainingSeconds =
-                    currentData.subscriptions[0].usage.remainingSeconds -
-                    assemblyResult.assembly.audio_duration;
-                  await updateDoc(userRef, {
-                    subscriptions: [
-                      {
-                        ...currentData.subscriptions[0],
-                        usage: {
-                          ...currentData.subscriptions[0].usage,
-                          usedSeconds: updatedUsedSeconds,
-                          remainingSeconds: updatedRemainingSeconds,
-                        },
-                      },
-                      ...currentData.subscriptions.slice(1),
-                    ],
-                  });
-                } catch (e) {
-                  console.error("Error updating credits: ", e);
-                }
-              } catch (e) {
-                console.error("Error adding document: ", e);
+
+                // Parse response JSON
+                const data = await response.json();
+                console.log(data);
+              } catch (error) {
+                console.error("Error starting video processing:", error);
               }
-            } catch (error) {
-              console.error(
-                "Error converting text to speech or translating:",
-                error
-              );
             }
+
+            // Call function to start processing video
+            startProcessingVideo();
 
             // Close modal
             handleModalClose();
           }
         );
       } catch (e) {
-        console.error("Error adding document: ", e);
+        console.error("Error uploading: ", e);
         handleModalClose();
       }
     });
@@ -855,6 +701,11 @@ const Projects = ({ openModal }) => {
                                 {project.fileName}
                               </p>
                             </div>
+                            <div className="flex-1 flex justify-end">
+                              {project.processing && (
+                                <Spinner className="mr-2" />
+                              )}
+                            </div>
                           </div>
                         </Link>
                       </TableCell>
@@ -865,19 +716,30 @@ const Projects = ({ openModal }) => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
-                          <Image
-                            alt="nextui logo"
-                            height={40}
-                            radius="sm"
-                            src={`https://flagcdn.com/${getFlagCode(
-                              project.originalLanguage
-                            )}.svg`}
-                            width={40}
-                            className="w-6 h-6 rounded-full mr-2"
-                          />
-                          <p className="text-default-500 text-sm">
-                            {project.originalLanguage}
-                          </p>
+                          {project.originalLanguage === "autodetect" ? (
+                            <>
+                              <HiSparkles className="text-foreground w-6 h-5 mr-1" />
+                              <p className="text-default-500 text-sm">
+                                Detecting...
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <Image
+                                alt="nextui logo"
+                                height={40}
+                                radius="sm"
+                                src={`https://flagcdn.com/${getFlagCode(
+                                  project.originalLanguage
+                                )}.svg`}
+                                width={40}
+                                className="w-6 h-6 rounded-full mr-2"
+                              />
+                              <p className="text-default-500 text-sm">
+                                {project.originalLanguage}
+                              </p>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>

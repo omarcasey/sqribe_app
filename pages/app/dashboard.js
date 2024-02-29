@@ -115,32 +115,46 @@ const Dashboard = () => {
   }, []);
 
   async function fetchDataFromCloudFunction() {
-    try {
-      const response = await fetch(
-        "https://us-central1-sqribe-app.cloudfunctions.net/speech-to-text",
-        {
+    async function uploadVideo() {
+      try {
+        const response = await fetch("/api/process-video", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            // Include any data or parameters required by your Cloud Function
-            name: "John Doe",
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        });
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error("Error uploading video:", error);
       }
-
-      const data = await response.json();
-      console.log("Data from Cloud Function:", data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching data from Cloud Function:", error);
-      // Handle error gracefully
     }
+
+    uploadVideo();
+
+    // try {
+    //   const response = await fetch(
+    //     "https://us-central1-sqribe-app.cloudfunctions.net/speech-to-text",
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         // Include any data or parameters required by your Cloud Function
+    //         name: "John Doe",
+    //       }),
+    //     }
+    //   );
+
+    //   if (!response.ok) {
+    //     throw new Error("Failed to fetch data");
+    //   }
+
+    //   const data = await response.json();
+    //   console.log(data.result);
+    //   return data;
+    // } catch (error) {
+    //   console.error("Error fetching data from Cloud Function:", error);
+    //   // Handle error gracefully
+    // }
   }
 
   return (
