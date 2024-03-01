@@ -4,13 +4,13 @@ const { PubSub } = require("@google-cloud/pubsub");
 
 // Your Google Cloud Speech-to-Text API credentials
 const googleCredentials = JSON.parse(
-  process.env.REACT_APP_GOOGLE_APPLICATION_CREDENTIALS
+  process.env.GOOGLE_CLOUD_KEY
 );
 
 // Create a Pub/Sub client
 const pubSubClient = new PubSub({
   projectId: 'sqribe-app',
-  keyFilename: './keys/sqribe-app-key.json'
+  credentials: googleCredentials
   });
 
 // Handler function for the API route
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   }
 
   // Extract parameters from the request body
-  const { filePath, audioLanguageCode, numOfSpeakers, projectName, downloadURL } = req.body;
+  const { filePath, audioLanguageCode, numOfSpeakers, projectName, downloadURL, translationCode, docRefId } = req.body;
 
   // Check if required parameters are provided
   if (!filePath || !audioLanguageCode || !numOfSpeakers) {
@@ -33,7 +33,9 @@ export default async function handler(req, res) {
     audioLanguageCode,
     numOfSpeakers,
     projectName,
-    downloadURL
+    downloadURL,
+    translationCode,
+    docRefId
   };
 
   try {

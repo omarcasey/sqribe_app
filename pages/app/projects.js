@@ -16,6 +16,7 @@ import {
   Spinner,
   Autocomplete,
   AutocompleteItem,
+  Skeleton,
 } from "@nextui-org/react";
 import {
   Dropdown,
@@ -251,6 +252,8 @@ const Projects = ({ openModal }) => {
               selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
             console.log("File uploaded at " + filePath);
 
+            let docRefId;
+
             // Create firestore doc with basic data and processing starts
             try {
               const docRef = await addDoc(collection(db, "projects"), {
@@ -263,23 +266,24 @@ const Projects = ({ openModal }) => {
                 fileURL: downloadURL,
                 thumbnailURL: thumbnailUrl,
                 processing: true,
-                // duration: assemblyResult.assembly.audio_duration,
+                duration: videoDuration,
                 // transcription: assemblyResult.assembly,
                 // segments: translatedParagraphs,
                 // translatedFileURL: audioUrl,
                 // speakers: speakers,
               });
               console.log("Document written with ID: ", docRef.id);
+              docRefId = docRef.id;
               try {
                 const userRef = doc(db, "users", uid);
                 const docSnap = await getDoc(userRef);
                 const currentData = docSnap.data();
                 const updatedUsedSeconds =
                   currentData.subscriptions[0].usage.usedSeconds +
-                  assemblyResult.assembly.audio_duration;
+                  videoDuration;
                 const updatedRemainingSeconds =
                   currentData.subscriptions[0].usage.remainingSeconds -
-                  assemblyResult.assembly.audio_duration;
+                  videoDuration;
                 await updateDoc(userRef, {
                   subscriptions: [
                     {
@@ -313,6 +317,8 @@ const Projects = ({ openModal }) => {
                   numOfSpeakers: numOfSpeakers,
                   projectName: projectName,
                   downloadURL: downloadURL,
+                  translationCode: getTranslateCode(translationLanguage),
+                  docRefId: docRefId,
                 };
 
                 // Send POST request to the server-side API with parameters
@@ -718,10 +724,14 @@ const Projects = ({ openModal }) => {
                         <div className="flex items-center">
                           {project.originalLanguage === "autodetect" ? (
                             <>
-                              <HiSparkles className="text-foreground w-6 h-5 mr-1" />
-                              <p className="text-default-500 text-sm">
-                                Detecting...
-                              </p>
+                              <Skeleton className="rounded-full h-6 mr-1">
+                                <HiSparkles className="text-foreground w-6 h-5" />
+                              </Skeleton>
+                              <Skeleton className="rounded-lg h-6">
+                                <p className="text-default-500 text-sm">
+                                  Detecting...
+                                </p>
+                              </Skeleton>
                             </>
                           ) : (
                             <>
