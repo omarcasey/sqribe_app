@@ -8,6 +8,8 @@ import LifetimeDeal from '@/components/Marketing/LifetimeDeal'
 import Footer from '@/components/Marketing/Footer'
 import Testimonial from '@/components/Marketing/Testimonial'
 import Features2 from '@/components/Marketing/Features2'
+import VideoPreview from '@/components/Marketing/VideoPreview'
+import TranslationPreview from '@/components/Marketing/TranslationPreview'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,6 +18,8 @@ export default function Home() {
     <main className="min-h-screen" id='home'>
       <Navbar />
       <Hero />
+      <VideoPreview />
+      <TranslationPreview />
       <CallToAction />
       <Features />
       <Features2 />
