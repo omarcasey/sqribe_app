@@ -28,7 +28,7 @@ const Sidebar = () => {
   const subscription = userData?.subscriptions[0];
 
   return (
-    <div className="w-[17.5rem] dark:bg-neutral-900 bg-white py-4 px-4 border-r border-foreground-200 flex flex-col">
+    <div className="w-[17.5rem] dark:bg-neutral-900 bg-white py-4 px-4 border-r border-foreground-200 lg:flex flex-col hidden">
       <Link href="/" className="flex items-center mb-10 p-1">
         <Image
           className="w-auto h-10 mr-2"

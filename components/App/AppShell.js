@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { IoMenu } from "react-icons/io5";
 import {
   Button,
   Spinner,
@@ -135,73 +136,6 @@ const AppShell = ({ children }) => {
       <div className="flex flex-col flex-1">
         <nav className="dark:bg-neutral-900 bg-white px-6 py-3 border-b border-foreground-300">
           <div className="flex justify-between items-center">
-            {/* <Link href="/" className="flex items-center">
-              <Image
-                className="w-auto h-10 mr-4"
-                src="/new logo transparent.png"
-                alt=""
-                width={1024}
-                height={1024}
-              />
-              <h1 className="text-foreground font-extrabold text-2xl tracking-tight">
-                Sqribe
-              </h1>
-            </Link>
-            <div className="flex flex-1 max-w-2xl justify-evenly">
-              <Link
-                href="/app/dashboard"
-                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-              >
-                <RiLayoutMasonryFill
-                  className={`mr-2 ${
-                    router.pathname === "/app/dashboard" ? "text-cyan-300" : ""
-                  }`}
-                />
-                <p
-                  className={`${
-                    router.pathname === "/app/dashboard"
-                      ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
-                      : ""
-                  }`}
-                >
-                  Dashboard
-                </p>
-              </Link>
-              <Link
-                href="/app/projects"
-                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-              >
-                <FaFolder className="mr-2" />
-                <p className="">Projects</p>
-              </Link>
-              <Link
-                href="/app/makespeech"
-                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-              >
-                <SiAudiomack
-                  size={20}
-                  className={`mr-2 ${
-                    router.pathname === "/app/makespeech" ? "text-cyan-300" : ""
-                  }`}
-                />
-                <p
-                  className={`${
-                    router.pathname === "/app/makespeech"
-                      ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-300"
-                      : ""
-                  }`}
-                >
-                  Speech Synthesis
-                </p>
-              </Link>
-              <Link
-                href="/app/history"
-                className="flex items-center text-default-500 hover:text-foreground transition-all font-medium"
-              >
-                <FaHistory className="mr-2" />
-                <p className="">History</p>
-              </Link>
-            </div> */}
             <Button
               startContent={<SearchIcon />}
               endContent={
@@ -209,11 +143,14 @@ const AppShell = ({ children }) => {
                   <span className="text-[10px]">⌘</span>K
                 </div>
               }
-              className="text-foreground-500 bg-foreground-200 dark:bg-foreground-200"
+              className="text-foreground-500 bg-foreground-200 dark:bg-foreground-200 hidden lg:flex"
               size="md"
               onPress={() => dispatch(setOpenCommandCenter(true))}
             >
               Command Center...
+            </Button>
+            <Button className="flex lg:hidden min-w-0 px-2" variant="flat">
+              <IoMenu size={30} />
             </Button>
             <div className="flex space-x-3 items-center">
               <div className="w-32 mr-2">
@@ -236,7 +173,7 @@ const AppShell = ({ children }) => {
               </div>
               <DropdownMenuIdk router={router} />
               <Button
-                className="px-3 min-w-0"
+                className="px-3 min-w-0 hidden lg:flex"
                 startContent={<IoIosHelpCircleOutline size={25} />}
               ></Button>
             </div>

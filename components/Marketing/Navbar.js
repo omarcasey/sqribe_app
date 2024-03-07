@@ -123,12 +123,12 @@ const Navbar = () => {
               Blog{" "}
             </a>
           </nav>
-          <div className="mr-6 mt-1">
+          <div className="mr-6 mt-1 hidden">
             <ThemeSwitch />
           </div>
           <Link
             href={user ? "/app/dashboard" : "/signin"}
-            className="relative hidden md:items-center md:justify-center md:inline-flex group"
+            className="relative md:items-center md:justify-center md:inline-flex group"
           >
             <div className="absolute transition-all duration-200 rounded-full -inset-[2px] bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
             <div className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-foreground bg-foreground-50 border border-transparent rounded-full">
