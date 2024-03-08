@@ -51,6 +51,7 @@ import ProjectSearch from "@/components/App/ProjectSearch";
 import { targetLanguageOptions } from "@/helpers/languages";
 import { voiceOverVoices } from "@/helpers/voices";
 import ThemeSearch from "@/components/App/ThemeSearch";
+import Timeline from "@/components/App/Timeline";
 
 const Page = () => {
   const router = useRouter();
@@ -75,6 +76,7 @@ const Page = () => {
   } = useDisclosure();
   const [translateLoading, setTranslateLoading] = useState([]);
   const [selectedVoices, setSelectedVoices] = useState({});
+  const [timelineVisible, setTimelineVisible] = useState(true);
 
   const handleSelectedVoice = (e) => {
     setSelectedVoice(e.target.value);
@@ -537,6 +539,7 @@ const Page = () => {
               </div>
             </div>
           </div>
+          {timelineVisible && <Timeline segments={editSegments} setTimelineVisible={setTimelineVisible} />}
         </>
       ) : (
         <Spinner size="lg" className="mt-32" />
