@@ -1,9 +1,9 @@
-import { Slider } from "@nextui-org/react";
 import React, { useRef, useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import { IoMdPause } from "react-icons/io";
 import { FaUndo, FaRedo } from "react-icons/fa";
 import { RxEnterFullScreen } from "react-icons/rx";
+import { Slider, Skeleton } from "@nextui-org/react";
 
 const formatTime = (time) => {
   const hours = Math.floor(time / 3600)
@@ -26,13 +26,12 @@ const VideoPlayer = ({ url }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
 
   const handleFullScreen = () => {
     const videoElement = videoRef.current;
 
-    // Check if the document is already in fullscreen
     if (
       document.fullscreenElement ||
       document.mozFullScreenElement ||
@@ -82,6 +81,7 @@ const VideoPlayer = ({ url }) => {
 
   const handleLoadedMetadata = () => {
     setDuration(videoRef.current.duration);
+    setIsVideoLoading(false);
   };
 
   const handleTimeUpdate = () => {
@@ -90,14 +90,20 @@ const VideoPlayer = ({ url }) => {
 
   return (
     <div className="border border-foreground-300 rounded-xl">
-      <video
-        ref={videoRef}
-        className="rounded-t-xl"
-        onLoadedMetadata={handleLoadedMetadata}
-        onTimeUpdate={handleTimeUpdate}
+      <Skeleton
+        className="rounded-t-xl h-[300px]"
+        isLoaded={!isVideoLoading}
       >
-        <source src={url} type="video/mp4" />
-      </video>
+        <video
+          ref={videoRef}
+          className="rounded-t-xl"
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={handleTimeUpdate}
+        >
+          <source src={url} type="video/mp4" />
+        </video>
+      </Skeleton>
+
       <Slider
         aria-label="Video progress"
         classNames={{
@@ -109,18 +115,19 @@ const VideoPlayer = ({ url }) => {
         onChange={moveAudio}
         hideThumb
       />
+
       <div className="px-6 p-4 flex flex-row justify-between items-center mt-2">
         <div className="flex flex-row items-center">
           {isPlaying ? (
             <IoMdPause
-              size={20}
-              className="text-foreground-500 hover:cursor-pointer hover:text-foreground transition-all mr-5"
+              size={25}
+              className="text-foreground-700 hover:cursor-pointer hover:text-foreground transition-all mr-5"
               onClick={handlePlayPause}
             />
           ) : (
             <FaPlay
-              size={20}
-              className="text-foreground-500 hover:cursor-pointer hover:text-foreground transition-all mr-5"
+              size={25}
+              className="text-foreground-700 hover:cursor-pointer hover:text-foreground transition-all mr-5"
               onClick={handlePlayPause}
             />
           )}
@@ -147,7 +154,6 @@ const VideoPlayer = ({ url }) => {
           />
         </div>
       </div>
-      {/* Add more custom controls here */}
     </div>
   );
 };

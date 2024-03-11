@@ -52,6 +52,7 @@ import { targetLanguageOptions } from "@/helpers/languages";
 import { voiceOverVoices } from "@/helpers/voices";
 import ThemeSearch from "@/components/App/ThemeSearch";
 import Timeline from "@/components/App/Timeline";
+import { PiWaveformFill } from "react-icons/pi";
 
 const Page = () => {
   const router = useRouter();
@@ -78,8 +79,11 @@ const Page = () => {
   const [selectedVoices, setSelectedVoices] = useState({});
   const [timelineVisible, setTimelineVisible] = useState(true);
 
-  const handleSelectedVoice = (e) => {
-    setSelectedVoice(e.target.value);
+  const handleSelectedVoice = (speaker) => (selected) => {
+    setSelectedVoices((prev) => ({
+      ...prev,
+      [speaker]: selected,
+    }));
   };
 
   const handleTranslationLanguage = (key) => {
@@ -469,8 +473,8 @@ const Page = () => {
                   className="pt-5"
                   defaultSelectedKey={"translated"}
                 >
-                  <Tab key="original" title="Original">
-                    <div className="p-4 px-5">
+                  <Tab key="original" title="Original" className="pb-0">
+                    <div className="p-4 pb-2 px-5">
                       {project.fileName.endsWith(".mp4") ? (
                         <VideoPlayer url={project.fileURL} />
                       ) : (
@@ -482,8 +486,8 @@ const Page = () => {
                       )}
                     </div>
                   </Tab>
-                  <Tab key="translated" title="Translated" className="">
-                    <div className="p-4 px-5">
+                  <Tab key="translated" title="Translated" className="pb-0">
+                    <div className="p-4 pb-2 px-5">
                       {project.fileName.endsWith(".mp4") ? (
                         <VideoPlayer url={project.translatedFileURL} />
                       ) : (
@@ -494,7 +498,7 @@ const Page = () => {
                         />
                       )}
                       {project.needsUpdate === true && (
-                        <div className="bg-blue-500 w-full flex items-center justify-center rounded-xl mt-2 px-4 py-3">
+                        <div className="bg-blue-500 w-full flex items-center justify-center rounded-xl mt-2 px-4 py-3 mb-2">
                           <p className="text-sm text-white text-center">
                             <span className="font-semibold">
                               This is an old version!{" "}
@@ -506,6 +510,32 @@ const Page = () => {
                     </div>
                   </Tab>
                 </Tabs>
+                <div className="flex flex-row px-6 gap-2 mb-2">
+                  <Button
+                    className="min-w-0 px-2 border border-blue-500"
+                    variant="light"
+                    onPress={onOpenVoiceoverModal}
+                  >
+                    <PiWaveformFill size={25} />
+                  </Button>
+                  <Button color="primary" className="flex-1 font-semibold">
+                    Apply Changes
+                  </Button>
+                </div>
+                <div className="flex flex-row px-6 gap-2 mb-2">
+                  <Button
+                    className="min-w-0 px-10 border border-foreground-300 font-semibold"
+                    variant="light"
+                  >
+                    Lip-Sync <span className="font-light">beta</span>
+                  </Button>
+                  <Button
+                    color="default"
+                    className="flex-1 font-semibold border border-blue-500"
+                  >
+                    Download
+                  </Button>
+                </div>
                 <div className="px-8">
                   {project.transcription.summary && (
                     <>
@@ -524,22 +554,38 @@ const Page = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-row w-full gap-4 px-5 mb-5 pt-5 border-t border-neutral-600">
-                <Button className="flex-1" color="default" variant="bordered">
-                  Speakers voice
-                </Button>
+              <div
+                className={` ${
+                  timelineVisible ? "hidden" : "flex"
+                } flex-row w-full gap-4 px-5 mb-5 pt-5 border-t border-neutral-600`}
+              >
                 <Button
+                  className="flex-1"
+                  color="default"
+                  variant="bordered"
+                  onPress={() => setTimelineVisible(true)}
+                >
+                  Open Timeline
+                </Button>
+                {/* <Button
                   className="flex-1"
                   color="primary"
                   onPress={updateDubbing}
                   isDisabled={!project.needsUpdate}
                 >
                   Redub
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
-          {timelineVisible && <Timeline segments={editSegments} setTimelineVisible={setTimelineVisible} />}
+          {timelineVisible && (
+            <Timeline
+              segments={editSegments}
+              setTimelineVisible={setTimelineVisible}
+              audioURL={project.fileURL}
+              duration={project.duration}
+            />
+          )}
         </>
       ) : (
         <Spinner size="lg" className="mt-32" />
@@ -686,11 +732,11 @@ const Page = () => {
                           isDarkMode ? "dark" : "light"
                         } text-foreground w-1/2`}
                         selectedKeys={[selectedVoices[speaker.speaker]]}
-                        onChange={handleSelectedVoice}
+                        onChange={handleSelectedVoice(speaker.speaker)}
                         aria-label="Voiceover Selection"
                         disallowEmptySelection
                         startContent={
-                          selectedVoice === "Clone" ? (
+                          selectedVoices[speaker.speaker] === "Clone" ? (
                             <HiSparkles className="text-foreground w-5" />
                           ) : (
                             <FaPlay className="text-foreground w-3 mr-1 ml-1" />

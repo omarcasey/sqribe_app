@@ -1,11 +1,5 @@
 // Imports the Google Cloud client library
-const { Translate } = require("@google-cloud/translate").v2;
 import * as deepl from 'deepl-node';
-
-// Your Google Cloud Speech-to-Text API credentials
-const googleCredentials = JSON.parse(
-  process.env.REACT_APP_GOOGLE_APPLICATION_CREDENTIALS
-);
 
 const deeplCredentials = process.env.DEEPL_KEY;
 
@@ -27,8 +21,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Creates a client
-    const translate = new Translate({ credentials: googleCredentials });
 
     const translator = new deepl.Translator(deeplCredentials);
 
@@ -44,26 +36,7 @@ export default async function handler(req, res) {
     }
 
     await translateTextAsync();
-
-    // async function translateText() {
-    //   // Translates the text into the target language. "text" can be a string for
-    //   // translating a single piece of text, or an array of strings for translating
-    //   // multiple texts.
-    //   let [translations] = await translate.translate(inputText, target);
-    //   translations = Array.isArray(translations)
-    //     ? translations
-    //     : [translations];
-    //   console.log("Translations:");
-    //   translations.forEach((translation, i) => {
-    //     console.log(`${inputText[i]} => (${target}) ${translation}`);
-    //   });
-
-    //   //send back translation
-    //   console.log("Translation OBJECT: ", JSON.stringify(translations));
-    //   res.status(200).json({ translations });
-    // }
-
-    // await translateText();
+    
   } catch (error) {
     console.error("Error translating:", error);
     res.status(500).json({ error: "Internal Server Error" });
