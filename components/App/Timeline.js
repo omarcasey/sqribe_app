@@ -31,23 +31,21 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
   }, [scaleFactor]);
 
   const zoomOut = () => {
-    console.log(scaleFactor)
-    if (scaleFactor === 20) {
-      console.log("max zoom out reached")
-      return;
-    };
-    setScaleFactor((prevScaleFactor) => prevScaleFactor + 3); // Decrease scaleFactor for zooming in
+    if (scaleFactor + 3 >= 20) {
+      setScaleFactor(20);
+    } else {
+      setScaleFactor((prevScaleFactor) => prevScaleFactor + 3);
+    }
   };
-  
+
   const zoomIn = () => {
-    console.log(scaleFactor)
-    if (scaleFactor === 5) {
-      console.log("max zoom in reached")
-      return;
-    };
-    setScaleFactor((prevScaleFactor) => prevScaleFactor - 3); // Increase scaleFactor for zooming out
+    console.log(scaleFactor);
+    if (scaleFactor - 3 <= 5) {
+      setScaleFactor(5);
+    } else {
+      setScaleFactor((prevScaleFactor) => prevScaleFactor - 3);
+    }
   };
-  
 
   const handleDrag = (index, newLeft, newWidth) => {
     const newSegments = [...segments];
@@ -130,10 +128,7 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
       tabIndex="0"
     >
       <div className="border-b border-foreground-300 h-8 w-full flex items-center justify-end px-3 gap-2 text-foreground">
-        <CiCircleMinus
-          onClick={zoomOut}
-          className="hover:cursor-pointer"
-        />
+        <CiCircleMinus onClick={zoomOut} className="hover:cursor-pointer" />
         <Slider
           size="sm"
           value={100 - scaleFactor} // Invert the value to achieve the desired behavior
@@ -146,10 +141,7 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
           hideThumb
         />
 
-        <CiCirclePlus
-          onClick={zoomIn}
-          className="hover:cursor-pointer"
-        />
+        <CiCirclePlus onClick={zoomIn} className="hover:cursor-pointer" />
         <BiHide onClick={hideTimeline} className="hover:cursor-pointer" />
       </div>
       <div className="relative overflow-x-auto overflow-y-hidden flex items-start h-[8.5rem]">
