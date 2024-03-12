@@ -20,10 +20,10 @@ export default async function handler(req, res) {
   }
 
   // Extract parameters from the request body
-  const { filePath, audioLanguageCode, numOfSpeakers, projectName, downloadURL, translationCode, docRefId } = req.body;
+  const { filePath, audioLanguageCode, numOfSpeakers, projectName, downloadURL, translationCode, docRefId, youtubeUrl } = req.body;
 
   // Check if required parameters are provided
-  if (!filePath || !audioLanguageCode || !numOfSpeakers) {
+  if (!audioLanguageCode || !numOfSpeakers) {
     return res.status(400).json({ error: "Missing parameters" });
   }
 
@@ -35,7 +35,8 @@ export default async function handler(req, res) {
     projectName,
     downloadURL,
     translationCode,
-    docRefId
+    docRefId,
+    youtubeUrl
   };
 
   try {

@@ -177,26 +177,95 @@ const Projects = ({ openModal }) => {
     settranslationLanguage(key);
   };
 
-  const handleUpload = async () => {
-    // Get video duration
-    const video = document.createElement("video");
-    const videoBlob = new Blob([selectedFile], { type: "video/mp4" });
-    video.src = URL.createObjectURL(videoBlob);
+  const handleUpload = async (youtubeLink) => {
+    setisUploading(true);
 
-    video.addEventListener("loadedmetadata", async () => {
-      console.log("Video duration:", video.duration);
-      console.log("Remaining seconds:", subscription?.usage.remainingSeconds);
+    let docRefId;
+    const docRef = await addDoc(collection(db, "projects"), {
+      projectName: projectName,
+      user: uid,
+      // fileName: selectedFileName,
+      originalLanguage: originalLanguage,
+      translationLanguage: translationLanguage,
+      date: Timestamp.fromDate(new Date()),
+      // fileURL: downloadURL,
+      // thumbnailURL: thumbnailUrl,
+      processing: true,
+      // duration: videoDuration,
 
-      const videoDuration = parseFloat(video.duration);
-      const remainingSeconds = parseFloat(subscription?.usage.remainingSeconds);
+      // transcription: assemblyResult.assembly,
+      // segments: translatedParagraphs,
+      // translatedFileURL: audioUrl,
+      // speakers: speakers,
+    });
+    console.log("Document written with ID: ", docRef.id);
+    docRefId = docRef.id;
 
-      if (videoDuration > remainingSeconds) {
-        console.log("You dont have enough minutes. Please upgrade your plan.");
-        return;
+    // Check if pasteLink contains a valid YouTube URL
+    if (youtubeLink) {
+      console.log("youtube :D")
+      // Function to start processing video
+      async function startProcessingVideoYoutube() {
+        try {
+          // Parameters to be passed to the API
+          const params = {
+            youtubeUrl: pasteLink,
+            audioLanguageCode:
+              originalLanguage === "autodetect"
+                ? "autodetect"
+                : getTranslateCode(originalLanguage),
+            numOfSpeakers: numOfSpeakers,
+            projectName: projectName,
+            translationCode: getTranslateCode(translationLanguage),
+            docRefId: docRefId,
+          };
+
+          // Send POST request to the server-side API with parameters
+          const response = await fetch("/api/process-video", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(params),
+          });
+
+          // Parse response JSON
+          const data = await response.json();
+          console.log(data);
+        } catch (error) {
+          console.error("Error starting video processing:", error);
+        }
       }
 
-      try {
-        setisUploading(true);
+      // Call function to start processing video
+      startProcessingVideoYoutube();
+
+      // Close modal
+      handleModalClose();
+      setisUploading(false);
+    } else {
+      console.log("no youtube")
+      // Get video duration
+      const video = document.createElement("video");
+      const videoBlob = new Blob([selectedFile], { type: "video/mp4" });
+      video.src = URL.createObjectURL(videoBlob);
+
+      video.addEventListener("loadedmetadata", async () => {
+        console.log("Video duration:", video.duration);
+        console.log("Remaining seconds:", subscription?.usage.remainingSeconds);
+
+        const videoDuration = parseFloat(video.duration);
+        const remainingSeconds = parseFloat(
+          subscription?.usage.remainingSeconds
+        );
+
+        if (videoDuration > remainingSeconds) {
+          console.log(
+            "You dont have enough minutes. Please upgrade your plan."
+          );
+          return;
+        }
+
         // Upload file to Firebase storage
         const storageRef = ref(storage, "files/" + selectedFileName);
         const uploadTask = uploadBytesResumable(storageRef, selectedFile);
@@ -252,28 +321,16 @@ const Projects = ({ openModal }) => {
               selectedFileName.replace(/ /g, "%20").replace(/#/g, "%23");
             console.log("File uploaded at " + filePath);
 
-            let docRefId;
-
             // Create firestore doc with basic data and processing starts
             try {
-              const docRef = await addDoc(collection(db, "projects"), {
-                projectName: projectName,
-                user: uid,
+              const docRef = doc(db, "projects", docRefId);
+              await updateDoc(docRef, {
                 fileName: selectedFileName,
-                originalLanguage: originalLanguage,
-                translationLanguage: translationLanguage,
-                date: Timestamp.fromDate(new Date()),
                 fileURL: downloadURL,
                 thumbnailURL: thumbnailUrl,
-                processing: true,
                 duration: videoDuration,
-                // transcription: assemblyResult.assembly,
-                // segments: translatedParagraphs,
-                // translatedFileURL: audioUrl,
-                // speakers: speakers,
               });
-              console.log("Document written with ID: ", docRef.id);
-              docRefId = docRef.id;
+              console.log("Document updated with ID: ", docRef.id);
               try {
                 const userRef = doc(db, "users", uid);
                 const docSnap = await getDoc(userRef);
@@ -343,13 +400,11 @@ const Projects = ({ openModal }) => {
 
             // Close modal
             handleModalClose();
+            setisUploading(false);
           }
         );
-      } catch (e) {
-        console.error("Error uploading: ", e);
-        handleModalClose();
-      }
-    });
+      });
+    }
   };
 
   const handleDownload = async (fileUrl, fileName) => {
@@ -373,6 +428,12 @@ const Projects = ({ openModal }) => {
       const fileInput = document.getElementById("fileInput");
       fileInput.click();
     }
+  };
+
+  const isValidYoutubeUrl = (url) => {
+    const youtubeRegex =
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|\w+[\?&]v=)|youtu\.be\/)([^"&?/=\s]{11})$/;
+    return youtubeRegex.test(url);
   };
 
   const handleFileSelection = (e) => {
@@ -641,13 +702,15 @@ const Projects = ({ openModal }) => {
                           <NextIcon size={25} />
                         </div>
                       </div>
-                      <Image
-                        src={project.thumbnailURL || "/drakedont.png"}
-                        width={1000}
-                        height={1000}
-                        alt="project_image"
-                        className="max-w-full max-h-full object-cover w-full h-full"
-                      />
+                      <Skeleton isLoaded={project.thumbnailURL}>
+                        <Image
+                          src={project.thumbnailURL}
+                          width={1000}
+                          height={1000}
+                          alt="project_image"
+                          className="max-w-full max-h-full object-cover w-full h-full"
+                        />
+                      </Skeleton>
                     </CardBody>
                     <Divider />
                     <CardFooter className="py-2 px-5 flex flex-col shrink-0">
@@ -891,25 +954,37 @@ const Projects = ({ openModal }) => {
                           onChange={handleFileSelection}
                         />
                         <div
-                          className={`border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full hover:border-purple-800 hover:bg-foreground-100 hover:cursor-pointer transition-all ${
+                          className={`border border-dashed border-gray-500 rounded-xl h-24 flex items-center justify-center w-full  ${
+                            pasteLink
+                              ? ""
+                              : "hover:cursor-pointer hover:border-purple-800 hover:bg-foreground-100"
+                          } ${
                             drag ? "border-purple-800 bg-foreground-100" : ""
-                          }`}
-                          onClick={openFileInput}
-                          onDragEnter={handleDragEnter}
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
+                          } ${pasteLink ? "bg-rose-950 border-none" : ""}`}
+                          onClick={!pasteLink ? openFileInput : undefined}
+                          onDragEnter={!pasteLink ? handleDragEnter : undefined}
+                          onDragOver={!pasteLink ? handleDragOver : undefined}
+                          onDragLeave={!pasteLink ? handleDragLeave : undefined}
+                          onDrop={!pasteLink ? handleDrop : undefined}
                         >
-                          {selectedFileName ? (
-                            <p className="text-sm text-default-500 text-center">
-                              {selectedFileName}
+                          {pasteLink ? (
+                            <p className="text-sm text-red-500 text-center">
+                              Youtube Video URL selected
                             </p>
                           ) : (
-                            <p className="text-sm text-default-500 text-center">
-                              Click to choose a file or drag and drop it here{" "}
-                              <br />
-                              MP4, MOV, WEBM, MKV, MP3, WAV
-                            </p>
+                            <>
+                              {selectedFileName ? (
+                                <p className="text-sm text-default-500 text-center">
+                                  {selectedFileName}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-default-500 text-center">
+                                  Click to choose a file or drag and drop it
+                                  here <br />
+                                  MP4, MOV, WEBM, MKV, MP3, WAV
+                                </p>
+                              )}
+                            </>
                           )}
                         </div>
 
@@ -991,61 +1066,6 @@ const Projects = ({ openModal }) => {
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Original Language
                         </p>
-                        {/* <Select
-                          size="sm"
-                          placeholder="Select a Language"
-                          color="default"
-                          className={`${
-                            isDarkMode ? "dark" : "light"
-                          } text-foreground pb-4`}
-                          selectedKeys={[originalLanguage]}
-                          onChange={handleOriginalLanguage}
-                          aria-label="Original Language"
-                          disallowEmptySelection
-                          isDisabled={isUploading}
-                          startContent={
-                            originalLanguage === "autodetect" ? (
-                              <HiSparkles className="text-foreground" />
-                            ) : (
-                              <Avatar
-                                alt={originalLanguage}
-                                className="w-7 h-6 mr-1"
-                                src={`https://flagcdn.com/${getFlagCode(
-                                  originalLanguage
-                                )}.svg`}
-                              />
-                            )
-                          }
-                        >
-                          <SelectItem
-                            key={"autodetect"}
-                            className="text-black"
-                            value={"autodetect"}
-                            startContent={<HiSparkles className="text-black" />}
-                          >
-                            Autodetect
-                          </SelectItem>
-                          {originallanguageOptions
-                            .filter(
-                              (option) => option.label !== translationLanguage
-                            ) // Filter out the original language
-                            .map((option) => (
-                              <SelectItem
-                                key={option.label}
-                                startContent={
-                                  <Avatar
-                                    alt={option.label}
-                                    className="w-6 h-6 mr-1"
-                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
-                                  />
-                                }
-                                className="text-black"
-                                value={option.label}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                        </Select> */}
                         <Autocomplete
                           variant="flat"
                           placeholder="Select a language"
@@ -1105,47 +1125,6 @@ const Projects = ({ openModal }) => {
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
                           Translate to
                         </p>
-                        {/* <Select
-                          size="sm"
-                          placeholder="Select a Language"
-                          className=" text-black pb-4"
-                          color="default"
-                          selectedKeys={[translationLanguage]}
-                          onChange={handleTranslationLanguage}
-                          aria-label="Translation Language"
-                          disallowEmptySelection
-                          isDisabled={isUploading}
-                          startContent={
-                            <Avatar
-                              alt={originalLanguage}
-                              className="w-7 h-6 mr-1"
-                              src={`https://flagcdn.com/${getFlagCode(
-                                translationLanguage
-                              )}.svg`}
-                            />
-                          }
-                        >
-                          {targetLanguageOptions
-                            .filter(
-                              (option) => option.label !== originalLanguage
-                            ) // Filter out the original language
-                            .map((option) => (
-                              <SelectItem
-                                key={option.label}
-                                startContent={
-                                  <Avatar
-                                    alt={option.label}
-                                    className="w-6 h-6 mr-1"
-                                    src={`https://flagcdn.com/${option.flagCode}.svg`}
-                                  />
-                                }
-                                className="text-black"
-                                value={option.label}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                        </Select> */}
                         <Autocomplete
                           variant="flat"
                           placeholder="Select a language"
@@ -1182,33 +1161,16 @@ const Projects = ({ openModal }) => {
                             </AutocompleteItem>
                           ))}
                         </Autocomplete>
-                        {/* <div className="w-full mt-2 mb-2">
-                          <CheckboxGroup
-                            orientation="horizontal"
-                            color="danger"
-                            isDisabled={isUploading}
-                          >
-                            <Checkbox
-                              isSelected={AIsummary}
-                              onValueChange={setAIsummary}
-                            >
-                              <div className="flex items-center">
-                                <IoSparkles className="text-sky-300" />
-                                <p className="ml-1 mr-4 font-medium text-sm">
-                                  AI Summary
-                                </p>
-                              </div>
-                            </Checkbox>
-                            <Checkbox isDisabled value="thumbnail">
-                              <div className="flex items-center">
-                                <IoSparkles className="text-sky-300" />
-                                <p className="ml-1 font-medium text-sm">
-                                  AI Thumbnail
-                                </p>
-                              </div>
-                            </Checkbox>
-                          </CheckboxGroup>
-                        </div> */}
+                        {originalLanguage === translationLanguage && (
+                          <p className="w-full text-left text-blue-600 font-medium text-xs pb-2">
+                            *You cannot translate to the same language.
+                          </p>
+                        )}
+                        {pasteLink && !isValidYoutubeUrl(pasteLink) && (
+                          <p className="w-full text-left text-blue-600 font-medium text-xs pb-2">
+                            *Not a valid Youtube URL.
+                          </p>
+                        )}
                       </div>
                     </ModalBody>
                     <ModalFooter>
@@ -1217,13 +1179,17 @@ const Projects = ({ openModal }) => {
                           className="w-full font-semibold text-base py-5"
                           color="secondary"
                           isDisabled={
-                            !selectedFile ||
+                            (!selectedFile && !pasteLink) ||
+                            (pasteLink && !isValidYoutubeUrl(pasteLink)) ||
                             !projectName ||
                             !translationLanguage ||
-                            !originalLanguage
+                            !originalLanguage ||
+                            originalLanguage === translationLanguage
                           }
                           isLoading={isUploading}
-                          onPress={handleUpload}
+                          onPress={() =>
+                            handleUpload(selectedFile ? false : true)
+                          }
                         >
                           Translate
                         </Button>
