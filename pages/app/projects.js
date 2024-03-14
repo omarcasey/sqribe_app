@@ -267,7 +267,7 @@ const Projects = ({ openModal }) => {
         }
 
         // Upload file to Firebase storage
-        const storageRef = ref(storage, "files/" + selectedFileName);
+        const storageRef = ref(storage, "uploads/" + selectedFileName);
         const uploadTask = uploadBytesResumable(storageRef, selectedFile);
 
         // Register three observers:
