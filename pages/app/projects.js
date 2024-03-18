@@ -23,17 +23,8 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  cn,
 } from "@nextui-org/react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Divider,
-  CheckboxGroup,
-  Checkbox,
-} from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Divider } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -41,20 +32,12 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  User,
-  Chip,
-  Tooltip,
-  getKeyValue,
 } from "@nextui-org/react";
 import { db, storage } from "@/firebase";
 import {
   collection,
   addDoc,
   Timestamp,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
   getDoc,
   updateDoc,
   doc,
@@ -62,19 +45,13 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { NextIcon } from "@/components/Icons/NextIcon";
-import {
-  getFlagCode,
-  getLabelfromCode,
-  getTranslateCode,
-} from "@/helpers/getFlag";
+import { getFlagCode, getTranslateCode } from "@/helpers/getFlag";
 import {
   originallanguageOptions,
   targetLanguageOptions,
 } from "@/helpers/languages";
 import withAuth from "@/components/App/withAuth";
 import AppShell from "@/components/App/AppShell";
-import { useAuth } from "@/components/App/authContext";
-import { IoSparkles } from "react-icons/io5";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { IoEllipsisHorizontalSharp } from "react-icons/io5";
@@ -86,7 +63,7 @@ import { FaList } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { HiOutlineSparkles } from "react-icons/hi";
 import Image from "next/image";
-import { mergeAndManipulateAudioClips } from "@/helpers/audioUtils";
+import Survey from "@/components/App/Survey";
 
 const Projects = ({ openModal }) => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
@@ -114,6 +91,12 @@ const Projects = ({ openModal }) => {
     onOpen: onOpenUnlockModal,
     onOpenChange: onOpenChangeUnlockModal,
     onClose: onCloseUnlockModal,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenSurveyModal,
+    onOpen: onOpenSurveyModal,
+    onOpenChange: onOpenChangeSurveyModal,
+    onClose: onCloseSurveyModal,
   } = useDisclosure();
   const [selectedFileName, setSelectedFileName] = useState("");
   const [selectedFile, setselectedFile] = useState("");
@@ -203,7 +186,7 @@ const Projects = ({ openModal }) => {
 
     // Check if pasteLink contains a valid YouTube URL
     if (youtubeLink) {
-      console.log("youtube :D")
+      console.log("youtube :D");
       // Function to start processing video
       async function startProcessingVideoYoutube() {
         try {
@@ -244,7 +227,7 @@ const Projects = ({ openModal }) => {
       handleModalClose();
       setisUploading(false);
     } else {
-      console.log("no youtube")
+      console.log("no youtube");
       // Get video duration
       const video = document.createElement("video");
       const videoBlob = new Blob([selectedFile], { type: "video/mp4" });
@@ -516,7 +499,7 @@ const Projects = ({ openModal }) => {
       <div className="w-full">
         <div className="flex flex-col items-center pb-24 pt-10">
           {subscription?.planID == "Free Trial" && (
-            <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-10">
+            <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-2">
               <div className="flex items-center justify-center">
                 <div className="flex items-center justify-center rounded-full bg-foreground-400 p-[6px] mr-4">
                   <HiOutlineSparkles size={25} className="" />
@@ -532,6 +515,26 @@ const Projects = ({ openModal }) => {
                 onPress={onOpenUnlockModal}
               >
                 Unlock Full Version
+              </Button>
+            </div>
+          )}
+          {userData?.surveyCompleted == false && (
+            <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-10">
+              <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center rounded-full bg-foreground-400 p-[6px] mr-4">
+                  <HiOutlineSparkles size={25} className="" />
+                </div>
+                <p className="text-base text-foreground">
+                  Complete this quick survey to get 10 minutes of free usage!
+                </p>
+              </div>
+              <Button
+                color="success"
+                className="font-semibold"
+                size="md"
+                onPress={onOpenSurveyModal}
+              >
+                Complete Survey
               </Button>
             </div>
           )}
@@ -1380,6 +1383,16 @@ const Projects = ({ openModal }) => {
                     </div>
                   </div>
                 )}
+              </ModalContent>
+            </Modal>
+            <Modal
+              isOpen={isOpenSurveyModal}
+              onOpenChange={onOpenChangeSurveyModal}
+              className={`${isDarkMode ? "dark" : "light"}`}
+              size="3xl"
+            >
+              <ModalContent className="">
+                {(onCloseSurveyModal) => <Survey />}
               </ModalContent>
             </Modal>
           </>

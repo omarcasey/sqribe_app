@@ -15,8 +15,10 @@ const withAuth = (WrappedComponent) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const user = useSelector((state) => state.user.data);
-    const loading = useSelector((state) => state.user.userLoading);
+    const userLoading = useSelector((state) => state.user.userLoading);
     const authLoading = useSelector((state) => state.user.authLoading);
+    const projectsLoading = useSelector((state) => state.user.projectsLoading);
+    const subscription = user?.subscriptions[0];
 
     useEffect(() => {
       const checkAuth = async () => {
@@ -86,13 +88,13 @@ const withAuth = (WrappedComponent) => {
       };
 
       // Only check authentication if not already loading
-      if (loading === "idle" && authLoading === false) {
+      if (userLoading === "idle" && authLoading === false) {
         checkAuth();
       }
-    }, [authLoading, dispatch, loading, router, user]);
+    }, [authLoading, dispatch, userLoading, router, user]);
 
     // Render the wrapped component if the user is authenticated and data is loaded
-    return user && loading === "succeeded" ? (
+    return user && subscription && projectsLoading === "succeeded" && userLoading === "succeeded" ? (
       <WrappedComponent {...props} />
     ) : (
       <div className="h-screen flex items-center justify-center">

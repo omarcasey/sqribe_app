@@ -49,7 +49,7 @@ const SignUp = () => {
           }
         ],
         createdAt: Timestamp.now(),
-        // Add more user details as needed
+        surveyCompleted: false
       });
       console.log("Signed up and add");
 

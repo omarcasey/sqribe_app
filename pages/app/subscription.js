@@ -11,6 +11,9 @@ import {
 import React, { useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(process.env.STRIPE_TEST_PUBLISHABLE_KEY);
 
 const Subscription = () => {
   const userData = useSelector((state) => state.user.data);
@@ -198,14 +201,27 @@ const Subscription = () => {
                     </p>
                   </li>
                 </ul>
-                <Button
-                  onPress={() =>
-                    router.push("https://buy.stripe.com/dR64hieJP6IX2pq4gg")
-                  }
-                  color="default"
+                <form
+                  id="checkoutForm"
+                  action="/api/checkout-session"
+                  method="POST"
                 >
-                  {basicButtonLabel}
-                </Button>
+                  <input
+                    type="hidden"
+                    id="priceID"
+                    name="priceID"
+                    value={selected ? "price_1OvnitLgT8zvXr8nlvm3sPMN" : "price_1OvniMLgT8zvXr8n5J04Pogc"}
+                  />
+                  <input
+                    type="hidden"
+                    id="customerEmail"
+                    name="customerEmail"
+                    value={userData.email}
+                  />
+                  <Button type="submit" color="default" fullWidth>
+                    {basicButtonLabel}
+                  </Button>
+                </form>
               </Card>
               <Card className="p-4 px-6 border border-indigo-700">
                 <div className="flex flex-row justify-between items-center mb-2">
@@ -352,27 +368,38 @@ const Subscription = () => {
                 title="What are the main features of Sqribe?"
                 className=""
               >
-                <p className="text-foreground-500">The following features are currently available in our product:
-                Automated speech-to-text, translation and voiceover: Create a
-                transcript, translation, and voice-over for your video. Voice
-                cloning: Copy the voice from the original video to the
-                translated version. Multiple speakers: Assign a unique voice to
-                each speaker in the video. ubtitles: Download the transcript
-                and translation in SRT format. AI rewriting: Adjust the speed
-                of speech by rewriting segments that are too long in the
-                translation. Multi-lingual projects: Translate your video into
-                several languages in one click.Upload SRT: Upload SRT Files
-                for achieving more accuracy in translation or transcription.
-                Lip-sync in Beta: Get synchronized mouth movements with the
-                audio track in a translated video.</p>
-
+                <p className="text-foreground-500">
+                  The following features are currently available in our product:
+                  Automated speech-to-text, translation and voiceover: Create a
+                  transcript, translation, and voice-over for your video. Voice
+                  cloning: Copy the voice from the original video to the
+                  translated version. Multiple speakers: Assign a unique voice
+                  to each speaker in the video. ubtitles: Download the
+                  transcript and translation in SRT format. AI rewriting: Adjust
+                  the speed of speech by rewriting segments that are too long in
+                  the translation. Multi-lingual projects: Translate your video
+                  into several languages in one click.Upload SRT: Upload SRT
+                  Files for achieving more accuracy in translation or
+                  transcription. Lip-sync in Beta: Get synchronized mouth
+                  movements with the audio track in a translated video.
+                </p>
               </AccordionItem>
               <AccordionItem
                 key="2"
                 aria-label="Accordion 2"
                 title="How many languages do you support?"
               >
-                <p className="text-foreground-500">With Rask AI, you can translate from nearly any language to over 130 languages. Our Voice Cloning feature offers a human-like experience and is currently available when dubbing from any source language to the following 29 languages: English, Japanese, Chinese, German, Hindi, French, Korean, Portuguese, Italian, Spanish, Indonesian, Dutch, Turkish, Filipino, Polish, Ukrainian, Swedish, Bulgarian, Romanian, Arabic, Czech, Greek, Finnish, Croatian, Malay, Slovak, Danish, Tamil, Russian.</p>
+                <p className="text-foreground-500">
+                  With Rask AI, you can translate from nearly any language to
+                  over 130 languages. Our Voice Cloning feature offers a
+                  human-like experience and is currently available when dubbing
+                  from any source language to the following 29 languages:
+                  English, Japanese, Chinese, German, Hindi, French, Korean,
+                  Portuguese, Italian, Spanish, Indonesian, Dutch, Turkish,
+                  Filipino, Polish, Ukrainian, Swedish, Bulgarian, Romanian,
+                  Arabic, Czech, Greek, Finnish, Croatian, Malay, Slovak,
+                  Danish, Tamil, Russian.
+                </p>
               </AccordionItem>
               <AccordionItem
                 key="3"
