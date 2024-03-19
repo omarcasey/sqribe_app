@@ -5,6 +5,7 @@ import ModelViewer from "./ModelViewer";
 import ButtonNice from "../UI/ButtonNice";
 import ButtonGradient from "../UI/ButtonGradient";
 import { Button } from "@nextui-org/react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -27,18 +28,14 @@ const Hero = () => {
           </p>
           <div className="relative inline-flex items-center justify-center mt-8 sm:mt-12 group">
             <div className="absolute transition-all duration-200 rounded-full -inset-[2px] bg-gradient-to-br from-rose-400 via-cyan-400 to-purple-600 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-            <a
-              onClick={() =>
-                document
-                  .getElementById("newsletter")
-                  .scrollIntoView({ behavior: "smooth" })
-              }
+            <Link
+              href="/signup"
               className="relative inline-flex items-center justify-center px-8 py-3 text-xl font-normal text-foreground bg-foreground-50 border border-transparent rounded-full"
               role="button"
             >
               {" "}
               Get Started for Free{" "}
-            </a>
+            </Link>
           </div>
 
           {/* <div>

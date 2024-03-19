@@ -37,9 +37,9 @@ const Subscription = () => {
   if (subscription.planID === "Creator Plan") {
     creatorButtonLabel = "Cancel Subscription";
   } else if (subscription.planID === "Basic Plan") {
-    creatorButtonLabel = "Downgrade";
-  } else if (subscription.planID === "Business Plan") {
     creatorButtonLabel = "Upgrade";
+  } else if (subscription.planID === "Business Plan") {
+    creatorButtonLabel = "Downgrade";
   } else {
     creatorButtonLabel = "Select Plan";
   }
@@ -55,6 +55,17 @@ const Subscription = () => {
     businessButtonLabel = "Select Plan";
   }
 
+  function calculateDaysLeft(endDate) {
+    const currentDate = new Date();
+    const differenceInTime = endDate.getTime() - currentDate.getTime();
+    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+    if (differenceInDays === 0) {
+      return "Soon";
+    } else {
+      return differenceInDays + " days";
+    }
+  }
+
   return (
     <AppShell>
       <div className="w-full">
@@ -62,7 +73,15 @@ const Subscription = () => {
           <Card className="flex flex-col w-full max-w-[90%]">
             <div className="flex flex-row justify-between items-center px-10 my-4 mb-6">
               <h1 className="text-xl font-medium">Subscription</h1>
-              <Button>Manage Subscription</Button>
+              <form id="stripePortal" action="/api/stripe-portal" method="POST">
+                <input
+                  type="hidden"
+                  id="customerStripeId"
+                  name="customerStripeId"
+                  value={userData.stripeId}
+                />
+                <Button type="submit">Manage Subscription</Button>
+              </form>
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
@@ -89,20 +108,21 @@ const Subscription = () => {
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next minute reset in</p>
-              <p>8 days</p>
+              <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Billing Period</p>
-              <p className="mr-5">Monthly</p>
+              <p className="mr-5">{subscription?.period}</p>
               <p className="text-blue-400 font-medium text-xs border rounded-lg px-2 py-[2px] border-indigo-800 hover:cursor-pointer">
-                Switch to Yearly
+                Switch to{" "}
+                {subscription?.period === "Monthly" ? "Yearly" : "Monthly"}
               </p>
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next invoice in</p>
-              <p>8 days</p>
+              <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
@@ -210,13 +230,23 @@ const Subscription = () => {
                     type="hidden"
                     id="priceID"
                     name="priceID"
-                    value={selected ? "price_1OvnitLgT8zvXr8nlvm3sPMN" : "price_1OvniMLgT8zvXr8n5J04Pogc"}
+                    value={
+                      selected
+                        ? "price_1OvnitLgT8zvXr8nlvm3sPMN"
+                        : "price_1OvniMLgT8zvXr8n5J04Pogc"
+                    }
                   />
                   <input
                     type="hidden"
                     id="customerEmail"
                     name="customerEmail"
                     value={userData.email}
+                  />
+                  <input
+                    type="hidden"
+                    id="customerStripeId"
+                    name="customerStripeId"
+                    value={userData.stripeId}
                   />
                   <Button type="submit" color="default" fullWidth>
                     {basicButtonLabel}

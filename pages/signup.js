@@ -5,8 +5,7 @@ import { Input, Button } from "@nextui-org/react";
 import { FaGoogle } from "react-icons/fa";
 import Image from "next/image";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
 } from "firebase/auth";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -15,6 +14,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Timestamp } from "firebase/firestore";
+const Stripe = require('stripe')
+const stripe = Stripe("sk_test_51OjOT0LgT8zvXr8nEojzCeUNTPJgP89CQv0v95gOLoJwUDOpYP1JolBc40aGl7h9y4VT3pKOtclFd55PJK9M8eJ200AdnmMHrM");
 
 const SignUp = () => {
   const router = useRouter();
@@ -32,6 +33,10 @@ const SignUp = () => {
       );
       const user = userCredential.user;
       console.log(user);
+      // add to stripe
+      const customer = await stripe.customers.create({
+        email: user.email,
+      });
       // Add user information to Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
@@ -46,10 +51,11 @@ const SignUp = () => {
               remainingSeconds: 300,
               totalSeconds: 300,
             },
-          }
+          },
         ],
         createdAt: Timestamp.now(),
-        surveyCompleted: false
+        surveyCompleted: false,
+        stripeId: customer.id,
       });
       console.log("Signed up and add");
 

@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { auth } from "@/firebase";
-import {
-  Input,
-  Button,
-  Autocomplete,
-  AutocompleteItem,
-} from "@nextui-org/react";
-import { FaGoogle } from "react-icons/fa";
+import { auth, db } from "@/firebase";
+import { Input, Button } from "@nextui-org/react";
 import Image from "next/image";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
+const Stripe = require('stripe')
+const stripe = Stripe("sk_test_51OjOT0LgT8zvXr8nEojzCeUNTPJgP89CQv0v95gOLoJwUDOpYP1JolBc40aGl7h9y4VT3pKOtclFd55PJK9M8eJ200AdnmMHrM");
 
 const SignIn = () => {
   const router = useRouter();
@@ -68,6 +69,59 @@ const SignIn = () => {
     setLoading(false);
   };
 
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+
+    try {
+      // Sign in with Google
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+
+      // Check if the user exists in your Firestore database
+      const userDoc = doc(db, "users", user.uid);
+      const userDocSnapshot = await getDoc(userDoc);
+
+      if (userDocSnapshot.exists()) {
+        // User exists, sign in normally
+        toast.success("Signed in successfully!");
+        router.push("/app/dashboard");
+      } else {
+        // User doesn't exist, proceed with signup
+        // Add to stripe
+        const customer = await stripe.customers.create({
+          email: user.email,
+        });
+
+        // Add user information to Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          darkMode: false,
+          subscriptions: [
+            {
+              planID: "Free Trial",
+              startDate: Timestamp.now(),
+              status: "active",
+              usage: {
+                usedSeconds: 0,
+                remainingSeconds: 300,
+                totalSeconds: 300,
+              },
+            },
+          ],
+          createdAt: Timestamp.now(),
+          surveyCompleted: false,
+          stripeId: customer.id,
+        });
+        console.log("Signed up and signed in successfully!");
+        toast.success("Signed up and signed in successfully!");
+        router.push("/app/dashboard");
+      }
+    } catch (error) {
+      console.error("Firebase Auth Error:", error.code, error.message);
+      setError(error.message); // Set error state or handle error accordingly
+    }
+  };
+
   return (
     <div className="h-screen flex flex-row text-foreground">
       <div className="w-full px-4 lg:w-[45%] bg-white dark:bg-black flex justify-center items-center">
@@ -94,6 +148,7 @@ const SignIn = () => {
           <Button
             variant="bordered"
             className="flex items-center justify-center border border-foreground-300 px-4 py-1 rounded-xl w-full shadow h-14"
+            onPress={signInWithGoogle}
           >
             <Image
               src="/google.png"
