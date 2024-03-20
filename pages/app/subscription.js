@@ -108,7 +108,9 @@ const Subscription = () => {
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next minute reset in</p>
-              <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
+              {subscription?.endDate && (
+                <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
+              )}
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
@@ -122,7 +124,9 @@ const Subscription = () => {
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next invoice in</p>
-              <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
+              {subscription?.endDate && (
+                <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
+              )}
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
@@ -138,7 +142,7 @@ const Subscription = () => {
                 </p>
               </div>
               <Switch
-                defaultSelected
+                
                 aria-label="Usage based billing"
                 size="sm"
               />
