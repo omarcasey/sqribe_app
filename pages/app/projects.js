@@ -1392,7 +1392,7 @@ const Projects = ({ openModal }) => {
               size="3xl"
             >
               <ModalContent className="">
-                {(onCloseSurveyModal) => <Survey />}
+                {(onCloseSurveyModal) => <Survey onClose={onCloseSurveyModal} />}
               </ModalContent>
             </Modal>
           </>
