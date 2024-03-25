@@ -499,7 +499,7 @@ const Projects = ({ openModal }) => {
       <div className="w-full">
         <div className="flex flex-col items-center pb-24 pt-10">
           {subscription?.planID == "Free Trial" && (
-            <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-2">
+            <div className="border border-foreground-500 p-3 flex items-center justify-between w-full rounded-xl bg-foreground-200 max-w-[85%] mb-6">
               <div className="flex items-center justify-center">
                 <div className="flex items-center justify-center rounded-full bg-foreground-400 p-[6px] mr-4">
                   <HiOutlineSparkles size={25} className="" />

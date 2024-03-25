@@ -100,7 +100,7 @@ const SignIn = () => {
             {
               planID: "Free Trial",
               startDate: Timestamp.now(),
-              status: "active",
+              status: "Active",
               usage: {
                 usedSeconds: 0,
                 remainingSeconds: 300,

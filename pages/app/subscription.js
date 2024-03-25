@@ -14,7 +14,6 @@ import {
 import React, { useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { loadStripe } from "@stripe/stripe-js";
 import { FaCircleInfo } from "react-icons/fa6";
 import { db } from "@/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -33,12 +32,22 @@ const Subscription = () => {
     onOpenChange: onOpenChangeCancelSubscriptionModal,
     onClose: onCloseCancelSubscriptionModal,
   } = useDisclosure();
+  const {
+    isOpen: isOpenStopCancelSubscriptionModal,
+    onOpen: onOpenStopCancelSubscriptionModal,
+    onOpenChange: onOpenChangeStopCancelSubscriptionModal,
+    onClose: onCloseStopCancelSubscriptionModal,
+  } = useDisclosure();
   let basicButtonLabel;
   let creatorButtonLabel;
   let businessButtonLabel;
 
   if (subscription.planID === "Basic Plan") {
-    basicButtonLabel = "Cancel Subscription";
+    if (subscription.status === "Cancelled") {
+      basicButtonLabel = "Stop Cancellation";
+    } else {
+      basicButtonLabel = "Cancel Subscription";
+    }
   } else if (
     subscription.planID === "Creator Plan" ||
     subscription.planID === "Business Plan"
@@ -49,7 +58,11 @@ const Subscription = () => {
   }
 
   if (subscription.planID === "Creator Plan") {
-    creatorButtonLabel = "Cancel Subscription";
+    if (subscription.status === "Cancelled") {
+      creatorButtonLabel = "Stop Cancellation";
+    } else {
+      creatorButtonLabel = "Cancel Subscription";
+    }
   } else if (subscription.planID === "Basic Plan") {
     creatorButtonLabel = "Upgrade";
   } else if (subscription.planID === "Business Plan") {
@@ -59,7 +72,11 @@ const Subscription = () => {
   }
 
   if (subscription.planID === "Business Plan") {
-    businessButtonLabel = "Cancel Subscription";
+    if (subscription.status === "Cancelled") {
+      businessButtonLabel = "Stop Cancellation";
+    } else {
+      businessButtonLabel = "Cancel Subscription";
+    }
   } else if (
     subscription.planID === "Creator Plan" ||
     subscription.planID === "Basic Plan"
@@ -109,6 +126,105 @@ const Subscription = () => {
       });
     } catch (e) {
       console.error("Error updating document: ", e);
+    }
+  };
+
+  const stopCancelSubscription = async () => {
+    try {
+      const subscriptionresult = await stripe.subscriptions.update(
+        subscription.subscriptionID,
+        {
+          cancel_at_period_end: false,
+        }
+      );
+      console.log(subscriptionresult);
+      onCloseStopCancelSubscriptionModal();
+    } catch (err) {
+      console.log(err);
+    }
+
+    try {
+      const userRef = doc(db, "users", uid);
+      const docSnap = await getDoc(userRef);
+      const currentData = docSnap.data();
+      await updateDoc(userRef, {
+        subscriptions: [
+          {
+            ...currentData.subscriptions[0],
+            status: "Active",
+          },
+          ...currentData.subscriptions.slice(1),
+        ],
+      });
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  };
+
+  const changeSubscription = async ({ newPriceId }) => {
+    try {
+      const getSubscriptionInfo = await stripe.subscriptions.retrieve(
+        subscription.subscriptionID
+      );
+      const subscriptionItemID = getSubscriptionInfo.items.data[0].id;
+      console.log(subscriptionItemID);
+      console.log(newPriceId);
+
+      const price = await stripe.prices.retrieve(newPriceId);
+      const product = await stripe.products.retrieve(price.product);
+      console.log(product.name);
+
+      let newTotalMinutes = 0;
+      let planName = ""; // Declare planName variable here
+      if (product.name === "Basic Plan") {
+        newTotalMinutes = 25;
+        planName = "Basic Plan"; // Set planName based on product name
+      } else if (product.name === "Creator Plan") {
+        newTotalMinutes = 100;
+        planName = "Creator Plan"; // Set planName based on product name
+      } else if (product.name === "Business Plan") {
+        newTotalMinutes = 500;
+        planName = "Business Plan"; // Set planName based on product name
+      }
+
+      const subscriptionresult = await stripe.subscriptions.update(
+        subscription.subscriptionID,
+        {
+          items: [
+            {
+              id: subscriptionItemID,
+              price: newPriceId,
+            },
+          ],
+          cancel_at_period_end: false,
+        }
+      );
+      console.log(subscriptionresult);
+
+      try {
+        const userRef = doc(db, "users", uid);
+        const docSnap = await getDoc(userRef);
+        const currentData = docSnap.data();
+        await updateDoc(userRef, {
+          subscriptions: [
+            {
+              ...currentData.subscriptions[0],
+              planID: planName, // Use planName variable here
+              status: "Active",
+              usage: {
+                ...currentData.subscriptions[0].usage,
+                totalSeconds: newTotalMinutes * 60,
+                remainingSeconds: newTotalMinutes * 60 - currentData.subscriptions[0].usage.usedSeconds,
+              },
+            },
+            ...currentData.subscriptions.slice(1),
+          ],
+        });
+      } catch (e) {
+        console.error("Error updating document: ", e);
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -232,7 +348,17 @@ const Subscription = () => {
             </div>
             <div className="gap-8 justify-center grid grid-cols-1 grid-rows-3 md:grid-cols-3 md:grid-rows-1 px-12 md:px-4">
               <Card className="p-4 px-6">
-                <h1 className="font-semibold text-xl mb-2">Basic</h1>
+                <div className="flex flex-row justify-between items-center mb-2">
+                  <h1 className="font-semibold text-xl">Basic</h1>
+                  {subscription.planID === "Basic Plan" &&
+                  subscription.status === "Cancelled" ? (
+                    <div className="rounded-md py-0 px-2 border text-sm text-red-500 border-red-500">
+                      Will be cancelled
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
+                </div>
                 <p className="text-foreground-500 text-sm mb-6">
                   For small to medium sized buisness that have a smaller target
                   audience
@@ -302,56 +428,48 @@ const Subscription = () => {
                       value={userData.stripeId}
                     />
                     <Button type="submit" color="default" fullWidth>
-                      {basicButtonLabel}
+                      Select Plan
                     </Button>
                   </form>
                 )}
                 {subscription.planID === "Basic Plan" && (
-                  <form
-                    id="cancelSubscription"
-                    action="/api/cancel-subscription"
-                    method="POST"
+                  <Button
+                    color="default"
+                    fullWidth
+                    onPress={
+                      subscription.status === "Active"
+                        ? onOpenCancelSubscriptionModal
+                        : onOpenStopCancelSubscriptionModal
+                    }
                   >
-                    <input
-                      type="hidden"
-                      id="subscriptionID"
-                      name="subscriptionID"
-                      value={subscription.id}
-                    />
-                    <Button
-                      color="default"
-                      fullWidth
-                      onPress={onOpenCancelSubscriptionModal}
-                    >
-                      {basicButtonLabel}
-                    </Button>
-                  </form>
+                    {subscription.status === "Active"
+                      ? "Cancel Subscription"
+                      : "Stop Cancellation"}
+                  </Button>
                 )}
                 {(subscription.planID === "Creator Plan" ||
                   subscription.planID === "Business Plan") && (
-                  <form
-                    id="downgradeSubscription"
-                    action="/api/downgrade-subscription"
-                    method="POST"
+                  <Button
+                    color="default"
+                    fullWidth
+                    onPress={() =>
+                      changeSubscription({
+                        newPriceId: selected
+                          ? "price_1OvnitLgT8zvXr8nlvm3sPMN"
+                          : "price_1OvniMLgT8zvXr8n5J04Pogc",
+                      })
+                    }
                   >
-                    <input
-                      type="hidden"
-                      id="subscriptionID"
-                      name="subscriptionID"
-                      value={subscription.id}
-                    />
-                    <Button type="submit" color="default" fullWidth>
-                      {basicButtonLabel}
-                    </Button>
-                  </form>
+                    Downgrade
+                  </Button>
                 )}
               </Card>
               <Card className="p-4 px-6 border border-indigo-700">
                 <div className="flex flex-row justify-between items-center mb-2">
                   <h1 className="font-semibold text-xl">Creator</h1>
-                  {subscription.planID === "Basic Plan" &&
+                  {subscription.planID === "Creator Plan" &&
                   subscription.status === "Cancelled" ? (
-                    <div className="rounded-md py-0 px-2 border text-sm text-foreground-500 border-foreground-500">
+                    <div className="rounded-md py-0 px-2 border text-sm text-red-500 border-red-500">
                       Will be cancelled
                     </div>
                   ) : (
@@ -468,30 +586,39 @@ const Subscription = () => {
                       value={userData.stripeId}
                     />
                     <Button type="submit" color="primary" fullWidth>
-                      {creatorButtonLabel}
+                      Select Plan
                     </Button>
                   </form>
                 )}
                 {subscription.planID === "Creator Plan" && (
-                  <form
-                    id="cancelSubscription"
-                    action="/api/cancel-subscription"
-                    method="POST"
+                  <Button
+                    color="primary"
+                    fullWidth
+                    onPress={
+                      subscription.status === "Active"
+                        ? onOpenCancelSubscriptionModal
+                        : onOpenStopCancelSubscriptionModal
+                    }
                   >
-                    <input
-                      type="hidden"
-                      id="subscriptionID"
-                      name="subscriptionID"
-                      value={subscription.id}
-                    />
-                    <Button
-                      color="primary"
-                      fullWidth
-                      onPress={onOpenCancelSubscriptionModal}
-                    >
-                      {creatorButtonLabel}
-                    </Button>
-                  </form>
+                    {subscription.status === "Active"
+                      ? "Cancel Subscription"
+                      : "Stop Cancellation"}
+                  </Button>
+                )}
+                {subscription.planID === "Basic Plan" && (
+                  <Button
+                    color="primary"
+                    onPress={() =>
+                      changeSubscription({
+                        newPriceId: selected
+                          ? "price_1OwozkLgT8zvXr8nTFy6aNXM"
+                          : "price_1OwozILgT8zvXr8n3iaevJTK",
+                      })
+                    }
+                    fullWidth
+                  >
+                    {creatorButtonLabel}
+                  </Button>
                 )}
               </Card>
               <Card className="p-4 px-6">
@@ -625,6 +752,43 @@ const Subscription = () => {
                   Close
                 </Button>
                 <Button color="primary" onPress={cancelSubscription}>
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isOpenStopCancelSubscriptionModal}
+        onOpenChange={onOpenChangeStopCancelSubscriptionModal}
+        className={`${isDarkMode ? "dark" : "light"}`}
+        size="lg"
+      >
+        <ModalContent className="">
+          {(onCloseStopCancelSubscriptionModal) => (
+            <div className="flex flex-col p-6 text-foreground">
+              <h2 className="text-lg mb-4">Stop Cancel Subscription</h2>
+              <p className="text-foreground-500 text-sm mb-6">
+                Do you really want to cancel your subscription at the next
+                billing interval?
+              </p>
+              <div className="bg-foreground-100 rounded-lg p-4 flex items-center">
+                <FaCircleInfo size={20} className="mr-6 text-foreground-400" />
+                <p className="text-foreground-500 text-sm pr-6">
+                  Unused minutes are not preserved and access to cloned voices
+                  will be lost.
+                </p>
+              </div>
+              <div className="flex flex-row justify-end mt-6">
+                <Button
+                  color="default"
+                  onPress={onCloseStopCancelSubscriptionModal}
+                  className="mr-4"
+                >
+                  Close
+                </Button>
+                <Button color="primary" onPress={stopCancelSubscription}>
                   Confirm
                 </Button>
               </div>
