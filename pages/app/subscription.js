@@ -25,7 +25,9 @@ const Subscription = () => {
   const uid = useSelector((state) => state.user.auth.uid);
   const userData = useSelector((state) => state.user.data);
   const subscription = userData?.subscriptions[0];
-  const [selected, setSelected] = useState(true);
+  const [selected, setSelected] = useState(subscription.period === "Yearly");
+  const [selectedPriceID, setSelectedPriceID] = useState(null);
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
   const {
     isOpen: isOpenCancelSubscriptionModal,
     onOpen: onOpenCancelSubscriptionModal,
@@ -38,53 +40,12 @@ const Subscription = () => {
     onOpenChange: onOpenChangeStopCancelSubscriptionModal,
     onClose: onCloseStopCancelSubscriptionModal,
   } = useDisclosure();
-  let basicButtonLabel;
-  let creatorButtonLabel;
-  let businessButtonLabel;
-
-  if (subscription.planID === "Basic Plan") {
-    if (subscription.status === "Cancelled") {
-      basicButtonLabel = "Stop Cancellation";
-    } else {
-      basicButtonLabel = "Cancel Subscription";
-    }
-  } else if (
-    subscription.planID === "Creator Plan" ||
-    subscription.planID === "Business Plan"
-  ) {
-    basicButtonLabel = "Downgrade";
-  } else {
-    basicButtonLabel = "Select Plan";
-  }
-
-  if (subscription.planID === "Creator Plan") {
-    if (subscription.status === "Cancelled") {
-      creatorButtonLabel = "Stop Cancellation";
-    } else {
-      creatorButtonLabel = "Cancel Subscription";
-    }
-  } else if (subscription.planID === "Basic Plan") {
-    creatorButtonLabel = "Upgrade";
-  } else if (subscription.planID === "Business Plan") {
-    creatorButtonLabel = "Downgrade";
-  } else {
-    creatorButtonLabel = "Select Plan";
-  }
-
-  if (subscription.planID === "Business Plan") {
-    if (subscription.status === "Cancelled") {
-      businessButtonLabel = "Stop Cancellation";
-    } else {
-      businessButtonLabel = "Cancel Subscription";
-    }
-  } else if (
-    subscription.planID === "Creator Plan" ||
-    subscription.planID === "Basic Plan"
-  ) {
-    businessButtonLabel = "Upgrade";
-  } else {
-    businessButtonLabel = "Select Plan";
-  }
+  const {
+    isOpen: isOpenChangeSubscriptionModal,
+    onOpen: onOpenChangeSubscriptionModal,
+    onOpenChange: onOpenChangeChangeSubscriptionModal,
+    onClose: onCloseChangeSubscriptionModal,
+  } = useDisclosure();
 
   function calculateDaysLeft(endDate) {
     const currentDate = new Date();
@@ -97,7 +58,7 @@ const Subscription = () => {
     }
   }
   const cancelSubscription = async () => {
-    console.log(process.env.NEXT_PUBLIC_STRIPE_TEST_SECRET_KEY);
+    setLoadingSubscription(true);
     try {
       const subscriptionresult = await stripe.subscriptions.update(
         subscription.subscriptionID,
@@ -106,6 +67,68 @@ const Subscription = () => {
         }
       );
       console.log(subscriptionresult);
+      const cancelAt = new Date(subscriptionresult.cancel_at * 1000);
+      console.log("This cancels at:", cancelAt);
+
+      // Extract the customer's account balance
+      const customer = await stripe.customers.retrieve(userData.stripeId);
+      const accountBalance = customer.balance / 100; // Convert amount from cents to dollars
+
+      console.log("Account credit:", accountBalance);
+
+      if (accountBalance > 0) {
+        const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+          subscription: subscription.subscriptionID,
+        });
+        const nextInvoiceDate = new Date(upcomingInvoice.period_end * 1000);
+        const invoicePeriodStart = new Date(
+          upcomingInvoice.period_start * 1000
+        );
+        console.log("This invoice start:", invoicePeriodStart);
+        console.log("Next invoice date:", nextInvoiceDate);
+
+        const nextInvoiceAmount = upcomingInvoice.amount_due / 100; // Convert amount from cents to dollars
+        console.log("Next invoice amount:", nextInvoiceAmount);
+        try {
+          const userRef = doc(db, "users", uid);
+          const docSnap = await getDoc(userRef);
+          const currentData = docSnap.data();
+          await updateDoc(userRef, {
+            subscriptions: [
+              {
+                ...currentData.subscriptions[0],
+                nextInvoiceDate: nextInvoiceDate,
+                nextInvoiceAmount: nextInvoiceAmount,
+                accountBalance: accountBalance,
+                cancelAt: cancelAt,
+              },
+              ...currentData.subscriptions.slice(1),
+            ],
+          });
+        } catch (e) {
+          console.error("Error updating document: ", e);
+        }
+      } else {
+        try {
+          const userRef = doc(db, "users", uid);
+          const docSnap = await getDoc(userRef);
+          const currentData = docSnap.data();
+          await updateDoc(userRef, {
+            subscriptions: [
+              {
+                ...currentData.subscriptions[0],
+                accountBalance: accountBalance,
+                cancelAt: cancelAt,
+                nextInvoiceAmount: 0,
+              },
+              ...currentData.subscriptions.slice(1),
+            ],
+          });
+        } catch (e) {
+          console.error("Error updating document: ", e);
+        }
+      }
+
       onCloseCancelSubscriptionModal();
     } catch (err) {
       console.log(err);
@@ -127,9 +150,11 @@ const Subscription = () => {
     } catch (e) {
       console.error("Error updating document: ", e);
     }
+    setLoadingSubscription(false);
   };
 
   const stopCancelSubscription = async () => {
+    setLoadingSubscription(true);
     try {
       const subscriptionresult = await stripe.subscriptions.update(
         subscription.subscriptionID,
@@ -159,6 +184,7 @@ const Subscription = () => {
     } catch (e) {
       console.error("Error updating document: ", e);
     }
+    setLoadingSubscription(false);
   };
 
   const changeSubscription = async ({ newPriceId }) => {
@@ -201,6 +227,28 @@ const Subscription = () => {
       );
       console.log(subscriptionresult);
 
+      const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+        subscription: subscription.subscriptionID,
+      });
+      const nextInvoiceDate = new Date(upcomingInvoice.period_end * 1000);
+      const invoicePeriodStart = new Date(upcomingInvoice.period_start * 1000);
+      console.log("This invoice start:", invoicePeriodStart);
+      console.log("Next invoice date:", nextInvoiceDate);
+
+      const nextInvoiceAmount = upcomingInvoice.amount_due / 100; // Convert amount from cents to dollars
+      console.log("Next invoice amount:", nextInvoiceAmount);
+
+      // Extract the customer's account balance
+      const customer = await stripe.customers.retrieve(userData.stripeId);
+      const accountBalance = customer.balance / 100; // Convert amount from cents to dollars
+
+      console.log("Account credit:", accountBalance);
+
+      let periodInnit =
+        subscriptionresult.plan.interval === "year" ? "Yearly" : "Monthly";
+      console.log("Interval: " + getSubscriptionInfo.plan.interval);
+      console.log("Period: " + periodInnit);
+
       try {
         const userRef = doc(db, "users", uid);
         const docSnap = await getDoc(userRef);
@@ -214,8 +262,15 @@ const Subscription = () => {
               usage: {
                 ...currentData.subscriptions[0].usage,
                 totalSeconds: newTotalMinutes * 60,
-                remainingSeconds: newTotalMinutes * 60 - currentData.subscriptions[0].usage.usedSeconds,
+                remainingSeconds:
+                  newTotalMinutes * 60 -
+                  currentData.subscriptions[0].usage.usedSeconds,
               },
+              invoicePeriodStart: invoicePeriodStart,
+              nextInvoiceDate: nextInvoiceDate,
+              nextInvoiceAmount: nextInvoiceAmount,
+              accountBalance: accountBalance,
+              period: periodInnit,
             },
             ...currentData.subscriptions.slice(1),
           ],
@@ -292,14 +347,34 @@ const Subscription = () => {
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next invoice in</p>
-              {subscription?.endDate && (
-                <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
+              {subscription?.nextInvoiceDate && (
+                <p>
+                  {calculateDaysLeft(subscription?.nextInvoiceDate.toDate())}
+                </p>
               )}
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next invoice</p>
-              <p>$35</p>
+              {subscription?.nextInvoiceAmount !== undefined && (
+                <p>${subscription.nextInvoiceAmount.toFixed(2)}</p>
+              )}
+              {subscription?.accountBalance !== undefined && (
+                <p className="text-xs ml-6 text-foreground-500">
+                  Account balance:{" "}
+                  <span
+                    className={`inline-block ${
+                      subscription.accountBalance < 0
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {subscription.accountBalance < 0
+                      ? `($${Math.abs(subscription.accountBalance).toFixed(2)})`
+                      : `$${subscription.accountBalance.toFixed(2)}`}
+                  </span>
+                </p>
+              )}
             </div>
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
@@ -309,7 +384,7 @@ const Subscription = () => {
                   (Surpass 100 minutes for $0.8 per extra minute)
                 </p>
               </div>
-              <Switch aria-label="Usage based billing" size="sm" />
+              <Switch isDisabled aria-label="Usage based billing" size="sm" />
             </div>
           </Card>
           <h1 className="w-[90%] mt-16 text-2xl font-semibold ml-5 text-foreground">
@@ -432,35 +507,47 @@ const Subscription = () => {
                     </Button>
                   </form>
                 )}
-                {subscription.planID === "Basic Plan" && (
-                  <Button
-                    color="default"
-                    fullWidth
-                    onPress={
-                      subscription.status === "Active"
-                        ? onOpenCancelSubscriptionModal
-                        : onOpenStopCancelSubscriptionModal
-                    }
-                  >
-                    {subscription.status === "Active"
-                      ? "Cancel Subscription"
-                      : "Stop Cancellation"}
-                  </Button>
-                )}
+                {subscription.planID === "Basic Plan" &&
+                  ((subscription.period === "Monthly" && selected === false) ||
+                    (subscription.period === "Yearly" &&
+                      selected === true)) && (
+                    <Button
+                      color="default"
+                      fullWidth
+                      onPress={
+                        subscription.status === "Active"
+                          ? onOpenCancelSubscriptionModal
+                          : onOpenStopCancelSubscriptionModal
+                      }
+                    >
+                      {subscription.status === "Active"
+                        ? "Cancel Subscription"
+                        : "Stop Cancellation"}
+                    </Button>
+                  )}
                 {(subscription.planID === "Creator Plan" ||
-                  subscription.planID === "Business Plan") && (
+                  subscription.planID === "Business Plan" ||
+                  (subscription.planID === "Basic Plan" &&
+                    ((subscription.period === "Monthly" && selected === true) ||
+                      (subscription.period === "Yearly" &&
+                        selected === false)))) && (
                   <Button
                     color="default"
                     fullWidth
-                    onPress={() =>
-                      changeSubscription({
-                        newPriceId: selected
+                    onPress={() => {
+                      setSelectedPriceID(
+                        selected
                           ? "price_1OvnitLgT8zvXr8nlvm3sPMN"
-                          : "price_1OvniMLgT8zvXr8n5J04Pogc",
-                      })
-                    }
+                          : "price_1OvniMLgT8zvXr8n5J04Pogc"
+                      );
+                      onOpenChangeSubscriptionModal();
+                    }}
                   >
-                    Downgrade
+                    {subscription.planID === "Basic Plan" &&
+                    ((subscription.period === "Monthly" && selected === true) ||
+                      (subscription.period === "Yearly" && selected === false))
+                      ? `Switch to ${selected ? "Yearly" : "Monthly"}`
+                      : "Downgrade"}
                   </Button>
                 )}
               </Card>
@@ -590,39 +677,66 @@ const Subscription = () => {
                     </Button>
                   </form>
                 )}
-                {subscription.planID === "Creator Plan" && (
+                {subscription.planID === "Creator Plan" &&
+                  ((subscription.period === "Monthly" && selected === false) ||
+                    (subscription.period === "Yearly" &&
+                      selected === true)) && (
+                    <Button
+                      color="primary"
+                      fullWidth
+                      onPress={
+                        subscription.status === "Active"
+                          ? onOpenCancelSubscriptionModal
+                          : onOpenStopCancelSubscriptionModal
+                      }
+                    >
+                      {subscription.status === "Active"
+                        ? "Cancel Subscription"
+                        : "Stop Cancellation"}
+                    </Button>
+                  )}
+                {(subscription.planID === "Basic Plan" ||
+                  subscription.planID === "Business Plan" ||
+                  (subscription.planID === "Creator Plan" &&
+                    ((subscription.period === "Monthly" && selected === true) ||
+                      (subscription.period === "Yearly" &&
+                        selected === false)))) && (
                   <Button
                     color="primary"
-                    fullWidth
-                    onPress={
-                      subscription.status === "Active"
-                        ? onOpenCancelSubscriptionModal
-                        : onOpenStopCancelSubscriptionModal
-                    }
-                  >
-                    {subscription.status === "Active"
-                      ? "Cancel Subscription"
-                      : "Stop Cancellation"}
-                  </Button>
-                )}
-                {subscription.planID === "Basic Plan" && (
-                  <Button
-                    color="primary"
-                    onPress={() =>
-                      changeSubscription({
-                        newPriceId: selected
+                    onPress={() => {
+                      setSelectedPriceID(
+                        selected
                           ? "price_1OwozkLgT8zvXr8nTFy6aNXM"
-                          : "price_1OwozILgT8zvXr8n3iaevJTK",
-                      })
-                    }
+                          : "price_1OwozILgT8zvXr8n3iaevJTK"
+                      );
+                      onOpenChangeSubscriptionModal();
+                    }}
                     fullWidth
                   >
-                    {creatorButtonLabel}
+                    {subscription.planID === "Creator Plan" &&
+                    ((subscription.period === "Monthly" && selected === true) ||
+                      (subscription.period === "Yearly" && selected === false))
+                      ? `Switch to ${selected ? "Yearly" : "Monthly"}`
+                      : `${
+                          subscription.planID === "Basic Plan"
+                            ? "Upgrade"
+                            : "Downgrade"
+                        }`}
                   </Button>
                 )}
               </Card>
               <Card className="p-4 px-6">
-                <h1 className="font-semibold text-xl mb-2">Business</h1>
+                <div className="flex flex-row justify-between items-center mb-2">
+                  <h1 className="font-semibold text-xl">Business</h1>
+                  {subscription.planID === "Business Plan" &&
+                  subscription.status === "Cancelled" ? (
+                    <div className="rounded-md py-0 px-2 border text-sm text-red-500 border-red-500">
+                      Will be cancelled
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
+                </div>
                 <p className="text-foreground-500 text-sm mb-6">
                   For small to medium sized buisness that have a smaller target
                   audience
@@ -663,7 +777,82 @@ const Subscription = () => {
                     </p>
                   </li>
                 </ul>
-                <Button color="default">{businessButtonLabel}</Button>
+                {subscription.planID === "Free Trial" && (
+                  <form
+                    id="checkoutForm"
+                    action="/api/checkout-session"
+                    method="POST"
+                  >
+                    <input
+                      type="hidden"
+                      id="priceID"
+                      name="priceID"
+                      value={
+                        selected
+                          ? "price_1OyclCLgT8zvXr8nnPbItN3V"
+                          : "price_1OycklLgT8zvXr8n2utTNsqB"
+                      }
+                    />
+                    <input
+                      type="hidden"
+                      id="customerEmail"
+                      name="customerEmail"
+                      value={userData.email}
+                    />
+                    <input
+                      type="hidden"
+                      id="customerStripeId"
+                      name="customerStripeId"
+                      value={userData.stripeId}
+                    />
+                    <Button type="submit" color="default" fullWidth>
+                      Select Plan
+                    </Button>
+                  </form>
+                )}
+                {subscription.planID === "Business Plan" &&
+                  ((subscription.period === "Monthly" && selected === false) ||
+                    (subscription.period === "Yearly" &&
+                      selected === true)) && (
+                    <Button
+                      color="default"
+                      fullWidth
+                      onPress={
+                        subscription.status === "Active"
+                          ? onOpenCancelSubscriptionModal
+                          : onOpenStopCancelSubscriptionModal
+                      }
+                    >
+                      {subscription.status === "Active"
+                        ? "Cancel Subscription"
+                        : "Stop Cancellation"}
+                    </Button>
+                  )}
+                {(subscription.planID === "Basic Plan" ||
+                  subscription.planID === "Creator Plan" ||
+                  (subscription.planID === "Business Plan" &&
+                    ((subscription.period === "Monthly" && selected === true) ||
+                      (subscription.period === "Yearly" &&
+                        selected === false)))) && (
+                  <Button
+                    color="default"
+                    onPress={() => {
+                      setSelectedPriceID(
+                        selected
+                          ? "price_1OyclCLgT8zvXr8nnPbItN3V"
+                          : "price_1OycklLgT8zvXr8n2utTNsqB"
+                      );
+                      onOpenChangeSubscriptionModal();
+                    }}
+                    fullWidth
+                  >
+                    {subscription.planID === "Business Plan" &&
+                    ((subscription.period === "Monthly" && selected === true) ||
+                      (subscription.period === "Yearly" && selected === false))
+                      ? `Switch to ${selected ? "Yearly" : "Monthly"}`
+                      : "Upgrade"}
+                  </Button>
+                )}
               </Card>
             </div>
           </div>
@@ -726,7 +915,9 @@ const Subscription = () => {
         isOpen={isOpenCancelSubscriptionModal}
         onOpenChange={onOpenChangeCancelSubscriptionModal}
         className={`${isDarkMode ? "dark" : "light"}`}
-        size="lg"
+        size="2xl"
+        isDismissable={!loadingSubscription}
+        hideCloseButton={loadingSubscription}
       >
         <ModalContent className="">
           {(onCloseCancelSubscriptionModal) => (
@@ -737,10 +928,14 @@ const Subscription = () => {
                 billing interval?
               </p>
               <div className="bg-foreground-100 rounded-lg p-4 flex items-center">
-                <FaCircleInfo size={20} className="mr-6 text-foreground-400" />
-                <p className="text-foreground-500 text-sm pr-6">
-                  Unused minutes are not preserved and access to cloned voices
-                  will be lost.
+                <FaCircleInfo size={20} className="mr-6 text-foreground-400 shrink-0" />
+                <p className="text-foreground-500 text-xs pr-8">
+                  Please note, if you choose to cancel your subscription, it
+                  will remain active until the end of the current billing
+                  period. You will continue to have access until then, after
+                  which your subscription will be terminated. No refunds will be
+                  issued for unused time or minutes. For assistance, contact
+                  support.
                 </p>
               </div>
               <div className="flex flex-row justify-end mt-6">
@@ -748,10 +943,15 @@ const Subscription = () => {
                   color="default"
                   onPress={onCloseCancelSubscriptionModal}
                   className="mr-4"
+                  isDisabled={loadingSubscription}
                 >
                   Close
                 </Button>
-                <Button color="primary" onPress={cancelSubscription}>
+                <Button
+                  color="primary"
+                  onPress={cancelSubscription}
+                  isLoading={loadingSubscription}
+                >
                   Confirm
                 </Button>
               </div>
@@ -763,21 +963,26 @@ const Subscription = () => {
         isOpen={isOpenStopCancelSubscriptionModal}
         onOpenChange={onOpenChangeStopCancelSubscriptionModal}
         className={`${isDarkMode ? "dark" : "light"}`}
-        size="lg"
+        size="2xl"
+        isDismissable={!loadingSubscription}
+        hideCloseButton={loadingSubscription}
       >
         <ModalContent className="">
           {(onCloseStopCancelSubscriptionModal) => (
             <div className="flex flex-col p-6 text-foreground">
-              <h2 className="text-lg mb-4">Stop Cancel Subscription</h2>
+              <h2 className="text-lg mb-4">Resume Subscription</h2>
               <p className="text-foreground-500 text-sm mb-6">
-                Do you really want to cancel your subscription at the next
+                Do you really want to continue your subscription at the next
                 billing interval?
               </p>
               <div className="bg-foreground-100 rounded-lg p-4 flex items-center">
-                <FaCircleInfo size={20} className="mr-6 text-foreground-400" />
-                <p className="text-foreground-500 text-sm pr-6">
-                  Unused minutes are not preserved and access to cloned voices
-                  will be lost.
+                <FaCircleInfo size={20} className="mr-6 text-foreground-400 shrink-0" />
+                <p className="text-foreground-500 text-xs pr-6">
+                  Before resuming your subscription, be aware that charges will
+                  apply based on your chosen plan and billing interval. If you
+                  previously canceled, your subscription will resume at the
+                  start of the next billing interval. Reach out to support for
+                  assistance.
                 </p>
               </div>
               <div className="flex flex-row justify-end mt-6">
@@ -785,10 +990,140 @@ const Subscription = () => {
                   color="default"
                   onPress={onCloseStopCancelSubscriptionModal}
                   className="mr-4"
+                  isDisabled={loadingSubscription}
                 >
                   Close
                 </Button>
-                <Button color="primary" onPress={stopCancelSubscription}>
+                <Button
+                  color="primary"
+                  onPress={stopCancelSubscription}
+                  isLoading={loadingSubscription}
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isOpenChangeSubscriptionModal}
+        onOpenChange={onOpenChangeChangeSubscriptionModal}
+        className={`${isDarkMode ? "dark" : "light"}`}
+        size="2xl"
+        isDismissable={!loadingSubscription}
+        hideCloseButton={loadingSubscription}
+      >
+        <ModalContent className="">
+          {(onCloseChangeSubscriptionModal) => (
+            <div className="flex flex-col p-6 text-foreground">
+              <h2 className="text-lg mb-2">Update Subscription</h2>
+              <p className="text-foreground-500 text-sm mb-2">
+                You are changing your subscription plan to:
+              </p>
+              {selectedPriceID === "price_1OvniMLgT8zvXr8n5J04Pogc" ? (
+                <div>
+                  <p className="text-foreground font-medium">
+                    Basic Plan - Monthly
+                  </p>
+                  <div className="flex flex-row items-center mb-3 text-sm">
+                    <p className="text-foreground">$30 / month</p>
+                    <p className="ml-4 italic">(billed monthly at $30)</p>
+                  </div>
+                </div>
+              ) : selectedPriceID === "price_1OvnitLgT8zvXr8nlvm3sPMN" ? (
+                <div>
+                  <p className="text-foreground font-medium">
+                    Basic Plan - Yearly
+                  </p>
+                  <div className="flex flex-row items-center mb-3 text-sm">
+                    <p className="text-foreground">$25 / month</p>
+                    <p className="ml-4 italic">(billed annually at $300)</p>
+                  </div>
+                </div>
+              ) : selectedPriceID === "price_1OwozkLgT8zvXr8nTFy6aNXM" ? (
+                <div>
+                  <p className="text-foreground font-medium">
+                    Creator Plan - Yearly
+                  </p>
+                  <div className="flex flex-row items-center mb-3 text-sm">
+                    <p className="text-foreground">$60 / month</p>
+                    <p className="ml-4 italic">(billed annually at $720)</p>
+                  </div>
+                </div>
+              ) : selectedPriceID === "price_1OwozILgT8zvXr8n3iaevJTK" ? (
+                <div>
+                  <p className="text-foreground font-medium">
+                    Creator Plan - Monthly
+                  </p>
+                  <div className="flex flex-row items-center mb-3 text-sm">
+                    <p className="text-foreground">$75 / month</p>
+                    <p className="ml-4 italic">(billed monthly at $75)</p>
+                  </div>
+                </div>
+              ) : selectedPriceID === "price_1OyclCLgT8zvXr8nnPbItN3V" ? (
+                <div>
+                  <p className="text-foreground font-medium">
+                    Business Plan - Yearly
+                  </p>
+                  <div className="flex flex-row items-center mb-3 text-sm">
+                    <p className="text-foreground">$250 / month</p>
+                    <p className="ml-4 italic">(billed annually at $3000)</p>
+                  </div>
+                </div>
+              ) : selectedPriceID === "price_1OycklLgT8zvXr8n2utTNsqB" ? (
+                <div>
+                  <p className="text-foreground font-medium">
+                    Business Plan - Monthly
+                  </p>
+                  <div className="flex flex-row items-center mb-3 text-sm">
+                    <p className="text-foreground">$300 / month</p>
+                    <p className="ml-4 italic">(billed monthly at $300)</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-foreground-500 text-sm">Unknown Plan</p>
+              )}
+              <div className="bg-foreground-100 rounded-lg p-4 flex items-center">
+                <FaCircleInfo
+                  size={20}
+                  className="mr-6 text-foreground-400 shrink-0"
+                />
+                <p className="text-foreground-500 text-xs pr-6">
+                  Please note that changing your subscription plan or billing
+                  period may result in proration adjustments. This means that
+                  you will only be charged for the portion of the plan you use,
+                  and any changes will be reflected in your next invoice. You
+                  will only be charged if there are additional costs incurred
+                  due to changes in your subscription. If you have any questions
+                  or concerns about how this may affect your billing, please
+                  don&apos;t hesitate to contact our support team for
+                  assistance. <br />
+                  <br />
+                  Do you wish to proceed with the changes to your subscription?
+                </p>
+              </div>
+              <div className="flex flex-row justify-end mt-6">
+                <Button
+                  color="default"
+                  onPress={onCloseChangeSubscriptionModal}
+                  className="mr-4"
+                  isDisabled={loadingSubscription}
+                >
+                  Close
+                </Button>
+                <Button
+                  color="primary"
+                  isLoading={loadingSubscription}
+                  onPress={async () => {
+                    setLoadingSubscription(true);
+                    await changeSubscription({
+                      newPriceId: selectedPriceID,
+                    });
+                    setLoadingSubscription(false);
+                    onCloseChangeSubscriptionModal();
+                  }}
+                >
                   Confirm
                 </Button>
               </div>
