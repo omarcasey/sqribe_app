@@ -18,7 +18,7 @@ const withAuth = (WrappedComponent) => {
     const userLoading = useSelector((state) => state.user.userLoading);
     const authLoading = useSelector((state) => state.user.authLoading);
     const projectsLoading = useSelector((state) => state.user.projectsLoading);
-    const subscription = user?.subscriptions[0];
+    const subscription = user?.subscription;
 
     useEffect(() => {
       const checkAuth = async () => {

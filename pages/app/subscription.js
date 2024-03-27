@@ -24,7 +24,7 @@ const Subscription = () => {
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const uid = useSelector((state) => state.user.auth.uid);
   const userData = useSelector((state) => state.user.data);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
   const [selected, setSelected] = useState(subscription.period === "Yearly");
   const [selectedPriceID, setSelectedPriceID] = useState(null);
   const [loadingSubscription, setLoadingSubscription] = useState(false);
@@ -57,6 +57,7 @@ const Subscription = () => {
       return differenceInDays + " days";
     }
   }
+
   const cancelSubscription = async () => {
     setLoadingSubscription(true);
     try {
@@ -76,7 +77,7 @@ const Subscription = () => {
 
       console.log("Account credit:", accountBalance);
 
-      if (accountBalance > 0) {
+      if (accountBalance >= 0) {
         const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
           subscription: subscription.subscriptionID,
         });
@@ -94,16 +95,12 @@ const Subscription = () => {
           const docSnap = await getDoc(userRef);
           const currentData = docSnap.data();
           await updateDoc(userRef, {
-            subscriptions: [
-              {
-                ...currentData.subscriptions[0],
-                nextInvoiceDate: nextInvoiceDate,
-                nextInvoiceAmount: nextInvoiceAmount,
-                accountBalance: accountBalance,
-                cancelAt: cancelAt,
-              },
-              ...currentData.subscriptions.slice(1),
-            ],
+            subscription: {
+              ...currentData.subscription,
+              nextInvoiceDate: nextInvoiceDate,
+              nextInvoiceAmount: nextInvoiceAmount,
+              accountBalance: accountBalance,
+            },
           });
         } catch (e) {
           console.error("Error updating document: ", e);
@@ -114,15 +111,12 @@ const Subscription = () => {
           const docSnap = await getDoc(userRef);
           const currentData = docSnap.data();
           await updateDoc(userRef, {
-            subscriptions: [
-              {
-                ...currentData.subscriptions[0],
-                accountBalance: accountBalance,
-                cancelAt: cancelAt,
-                nextInvoiceAmount: 0,
-              },
-              ...currentData.subscriptions.slice(1),
-            ],
+            subscription: {
+              ...currentData.subscription,
+              accountBalance: accountBalance,
+              cancelAt: cancelAt,
+              nextInvoiceAmount: 0,
+            },
           });
         } catch (e) {
           console.error("Error updating document: ", e);
@@ -139,13 +133,10 @@ const Subscription = () => {
       const docSnap = await getDoc(userRef);
       const currentData = docSnap.data();
       await updateDoc(userRef, {
-        subscriptions: [
-          {
-            ...currentData.subscriptions[0],
-            status: "Cancelled",
-          },
-          ...currentData.subscriptions.slice(1),
-        ],
+        subscription: {
+          ...currentData.subscription,
+          status: "Cancelled",
+        },
       });
     } catch (e) {
       console.error("Error updating document: ", e);
@@ -162,6 +153,37 @@ const Subscription = () => {
           cancel_at_period_end: false,
         }
       );
+
+      const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+        subscription: subscription.subscriptionID,
+      });
+      const nextInvoiceDate = new Date(upcomingInvoice.period_end * 1000);
+      const invoicePeriodStart = new Date(upcomingInvoice.period_start * 1000);
+      console.log("This invoice start:", invoicePeriodStart);
+      console.log("Next invoice date:", nextInvoiceDate);
+
+      const nextInvoiceAmount = upcomingInvoice.amount_due / 100; // Convert amount from cents to dollars
+      console.log("Next invoice amount:", nextInvoiceAmount);
+
+      // Extract the customer's account balance
+      const customer = await stripe.customers.retrieve(userData.stripeId);
+      const accountBalance = customer.balance / 100; // Convert amount from cents to dollars
+
+      try {
+        const userRef = doc(db, "users", uid);
+        const docSnap = await getDoc(userRef);
+        const currentData = docSnap.data();
+        await updateDoc(userRef, {
+          subscription: {
+            ...currentData.subscription,
+            nextInvoiceDate: nextInvoiceDate,
+            nextInvoiceAmount: nextInvoiceAmount,
+            accountBalance: accountBalance,
+          },
+        });
+      } catch (e) {
+        console.error("Error updating document: ", e);
+      }
       console.log(subscriptionresult);
       onCloseStopCancelSubscriptionModal();
     } catch (err) {
@@ -173,13 +195,10 @@ const Subscription = () => {
       const docSnap = await getDoc(userRef);
       const currentData = docSnap.data();
       await updateDoc(userRef, {
-        subscriptions: [
-          {
-            ...currentData.subscriptions[0],
-            status: "Active",
-          },
-          ...currentData.subscriptions.slice(1),
-        ],
+        subscription: {
+          ...currentData.subscription,
+          status: "Active",
+        },
       });
     } catch (e) {
       console.error("Error updating document: ", e);
@@ -253,27 +272,35 @@ const Subscription = () => {
         const userRef = doc(db, "users", uid);
         const docSnap = await getDoc(userRef);
         const currentData = docSnap.data();
+
+        let newResetDate = subscription.resetDate; // Default to existing resetDate
+
+        // Update resetDate only if the period is different
+        if (periodInnit !== subscription.period) {
+          const nextMonth = new Date(invoicePeriodStart);
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
+          newResetDate = nextMonth;
+        }
+
         await updateDoc(userRef, {
-          subscriptions: [
-            {
-              ...currentData.subscriptions[0],
-              planID: planName, // Use planName variable here
-              status: "Active",
-              usage: {
-                ...currentData.subscriptions[0].usage,
-                totalSeconds: newTotalMinutes * 60,
-                remainingSeconds:
-                  newTotalMinutes * 60 -
-                  currentData.subscriptions[0].usage.usedSeconds,
-              },
-              invoicePeriodStart: invoicePeriodStart,
-              nextInvoiceDate: nextInvoiceDate,
-              nextInvoiceAmount: nextInvoiceAmount,
-              accountBalance: accountBalance,
-              period: periodInnit,
+          subscription: {
+            ...currentData.subscription,
+            planID: planName, // Use planName variable here
+            status: "Active",
+            usage: {
+              ...currentData.subscription.usage,
+              totalSeconds: newTotalMinutes * 60,
+              remainingSeconds:
+                newTotalMinutes * 60 -
+                currentData.subscription.usage.usedSeconds,
             },
-            ...currentData.subscriptions.slice(1),
-          ],
+            invoicePeriodStart: invoicePeriodStart,
+            nextInvoiceDate: nextInvoiceDate,
+            nextInvoiceAmount: nextInvoiceAmount,
+            accountBalance: accountBalance,
+            period: periodInnit,
+            resetDate: newResetDate,
+          },
         });
       } catch (e) {
         console.error("Error updating document: ", e);
@@ -331,8 +358,8 @@ const Subscription = () => {
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Next minute reset in</p>
-              {subscription?.endDate && (
-                <p>{calculateDaysLeft(subscription?.endDate.toDate())}</p>
+              {subscription?.resetDate && (
+                <p>{calculateDaysLeft(subscription?.resetDate.toDate())}</p>
               )}
             </div>
             <Divider className="" />
@@ -928,7 +955,10 @@ const Subscription = () => {
                 billing interval?
               </p>
               <div className="bg-foreground-100 rounded-lg p-4 flex items-center">
-                <FaCircleInfo size={20} className="mr-6 text-foreground-400 shrink-0" />
+                <FaCircleInfo
+                  size={20}
+                  className="mr-6 text-foreground-400 shrink-0"
+                />
                 <p className="text-foreground-500 text-xs pr-8">
                   Please note, if you choose to cancel your subscription, it
                   will remain active until the end of the current billing
@@ -976,7 +1006,10 @@ const Subscription = () => {
                 billing interval?
               </p>
               <div className="bg-foreground-100 rounded-lg p-4 flex items-center">
-                <FaCircleInfo size={20} className="mr-6 text-foreground-400 shrink-0" />
+                <FaCircleInfo
+                  size={20}
+                  className="mr-6 text-foreground-400 shrink-0"
+                />
                 <p className="text-foreground-500 text-xs pr-6">
                   Before resuming your subscription, be aware that charges will
                   apply based on your chosen plan and billing interval. If you

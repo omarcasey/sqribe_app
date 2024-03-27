@@ -5,7 +5,7 @@ import React from "react";
 
 const Sqribeclips = () => {
   const userData = useSelector((state) => state.user.data);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
 
   return (
     <AppShell>

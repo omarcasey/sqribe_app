@@ -108,21 +108,18 @@ const Survey = ({ onClose }) => {
       const docSnap = await getDoc(userRef);
       const currentData = docSnap.data();
       const updatedTotalSeconds =
-        currentData.subscriptions[0].usage.totalSeconds + 600;
+        currentData.subscription.usage.totalSeconds + 600;
       const updatedRemainingSeconds =
-        currentData.subscriptions[0].usage.remainingSeconds + 600;
+        currentData.subscription.usage.remainingSeconds + 600;
       updateDoc(userRef, {
-        subscriptions: [
-          {
-            ...currentData.subscriptions[0],
-            usage: {
-              ...currentData.subscriptions[0].usage,
-              totalSeconds: updatedTotalSeconds,
-              remainingSeconds: updatedRemainingSeconds,
-            },
+        subscription: {
+          ...currentData.subscription,
+          usage: {
+            ...currentData.subscription.usage,
+            totalSeconds: updatedTotalSeconds,
+            remainingSeconds: updatedRemainingSeconds,
           },
-          ...currentData.subscriptions.slice(1),
-        ],
+        },
         surveyCompleted: true,
       });
       addDoc(collection(db, "surveys"), {

@@ -12,8 +12,10 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
-const Stripe = require('stripe')
-const stripe = Stripe("sk_test_51OjOT0LgT8zvXr8nEojzCeUNTPJgP89CQv0v95gOLoJwUDOpYP1JolBc40aGl7h9y4VT3pKOtclFd55PJK9M8eJ200AdnmMHrM");
+const Stripe = require("stripe");
+const stripe = Stripe(
+  "sk_test_51OjOT0LgT8zvXr8nEojzCeUNTPJgP89CQv0v95gOLoJwUDOpYP1JolBc40aGl7h9y4VT3pKOtclFd55PJK9M8eJ200AdnmMHrM"
+);
 
 const SignIn = () => {
   const router = useRouter();
@@ -96,18 +98,16 @@ const SignIn = () => {
         await setDoc(doc(db, "users", user.uid), {
           email: user.email,
           darkMode: false,
-          subscriptions: [
-            {
-              planID: "Free Trial",
-              startDate: Timestamp.now(),
-              status: "Active",
-              usage: {
-                usedSeconds: 0,
-                remainingSeconds: 300,
-                totalSeconds: 300,
-              },
+          subscription: {
+            planID: "Free Trial",
+            startDate: Timestamp.now(),
+            status: "Active",
+            usage: {
+              usedSeconds: 0,
+              remainingSeconds: 300,
+              totalSeconds: 300,
             },
-          ],
+          },
           createdAt: Timestamp.now(),
           surveyCompleted: false,
           stripeId: customer.id,

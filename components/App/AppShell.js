@@ -54,7 +54,7 @@ const AppShell = ({ children }) => {
   const dispatch = useDispatch();
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const userData = useSelector((state) => state.user.data);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
   const uid = useSelector((state) => state.user.auth.uid);
   const audioPlayerVisible = useSelector(
     (state) => state.user.audio.audioPlayerVisible

@@ -26,7 +26,7 @@ export default function DropdownMenuIdk({ router, sidebar }) {
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const user = useSelector((state) => state.user.auth);
   const userData = useSelector((state) => state.user.data);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
   const dispatch = useDispatch();
 
   const toggleTheme = async () => {

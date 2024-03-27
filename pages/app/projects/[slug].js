@@ -59,7 +59,7 @@ const Page = () => {
   const [project, setProject] = useState(null);
   const isDarkMode = useSelector((state) => state.user.darkMode);
   const userData = useSelector((state) => state.user.data);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
   const userProjects = useSelector((state) => state.user.projects);
   const loading = useSelector((state) => state.user.projectsLoading);
   const { isOpen, onOpen, onClose } = useDisclosure();

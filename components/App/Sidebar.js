@@ -25,7 +25,7 @@ const Sidebar = () => {
   const user = useSelector((state) => state.user.auth);
   const userData = useSelector((state) => state.user.data);
   const isDarkMode = useSelector((state) => state.user.darkMode);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
 
   return (
     <div className="w-[17.5rem] dark:bg-neutral-900 bg-white py-4 px-4 border-r border-foreground-200 lg:flex flex-col hidden">

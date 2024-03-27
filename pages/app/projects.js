@@ -71,7 +71,7 @@ const Projects = ({ openModal }) => {
   const uid = useSelector((state) => state.user.auth.uid);
   const router = useRouter();
   const userData = useSelector((state) => state.user.data);
-  const subscription = userData?.subscriptions[0];
+  const subscription = userData?.subscription;
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const {
@@ -319,23 +319,19 @@ const Projects = ({ openModal }) => {
                 const docSnap = await getDoc(userRef);
                 const currentData = docSnap.data();
                 const updatedUsedSeconds =
-                  currentData.subscriptions[0].usage.usedSeconds +
-                  videoDuration;
+                  currentData.subscription.usage.usedSeconds + videoDuration;
                 const updatedRemainingSeconds =
-                  currentData.subscriptions[0].usage.remainingSeconds -
+                  currentData.subscription.usage.remainingSeconds -
                   videoDuration;
                 await updateDoc(userRef, {
-                  subscriptions: [
-                    {
-                      ...currentData.subscriptions[0],
-                      usage: {
-                        ...currentData.subscriptions[0].usage,
-                        usedSeconds: updatedUsedSeconds,
-                        remainingSeconds: updatedRemainingSeconds,
-                      },
+                  subscription: {
+                    ...currentData.subscription,
+                    usage: {
+                      ...currentData.subscription.usage,
+                      usedSeconds: updatedUsedSeconds,
+                      remainingSeconds: updatedRemainingSeconds,
                     },
-                    ...currentData.subscriptions.slice(1),
-                  ],
+                  },
                 });
               } catch (e) {
                 console.error("Error updating credits: ", e);
@@ -1392,7 +1388,9 @@ const Projects = ({ openModal }) => {
               size="3xl"
             >
               <ModalContent className="">
-                {(onCloseSurveyModal) => <Survey onClose={onCloseSurveyModal} />}
+                {(onCloseSurveyModal) => (
+                  <Survey onClose={onCloseSurveyModal} />
+                )}
               </ModalContent>
             </Modal>
           </>

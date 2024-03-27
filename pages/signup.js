@@ -43,18 +43,16 @@ const SignUp = () => {
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         darkMode: false,
-        subscriptions: [
-          {
-            planID: "Free Trial",
-            startDate: Timestamp.now(),
-            status: "Active",
-            usage: {
-              usedSeconds: 0,
-              remainingSeconds: 300,
-              totalSeconds: 300,
-            },
+        subscription: {
+          planID: "Free Trial",
+          startDate: Timestamp.now(),
+          status: "Active",
+          usage: {
+            usedSeconds: 0,
+            remainingSeconds: 300,
+            totalSeconds: 300,
           },
-        ],
+        },
         createdAt: Timestamp.now(),
         surveyCompleted: false,
         stripeId: customer.id,
@@ -97,18 +95,16 @@ const SignUp = () => {
         await setDoc(doc(db, "users", user.uid), {
           email: user.email,
           darkMode: false,
-          subscriptions: [
-            {
-              planID: "Free Trial",
-              startDate: Timestamp.now(),
-              status: "Active",
-              usage: {
-                usedSeconds: 0,
-                remainingSeconds: 300,
-                totalSeconds: 300,
-              },
+          subscription: {
+            planID: "Free Trial",
+            startDate: Timestamp.now(),
+            status: "Active",
+            usage: {
+              usedSeconds: 0,
+              remainingSeconds: 300,
+              totalSeconds: 300,
             },
-          ],
+          },
           createdAt: Timestamp.now(),
           surveyCompleted: false,
           stripeId: customer.id,
