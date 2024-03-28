@@ -750,8 +750,21 @@ const Projects = ({ openModal }) => {
                   {projects?.map((project, index) => (
                     <TableRow key={project.id}>
                       <TableCell>
-                        <Link href={`/app/projects/${project.id}`} className="">
-                          <div className="flex flex-row hover:bg-foreground-100 rounded-lg p-1 transition-all">
+                        <Link
+                          href={
+                            project.processing
+                              ? ""
+                              : `/app/projects/${project.id}`
+                          }
+                          className=""
+                        >
+                          <div
+                            className={`flex flex-row ${
+                              project.processing
+                                ? " cursor-default"
+                                : "hover:bg-foreground-100"
+                            } rounded-lg p-1 transition-all`}
+                          >
                             <div className="flex items-center justify-center w-20">
                               <Image
                                 src={project.thumbnailURL || "/drakedont.png"}
@@ -849,6 +862,7 @@ const Projects = ({ openModal }) => {
                               }}
                               variant="light"
                               className="min-w-0"
+                              isDisabled={project.processing}
                             >
                               <IoEllipsisHorizontalSharp size={20} />
                             </Button>
@@ -870,6 +884,7 @@ const Projects = ({ openModal }) => {
                             >
                               View file
                             </DropdownItem>
+
                             <DropdownItem
                               key="rename"
                               startContent={
