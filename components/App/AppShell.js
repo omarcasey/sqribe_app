@@ -264,7 +264,7 @@ const AppShell = ({ children }) => {
                 <Slider
                   size="sm"
                   color="foreground"
-                  step={0.01}
+                  step={0.001}
                   maxValue={1}
                   minValue={0}
                   formatOptions={{ style: "percent" }}
