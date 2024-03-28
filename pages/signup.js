@@ -46,7 +46,7 @@ const SignUp = () => {
         subscription: {
           planID: "Free Trial",
           startDate: Timestamp.now(),
-          status: "Active",
+          status: "Trial",
           usage: {
             usedSeconds: 0,
             remainingSeconds: 300,
@@ -98,7 +98,7 @@ const SignUp = () => {
           subscription: {
             planID: "Free Trial",
             startDate: Timestamp.now(),
-            status: "Active",
+            status: "Trial",
             usage: {
               usedSeconds: 0,
               remainingSeconds: 300,

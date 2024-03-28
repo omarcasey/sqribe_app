@@ -68,59 +68,60 @@ const Subscription = () => {
         }
       );
       console.log(subscriptionresult);
+
       const cancelAt = new Date(subscriptionresult.cancel_at * 1000);
       console.log("This cancels at:", cancelAt);
 
       // Extract the customer's account balance
       const customer = await stripe.customers.retrieve(userData.stripeId);
+      console.log("Customer:", customer);
       const accountBalance = customer.balance / 100; // Convert amount from cents to dollars
 
       console.log("Account credit:", accountBalance);
 
-      if (accountBalance >= 0) {
+      // Initialize variables for upcoming invoice details
+      let nextInvoiceDate, invoicePeriodStart, nextInvoiceAmount;
+
+      try {
+        // Retrieve the upcoming invoice
         const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
           subscription: subscription.subscriptionID,
         });
-        const nextInvoiceDate = new Date(upcomingInvoice.period_end * 1000);
-        const invoicePeriodStart = new Date(
-          upcomingInvoice.period_start * 1000
-        );
+
+        // Extract necessary information from the upcoming invoice
+        nextInvoiceDate = new Date(upcomingInvoice.period_end * 1000);
+        invoicePeriodStart = new Date(upcomingInvoice.period_start * 1000);
+        nextInvoiceAmount = upcomingInvoice.amount_due / 100; // Convert amount from cents to dollars
+
         console.log("This invoice start:", invoicePeriodStart);
         console.log("Next invoice date:", nextInvoiceDate);
-
-        const nextInvoiceAmount = upcomingInvoice.amount_due / 100; // Convert amount from cents to dollars
         console.log("Next invoice amount:", nextInvoiceAmount);
-        try {
-          const userRef = doc(db, "users", uid);
-          const docSnap = await getDoc(userRef);
-          const currentData = docSnap.data();
-          await updateDoc(userRef, {
-            subscription: {
-              ...currentData.subscription,
-              nextInvoiceDate: nextInvoiceDate,
-              nextInvoiceAmount: nextInvoiceAmount,
-              accountBalance: accountBalance,
-            },
-          });
-        } catch (e) {
-          console.error("Error updating document: ", e);
-        }
-      } else {
-        try {
-          const userRef = doc(db, "users", uid);
-          const docSnap = await getDoc(userRef);
-          const currentData = docSnap.data();
-          await updateDoc(userRef, {
-            subscription: {
-              ...currentData.subscription,
-              accountBalance: accountBalance,
-              cancelAt: cancelAt,
-              nextInvoiceAmount: 0,
-            },
-          });
-        } catch (e) {
-          console.error("Error updating document: ", e);
-        }
+      } catch (error) {
+        // Handle the case where there are no upcoming invoices
+        console.error("No upcoming invoice found:", error);
+        nextInvoiceDate = null;
+        invoicePeriodStart = null;
+        nextInvoiceAmount = 0;
+      }
+
+      try {
+        // Update the user document with subscription and invoice details
+        const userRef = doc(db, "users", uid);
+        const docSnap = await getDoc(userRef);
+        const currentData = docSnap.data();
+        await updateDoc(userRef, {
+          subscription: {
+            ...currentData.subscription,
+            nextInvoiceDate: nextInvoiceDate,
+            invoicePeriodStart: invoicePeriodStart,
+            nextInvoiceAmount: nextInvoiceAmount,
+            accountBalance: accountBalance,
+            cancelAt: cancelAt,
+            status: "Cancelling",
+          },
+        });
+      } catch (e) {
+        console.error("Error updating document: ", e);
       }
 
       onCloseCancelSubscriptionModal();
@@ -128,19 +129,6 @@ const Subscription = () => {
       console.log(err);
     }
 
-    try {
-      const userRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userRef);
-      const currentData = docSnap.data();
-      await updateDoc(userRef, {
-        subscription: {
-          ...currentData.subscription,
-          status: "Cancelled",
-        },
-      });
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
     setLoadingSubscription(false);
   };
 
@@ -176,9 +164,12 @@ const Subscription = () => {
         await updateDoc(userRef, {
           subscription: {
             ...currentData.subscription,
+            invoicePeriodStart: invoicePeriodStart,
             nextInvoiceDate: nextInvoiceDate,
             nextInvoiceAmount: nextInvoiceAmount,
             accountBalance: accountBalance,
+            cancelAt: null,
+            status: "Active",
           },
         });
       } catch (e) {
@@ -190,19 +181,6 @@ const Subscription = () => {
       console.log(err);
     }
 
-    try {
-      const userRef = doc(db, "users", uid);
-      const docSnap = await getDoc(userRef);
-      const currentData = docSnap.data();
-      await updateDoc(userRef, {
-        subscription: {
-          ...currentData.subscription,
-          status: "Active",
-        },
-      });
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
     setLoadingSubscription(false);
   };
 
@@ -274,12 +252,14 @@ const Subscription = () => {
         const currentData = docSnap.data();
 
         let newResetDate = subscription.resetDate; // Default to existing resetDate
+        let newUsedSeconds = subscription.usage.usedSeconds;
 
         // Update resetDate only if the period is different
         if (periodInnit !== subscription.period) {
           const nextMonth = new Date(invoicePeriodStart);
           nextMonth.setMonth(nextMonth.getMonth() + 1);
           newResetDate = nextMonth;
+          newUsedSeconds = 0; // Reset usedSeconds if period changes
         }
 
         await updateDoc(userRef, {
@@ -293,6 +273,7 @@ const Subscription = () => {
               remainingSeconds:
                 newTotalMinutes * 60 -
                 currentData.subscription.usage.usedSeconds,
+              usedSeconds: newUsedSeconds,
             },
             invoicePeriodStart: invoicePeriodStart,
             nextInvoiceDate: nextInvoiceDate,
@@ -307,6 +288,28 @@ const Subscription = () => {
       }
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const getPriceIDSwitchPeriod = () => {
+    if (subscription.planID === "Basic Plan") {
+      if (subscription.period === "Yearly") {
+        return "price_1OvniMLgT8zvXr8n5J04Pogc";
+      } else {
+        return "price_1OvnitLgT8zvXr8nlvm3sPMN";
+      }
+    } else if (subscription.planID === "Creator Plan") {
+      if (subscription.period === "Yearly") {
+        return "price_1OwozILgT8zvXr8n3iaevJTK";
+      } else {
+        return "price_1OwozkLgT8zvXr8nTFy6aNXM";
+      }
+    } else if (subscription.planID === "Business Plan") {
+      if (subscription.period === "Yearly") {
+        return "price_1OycklLgT8zvXr8n2utTNsqB";
+      } else {
+        return "price_1OyclCLgT8zvXr8nnPbItN3V";
+      }
     }
   };
 
@@ -339,12 +342,35 @@ const Subscription = () => {
                 className={`${
                   subscription.status === "Active"
                     ? "bg-green-300"
+                    : subscription.status === "Trial"
+                    ? "bg-orange-300"
                     : "bg-red-300"
-                } rounded-full py-[2px] px-2 text-black text-xs font-medium`}
+                } rounded-full py-[2px] px-2 text-black text-xs font-medium mr-5`}
               >
                 {subscription?.status}
               </div>
+              {subscription?.status === "Cancelling" && (
+                <p
+                  className="text-green-600 font-medium text-xs border rounded-lg px-2 py-[2px] border-green-600 hover:cursor-pointer"
+                  onClick={() => {
+                    onOpenStopCancelSubscriptionModal();
+                  }}
+                >
+                  Resume Subscription
+                </p>
+              )}
             </div>
+            {subscription?.status === "Cancelling" && (
+              <>
+                <Divider className="" />
+                <div className="flex flex-row items-center px-10 my-4 text-sm">
+                  <p className="w-[27rem]">Cancels in</p>
+                  {subscription?.cancelAt && (
+                    <p>{calculateDaysLeft(subscription?.cancelAt.toDate())}</p>
+                  )}
+                </div>
+              </>
+            )}
             <Divider className="" />
             <div className="flex flex-row items-center px-10 my-4 text-sm">
               <p className="w-[27rem]">Minutes used</p>
@@ -355,64 +381,86 @@ const Subscription = () => {
                 ({(subscription?.usage.totalSeconds / 60).toFixed(0)} included)
               </p>
             </div>
-            <Divider className="" />
-            <div className="flex flex-row items-center px-10 my-4 text-sm">
-              <p className="w-[27rem]">Next minute reset in</p>
-              {subscription?.resetDate && (
-                <p>{calculateDaysLeft(subscription?.resetDate.toDate())}</p>
-              )}
-            </div>
-            <Divider className="" />
-            <div className="flex flex-row items-center px-10 my-4 text-sm">
-              <p className="w-[27rem]">Billing Period</p>
-              <p className="mr-5">{subscription?.period}</p>
-              <p className="text-blue-400 font-medium text-xs border rounded-lg px-2 py-[2px] border-indigo-800 hover:cursor-pointer">
-                Switch to{" "}
-                {subscription?.period === "Monthly" ? "Yearly" : "Monthly"}
-              </p>
-            </div>
-            <Divider className="" />
-            <div className="flex flex-row items-center px-10 my-4 text-sm">
-              <p className="w-[27rem]">Next invoice in</p>
-              {subscription?.nextInvoiceDate && (
-                <p>
-                  {calculateDaysLeft(subscription?.nextInvoiceDate.toDate())}
-                </p>
-              )}
-            </div>
-            <Divider className="" />
-            <div className="flex flex-row items-center px-10 my-4 text-sm">
-              <p className="w-[27rem]">Next invoice</p>
-              {subscription?.nextInvoiceAmount !== undefined && (
-                <p>${subscription.nextInvoiceAmount.toFixed(2)}</p>
-              )}
-              {subscription?.accountBalance !== undefined && (
-                <p className="text-xs ml-6 text-foreground-500">
-                  Account balance:{" "}
-                  <span
-                    className={`inline-block ${
-                      subscription.accountBalance < 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {subscription.accountBalance < 0
-                      ? `($${Math.abs(subscription.accountBalance).toFixed(2)})`
-                      : `$${subscription.accountBalance.toFixed(2)}`}
-                  </span>
-                </p>
-              )}
-            </div>
-            <Divider className="" />
-            <div className="flex flex-row items-center px-10 my-4 text-sm">
-              <div className="flex flex-col">
-                <p className="w-[27rem]">Enable usage based billing</p>
-                <p className="text-xs text-foreground-500">
-                  (Surpass 100 minutes for $0.8 per extra minute)
-                </p>
-              </div>
-              <Switch isDisabled aria-label="Usage based billing" size="sm" />
-            </div>
+            {subscription?.planID !== "Free Trial" && (
+              <>
+                <Divider className="" />
+                <div className="flex flex-row items-center px-10 my-4 text-sm">
+                  <p className="w-[27rem]">Next minute reset in</p>
+                  {subscription?.resetDate && (
+                    <p>{calculateDaysLeft(subscription?.resetDate.toDate())}</p>
+                  )}
+                </div>
+                <Divider className="" />
+                <div className="flex flex-row items-center px-10 my-4 text-sm">
+                  <p className="w-[27rem]">Billing Period</p>
+                  <p className="mr-5">{subscription?.period}</p>
+                  {subscription?.status === "Active" && (
+                    <p
+                      className="text-blue-400 font-medium text-xs border rounded-lg px-2 py-[2px] border-indigo-800 hover:cursor-pointer"
+                      onClick={() => {
+                        setSelectedPriceID(getPriceIDSwitchPeriod());
+                        onOpenChangeSubscriptionModal();
+                      }}
+                    >
+                      Switch to{" "}
+                      {subscription?.period === "Monthly"
+                        ? "Yearly"
+                        : "Monthly"}
+                    </p>
+                  )}
+                </div>
+                <Divider className="" />
+                <div className="flex flex-row items-center px-10 my-4 text-sm">
+                  <p className="w-[27rem]">Next invoice in</p>
+                  {subscription?.nextInvoiceDate && (
+                    <p>
+                      {calculateDaysLeft(
+                        subscription?.nextInvoiceDate.toDate()
+                      )}
+                    </p>
+                  )}
+                </div>
+                <Divider className="" />
+                <div className="flex flex-row items-center px-10 my-4 text-sm">
+                  <p className="w-[27rem]">Next invoice</p>
+                  {subscription?.nextInvoiceAmount !== undefined && (
+                    <p>${subscription.nextInvoiceAmount.toFixed(2)}</p>
+                  )}
+                  {subscription?.accountBalance !== undefined && (
+                    <p className="text-xs ml-6 text-foreground-500">
+                      Account balance:{" "}
+                      <span
+                        className={`inline-block ${
+                          subscription.accountBalance < 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {subscription.accountBalance < 0
+                          ? `($${Math.abs(subscription.accountBalance).toFixed(
+                              2
+                            )})`
+                          : `$${subscription.accountBalance.toFixed(2)}`}
+                      </span>
+                    </p>
+                  )}
+                </div>
+                <Divider className="" />
+                <div className="flex flex-row items-center px-10 my-4 text-sm">
+                  <div className="flex flex-col">
+                    <p className="w-[27rem]">Enable usage based billing</p>
+                    <p className="text-xs text-foreground-500">
+                      (Surpass 100 minutes for $0.8 per extra minute)
+                    </p>
+                  </div>
+                  <Switch
+                    isDisabled
+                    aria-label="Usage based billing"
+                    size="sm"
+                  />
+                </div>
+              </>
+            )}
           </Card>
           <h1 className="w-[90%] mt-16 text-2xl font-semibold ml-5 text-foreground">
             Plans
@@ -453,7 +501,7 @@ const Subscription = () => {
                 <div className="flex flex-row justify-between items-center mb-2">
                   <h1 className="font-semibold text-xl">Basic</h1>
                   {subscription.planID === "Basic Plan" &&
-                  subscription.status === "Cancelled" ? (
+                  subscription.status === "Cancelling" ? (
                     <div className="rounded-md py-0 px-2 border text-sm text-red-500 border-red-500">
                       Will be cancelled
                     </div>
@@ -582,7 +630,7 @@ const Subscription = () => {
                 <div className="flex flex-row justify-between items-center mb-2">
                   <h1 className="font-semibold text-xl">Creator</h1>
                   {subscription.planID === "Creator Plan" &&
-                  subscription.status === "Cancelled" ? (
+                  subscription.status === "Cancelling" ? (
                     <div className="rounded-md py-0 px-2 border text-sm text-red-500 border-red-500">
                       Will be cancelled
                     </div>
@@ -756,7 +804,7 @@ const Subscription = () => {
                 <div className="flex flex-row justify-between items-center mb-2">
                   <h1 className="font-semibold text-xl">Business</h1>
                   {subscription.planID === "Business Plan" &&
-                  subscription.status === "Cancelled" ? (
+                  subscription.status === "Cancelling" ? (
                     <div className="rounded-md py-0 px-2 border text-sm text-red-500 border-red-500">
                       Will be cancelled
                     </div>
