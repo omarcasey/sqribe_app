@@ -11,7 +11,7 @@ const Sqribeclips = () => {
     <AppShell>
       <div className="w-full">
         <div className="flex flex-col items-center pb-24 pt-10">
-            sqribe clips hehe
+            Coming Soon...
         </div>
       </div>
     </AppShell>

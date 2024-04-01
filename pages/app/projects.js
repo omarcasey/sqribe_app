@@ -246,6 +246,16 @@ const Projects = ({ openModal }) => {
           console.log(
             "You dont have enough minutes. Please upgrade your plan."
           );
+          // Delete the document that was just created
+          try {
+            await deleteDoc(doc(db, "projects", docRefId));
+            console.log("Document deleted successfully.");
+          } catch (error) {
+            console.error("Error deleting document:", error);
+          }
+          setisUploading(false);
+          onClose();
+          onOpenUnlockModal();
           return;
         }
 
