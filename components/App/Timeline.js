@@ -4,8 +4,17 @@ import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
 import Draggable from "react-draggable";
 import { AudioVisualizer } from "react-audio-visualize";
 import { Slider } from "@nextui-org/react";
+import { Resizable } from "re-resizable";
+import { Rnd } from "react-rnd";
 
-const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
+const Timeline = ({
+  segments,
+  setEditSegments,
+  setTimelineVisible,
+  setIsSaving,
+  audioURL,
+  duration,
+}) => {
   const hideTimeline = () => {
     setTimelineVisible(false);
   };
@@ -45,17 +54,6 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
     } else {
       setScaleFactor((prevScaleFactor) => prevScaleFactor - 3);
     }
-  };
-
-  const handleDrag = (index, newLeft, newWidth) => {
-    const newSegments = [...segments];
-    newSegments[index] = {
-      ...newSegments[index],
-      start: newLeft * scaleFactor,
-      end: (newLeft + newWidth) * scaleFactor,
-    };
-    // Update state with the new segments
-    // Here you should have a state setter to update segments
   };
 
   const renderTicks = () => {
@@ -122,6 +120,41 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
     return `${hours}:${minutes}:${seconds},${milliseconds}`;
   };
 
+  const handleResize = (index, direction, ref, d, position) => {
+    const newSegments = [...segments];
+    let newStart = newSegments[index].start;
+    let newEnd = newSegments[index].end;
+
+    if (direction === "left") {
+      // Check if resizing left is within bounds
+      if (
+        index > 0 &&
+        newStart - d.width * scaleFactor < newSegments[index - 1].end
+      ) {
+        newStart = newSegments[index - 1].end;
+      } else {
+        newStart -= d.width * scaleFactor;
+      }
+    } else if (direction === "right") {
+      // Check if resizing right is within bounds
+      if (
+        index < segments.length - 1 &&
+        newEnd + d.width * scaleFactor > segments[index + 1].start
+      ) {
+        newEnd = segments[index + 1].start;
+      } else {
+        newEnd += d.width * scaleFactor;
+      }
+    }
+
+    newSegments[index] = {
+      ...newSegments[index],
+      start: newStart,
+      end: newEnd,
+    };
+    setEditSegments(newSegments);
+  };
+
   return (
     <div
       className="h-[10.6rem] bg-foreground-50 border border-foreground-300 mt-1"
@@ -146,22 +179,50 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
       </div>
       <div className="relative overflow-x-auto overflow-y-hidden flex items-start h-[8.5rem]">
         {/* Render timeline clips and time intervals */}
-        {segments.map((segment, index) => (
-          <Draggable
-            key={index}
-            axis="x"
-            bounds="parent"
-            onDrag={(e, { x, deltaX }) =>
-              handleDrag(index, x, segment.end - segment.start)
-            }
-          >
-            <div
-              className="mt-9 clip absolute bg-sky-400/25 text-white rounded-md px-2 py-1 h-12 overflow-hidden hover:border-2 hover:border-cyan-500 flex flex-col justify-around"
-              style={{
-                left: `${segment.start / scaleFactor}px`,
-                width: `${(segment.end - segment.start) / scaleFactor}px`,
+        {segments.map((segment, index) => {
+          const segmentWidth = (segment.end - segment.start) / scaleFactor;
+          const leftPosition = (segment.start / scaleFactor) + 'px';
+
+          return (
+            <Rnd
+              key={index}
+              size={{
+                width: (segment.end - segment.start) / scaleFactor,
+                height: 48,
               }}
+              position={{
+                x: segment.start / scaleFactor,
+                y: 36,
+              }}
+              enableResizing={{
+                top: false,
+                right: true,
+                bottom: false,
+                left: true,
+                topRight: false,
+                bottomRight: false,
+                bottomLeft: false,
+                topLeft: false,
+              }}
+              onResize={(e, direction, ref, delta, position) => {
+                // Handle resizing logic here
+                // handleResize(index, direction, ref, delta, position);
+              }}
+              bounds="parent"
+              onResizeStop={(e, direction, ref, delta, position) => {
+                // Handle resizing logic here
+                handleResize(index, direction, ref, delta, position);
+              }}
+              onDragStop={(e, d) => {
+                // Handle dragging logic here
+              }}
+              dragAxis="x"
+              disableDragging={true}
+              className="mt-9 clip absolute bg-sky-400/25 text-white rounded-md px-2 py-1 h-12 overflow-hidden flex flex-col justify-around group"
             >
+              {/* Black circles at segment edges */}
+              <div className="absolute top-0 h-full w-1 bg-sky-400 group-hover:bg-orange-600 transition-all" style={{ left: 0 }} />
+              <div className="absolute top-0 h-full w-1 bg-sky-400 group-hover:bg-orange-600 transition-all" style={{ right: 0 }} />
               <p className="text-xs text-[0.5rem] text-sky-500 font-medium tracking-tighter mb-1">
                 Speaker A
               </p>
@@ -169,9 +230,10 @@ const Timeline = ({ segments, setTimelineVisible, audioURL, duration }) => {
               <p className="whitespace-nowrap overflow-hidden overflow-ellipsis text-xs text-sky-500">
                 {segment.translatedText}
               </p>
-            </div>
-          </Draggable>
-        ))}
+            </Rnd>
+          );
+        })}
+
         {/* Audio visualization */}
         {audioBlob && (
           <div className="absolute top-[70px]">

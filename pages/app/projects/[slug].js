@@ -78,6 +78,7 @@ const Page = () => {
   const [translateLoading, setTranslateLoading] = useState([]);
   const [selectedVoices, setSelectedVoices] = useState({});
   const [timelineVisible, setTimelineVisible] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSelectedVoice = (speaker) => (selected) => {
     setSelectedVoices((prev) => ({
@@ -176,6 +177,7 @@ const Page = () => {
   };
 
   const translateSegments = async (index) => {
+    setIsSaving(true);
     setTranslateLoading((prev) => {
       const updated = [...prev];
       updated[index] = true;
@@ -223,6 +225,7 @@ const Page = () => {
       updated[index] = false;
       return updated;
     });
+    setIsSaving(false);
   };
 
   const updateDubbing = async (e) => {
@@ -263,6 +266,10 @@ const Page = () => {
                 <IoIosArrowBack size={25} className="" />
               </div>
               <p className="font-medium">{project.projectName}</p>
+              <div className={`${isSaving ? "flex" : "hidden"} bg-foreground-200 rounded-full flex-row items-center px-3 py-[6px] ml-8`}>
+                <Spinner size="sm" className="" color="primary" />
+                <p className="ml-3 text-sm">Saving</p>
+              </div>
             </div>
             <div className="flex items-center justify-center gap-3">
               <div className="w-32 mr-2">
@@ -581,7 +588,9 @@ const Page = () => {
           {timelineVisible && (
             <Timeline
               segments={editSegments}
+              setEditSegments={setEditSegments}
               setTimelineVisible={setTimelineVisible}
+              setIsSaving={setIsSaving}
               audioURL={project.fileURL}
               duration={project.duration}
             />
