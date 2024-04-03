@@ -6,6 +6,8 @@ import { AudioVisualizer } from "react-audio-visualize";
 import { Slider } from "@nextui-org/react";
 import { Resizable } from "re-resizable";
 import { Rnd } from "react-rnd";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 
 const Timeline = ({
   segments,
@@ -14,6 +16,7 @@ const Timeline = ({
   setIsSaving,
   audioURL,
   duration,
+  projectId
 }) => {
   const hideTimeline = () => {
     setTimelineVisible(false);
@@ -120,8 +123,10 @@ const Timeline = ({
     return `${hours}:${minutes}:${seconds},${milliseconds}`;
   };
 
-  const handleResize = (index, direction, ref, d, position) => {
+  const handleResize = async (index, direction, ref, d, position) => {
     const newSegments = [...segments];
+    const originalStart = segments[index].start;
+    const originalEnd = segments[index].end;
     let newStart = newSegments[index].start;
     let newEnd = newSegments[index].end;
 
@@ -145,6 +150,56 @@ const Timeline = ({
       } else {
         newEnd += d.width * scaleFactor;
       }
+    }
+
+    newSegments[index] = {
+      ...newSegments[index],
+      start: newStart,
+      end: newEnd,
+    };
+    setEditSegments(newSegments);
+
+    const UndoObject = {
+      type: "resize",
+      index: index,
+      oldStart: originalStart,
+      oldEnd: originalEnd,
+    };
+
+    try {
+      const projectRef = doc(db, "projects", projectId);
+      await updateDoc(projectRef, {
+        historyOfActions: arrayUnion(UndoObject),
+        segments: newSegments,
+        needsUpdate: true,
+      });
+    } catch (e) {
+      console.error("Error updating project segments: ", e);
+    }
+  };
+
+  const handleDrag = (index, d) => {
+    const newSegments = [...segments];
+    let currentWidth = newSegments[index].end - newSegments[index].start;
+    console.log("currentWidth", currentWidth);
+    let newStart = d.x * scaleFactor;
+    console.log("newStart", newStart);
+    console.log("d.x", d.x);
+    let newEnd = newStart + currentWidth;
+
+    // Check if dragging is within bounds
+    if (index === 0 && newStart < 0) {
+      newStart = 0;
+      newEnd = newStart + currentWidth;
+    } else if (index > 0 && newStart < newSegments[index - 1].end) {
+      newStart = newSegments[index - 1].end;
+      newEnd = newStart + newSegments[index].end - newSegments[index].start;
+    } else if (
+      index < segments.length - 1 &&
+      newEnd > segments[index + 1].start
+    ) {
+      newEnd = segments[index + 1].start;
+      newStart = newEnd - newSegments[index].end + newSegments[index].start;
     }
 
     newSegments[index] = {
@@ -181,7 +236,16 @@ const Timeline = ({
         {/* Render timeline clips and time intervals */}
         {segments.map((segment, index) => {
           const segmentWidth = (segment.end - segment.start) / scaleFactor;
-          const leftPosition = (segment.start / scaleFactor) + 'px';
+          const leftPosition = segment.start / scaleFactor + "px";
+          let maxwidthfr;
+          if (index === segments.length - 1) {
+            maxwidthfr = (duration * 1000 - segment.start) / scaleFactor;
+            console.log("last")
+          } else {
+            maxwidthfr =
+              (segments[index + 1].start - segment.start) / scaleFactor;
+          }
+          console.log(index + "maxwidthfr", maxwidthfr);
 
           return (
             <Rnd
@@ -194,6 +258,7 @@ const Timeline = ({
                 x: segment.start / scaleFactor,
                 y: 36,
               }}
+              // maxWidth={maxwidthfr}
               enableResizing={{
                 top: false,
                 right: true,
@@ -208,21 +273,28 @@ const Timeline = ({
                 // Handle resizing logic here
                 // handleResize(index, direction, ref, delta, position);
               }}
-              bounds="parent"
+              // bounds="parent"
               onResizeStop={(e, direction, ref, delta, position) => {
                 // Handle resizing logic here
                 handleResize(index, direction, ref, delta, position);
               }}
               onDragStop={(e, d) => {
                 // Handle dragging logic here
+                handleDrag(index, d);
               }}
               dragAxis="x"
               disableDragging={true}
               className="mt-9 clip absolute bg-sky-400/25 text-white rounded-md px-2 py-1 h-12 overflow-hidden flex flex-col justify-around group"
             >
               {/* Black circles at segment edges */}
-              <div className="absolute top-0 h-full w-1 bg-sky-400 group-hover:bg-orange-600 transition-all" style={{ left: 0 }} />
-              <div className="absolute top-0 h-full w-1 bg-sky-400 group-hover:bg-orange-600 transition-all" style={{ right: 0 }} />
+              <div
+                className="absolute top-0 h-full w-1 bg-sky-400 group-hover:bg-orange-600 transition-all"
+                style={{ left: 0 }}
+              />
+              <div
+                className="absolute top-0 h-full w-1 bg-sky-400 group-hover:bg-orange-600 transition-all"
+                style={{ right: 0 }}
+              />
               <p className="text-xs text-[0.5rem] text-sky-500 font-medium tracking-tighter mb-1">
                 Speaker A
               </p>

@@ -27,6 +27,8 @@ import {
   Skeleton,
   Autocomplete,
   AutocompleteItem,
+  Accordion,
+  AccordionItem,
 } from "@nextui-org/react";
 import { IoIosArrowBack, IoIosHelpCircleOutline } from "react-icons/io";
 import { HiOutlineSparkles, HiSparkles } from "react-icons/hi2";
@@ -41,7 +43,7 @@ import { useSelector } from "react-redux";
 import VideoPlayer from "@/components/App/VideoPlayer";
 import { motion } from "framer-motion";
 import { BsBodyText, BsTextLeft } from "react-icons/bs";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import Link from "next/link";
 import ThemeSwitch from "@/components/App/ThemeSwitch";
@@ -53,6 +55,10 @@ import { voiceOverVoices } from "@/helpers/voices";
 import ThemeSearch from "@/components/App/ThemeSearch";
 import Timeline from "@/components/App/Timeline";
 import { PiWaveformFill } from "react-icons/pi";
+import Image from "next/image";
+import { CiVideoOn, CiMusicNote1, CiText } from "react-icons/ci";
+import { PiTextT } from "react-icons/pi";
+import { FaUndo } from "react-icons/fa";
 
 const Page = () => {
   const router = useRouter();
@@ -79,6 +85,7 @@ const Page = () => {
   const [selectedVoices, setSelectedVoices] = useState({});
   const [timelineVisible, setTimelineVisible] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [downloadDropdown, setDownloadDropdown] = useState(false);
 
   const handleSelectedVoice = (speaker) => (selected) => {
     setSelectedVoices((prev) => ({
@@ -183,6 +190,9 @@ const Page = () => {
       updated[index] = true;
       return updated;
     });
+    const originalText = project.segments[index]["text"];
+    const originalTranslation = project.segments[index]["translatedText"];
+
     const inputText = editSegments[index]["text"];
     const translationResponse = await fetch("/api/translate-text", {
       method: "POST",
@@ -211,15 +221,24 @@ const Page = () => {
       segments: updatedSegments,
     }));
 
+    const UndoObject = {
+      type: "translate",
+      index: index,
+      oldText: originalText,
+      oldTranslation: originalTranslation,
+    };
+
     try {
       const projectRef = doc(db, "projects", project.id);
       await updateDoc(projectRef, {
+        historyOfActions: arrayUnion(UndoObject),
         segments: updatedSegments,
         needsUpdate: true,
       });
     } catch (e) {
       console.error("Error updating project segments: ", e);
     }
+
     setTranslateLoading((prev) => {
       const updated = [...prev];
       updated[index] = false;
@@ -249,6 +268,112 @@ const Page = () => {
       .padStart(2, "0")}:${remainingSeconds}`;
   }
 
+  function formatTimeSRT(milliseconds) {
+    const date = new Date(milliseconds);
+    const hours = date.getUTCHours().toString().padStart(2, "0");
+    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    const seconds = date.getUTCSeconds().toString().padStart(2, "0");
+    const millisecondsFormatted = date
+      .getUTCMilliseconds()
+      .toString()
+      .padStart(3, "0");
+
+    return `${hours}:${minutes}:${seconds},${millisecondsFormatted}`;
+  }
+
+  function generateSRT(segments, original) {
+    let srtContent = "";
+
+    segments.forEach((segment, index) => {
+      const startTime = formatTimeSRT(segment.start);
+      const endTime = formatTimeSRT(segment.end);
+
+      srtContent += `${index + 1}\n`;
+      srtContent += `${startTime} --> ${endTime}\n`;
+      if (original === true) srtContent += `${segment.text}\n\n`;
+      else srtContent += `${segment.translatedText}\n\n`;
+    });
+
+    return srtContent;
+  }
+
+  function downloadSRT(filename, original) {
+    const element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:text/plain;charset=utf-8," +
+        encodeURIComponent(generateSRT(project.segments, original))
+    );
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+
+  const handleDownload = async (fileUrl, fileName) => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
+
+  const handleUndo = async () => {
+    const docRef = doc(db, "projects", project.id);
+    const docSnap = await getDoc(docRef);
+    const currentData = docSnap.data();
+
+    // Check if historyOfActions exists and has any actions to undo
+    if (
+      !currentData.historyOfActions ||
+      currentData.historyOfActions.length === 0
+    ) {
+      console.log("No actions to undo or historyOfActions does not exist");
+      return; // Exit function if there are no actions to undo or historyOfActions doesn't exist
+    }
+
+    const newSegments = [...currentData.segments];
+
+    // Get the last action from historyOfActions array
+    const lastAction =
+      currentData.historyOfActions[currentData.historyOfActions.length - 1];
+    console.log("Last action: ", lastAction);
+
+    // Perform the appropriate undo operation based on the type of the last action
+    if (lastAction.type === "resize") {
+      newSegments[lastAction.index].start = lastAction.oldStart;
+      newSegments[lastAction.index].end = lastAction.oldEnd;
+    }
+    if (lastAction.type === "translate") {
+      newSegments[lastAction.index].text = lastAction.oldText;
+      newSegments[lastAction.index].translatedText = lastAction.oldTranslation;
+    }
+
+    try {
+      // Update the segments in Firestore document
+      await updateDoc(docRef, {
+        segments: newSegments,
+        // Remove the last action from historyOfActions array
+        historyOfActions: currentData.historyOfActions.slice(0, -1),
+      });
+      console.log("Undo operation completed successfully");
+    } catch (e) {
+      console.error("Error updating project segments: ", e);
+    }
+  };
+
   return (
     <div
       className={`flex flex-col h-screen bg-default-100 ${
@@ -266,7 +391,11 @@ const Page = () => {
                 <IoIosArrowBack size={25} className="" />
               </div>
               <p className="font-medium">{project.projectName}</p>
-              <div className={`${isSaving ? "flex" : "hidden"} bg-foreground-200 rounded-full flex-row items-center px-3 py-[6px] ml-8`}>
+              <div
+                className={`${
+                  isSaving ? "flex" : "hidden"
+                } bg-foreground-200 rounded-full flex-row items-center px-3 py-[6px] ml-8`}
+              >
                 <Spinner size="sm" className="" color="primary" />
                 <p className="ml-3 text-sm">Saving</p>
               </div>
@@ -333,20 +462,34 @@ const Page = () => {
                       {project.translationLanguage}
                     </p>
                   </div>
-                  <Button
-                    color="default"
-                    variant="light"
-                    className="flex items-center justify-center group hover:cursor-pointer"
-                    onPress={onOpenNewTranslateModal}
-                  >
-                    <GoPlus
-                      size={20}
-                      className="mr-1 text-foreground-500 group-hover:text-foreground transition-all"
-                    />
-                    <p className="text-xs text-foreground-500 font-medium group-hover:text-foreground transition-all">
-                      Translate to a different language
-                    </p>
-                  </Button>
+                  <div className="flex flex-row items-center gap-4">
+                    <Button
+                      color="default"
+                      variant="light"
+                      className="flex items-center justify-center group hover:cursor-pointer"
+                      onPress={onOpenNewTranslateModal}
+                    >
+                      <GoPlus
+                        size={20}
+                        className="mr-1 text-foreground-500 group-hover:text-foreground transition-all"
+                      />
+                      <p className="text-xs text-foreground-500 font-medium group-hover:text-foreground transition-all">
+                        Translate to a different language
+                      </p>
+                    </Button>
+                    <Button
+                      onPress={handleUndo}
+                      size="sm"
+                      className="px-2 min-w-0"
+                      startContent={<FaUndo size={12} />}
+                      isDisabled={
+                        !project.historyOfActions ||
+                        project.historyOfActions.length === 0
+                      }
+                    >
+                      Undo
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="w-full pt-4 overflow-auto">
@@ -525,7 +668,11 @@ const Page = () => {
                   >
                     <PiWaveformFill size={25} />
                   </Button>
-                  <Button color="primary" className="flex-1 font-semibold">
+                  <Button
+                    color="primary"
+                    className="flex-1 font-semibold"
+                    onPress={updateDubbing}
+                  >
                     Apply Changes
                   </Button>
                 </div>
@@ -533,15 +680,172 @@ const Page = () => {
                   <Button
                     className="min-w-0 px-10 border border-foreground-300 font-semibold"
                     variant="light"
+                    disabled
+                    disableAnimation
                   >
                     Lip-Sync <span className="font-light">beta</span>
                   </Button>
-                  <Button
-                    color="default"
-                    className="flex-1 font-semibold border border-blue-500"
+
+                  <Dropdown
+                    className={`${isDarkMode ? "dark" : "light"} w-96`}
+                    closeOnSelect={false}
+                    placement="top-start"
                   >
-                    Download
-                  </Button>
+                    <DropdownTrigger>
+                      <Button
+                        color="default"
+                        className="flex-1 font-semibold border border-blue-500"
+                      >
+                        Download
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      aria-label="Action event example"
+                      itemClasses={{
+                        base: ["data-[hover=true]:bg-default-50 px-0"],
+                      }}
+                    >
+                      <DropdownItem key="video">
+                        <Accordion isCompact>
+                          <AccordionItem
+                            key="videoitem"
+                            aria-label="Video"
+                            title={
+                              <div className="flex flex-row items-center">
+                                <div className="p-1 rounded-full flex items-center justify-center bg-foreground-300">
+                                  <CiVideoOn className="w-4 h-4" />
+                                </div>
+                                <p className="ml-3 text-base">Video</p>
+                              </div>
+                            }
+                          >
+                            <div className="flex flex-col gap-1">
+                              <Button
+                                variant="light"
+                                className="justify-between"
+                                onPress={() =>
+                                  handleDownload(
+                                    project.translatedFileURL,
+                                    project.projectName + " - Translated.mp4"
+                                  )
+                                }
+                              >
+                                <p>Translated Video</p>
+                                <div className="bg-foreground-300 rounded-lg px-2 py-1 text-xs">
+                                  MP4
+                                </div>
+                              </Button>
+                              <Button
+                                variant="light"
+                                className="justify-between"
+                                onPress={() =>
+                                  handleDownload(
+                                    project.fileURL,
+                                    project.projectName + " - Original.mp4"
+                                  )
+                                }
+                              >
+                                <p>Original Video</p>
+                                <div className="bg-foreground-300 rounded-lg px-2 py-1 text-xs">
+                                  MP4
+                                </div>
+                              </Button>
+                            </div>
+                          </AccordionItem>
+                        </Accordion>
+                      </DropdownItem>
+                      <DropdownItem key="audio">
+                        <Accordion isCompact>
+                          <AccordionItem
+                            key="audioitem"
+                            aria-label="Audio"
+                            title={
+                              <div className="flex flex-row items-center">
+                                <div className="p-1 rounded-full flex items-center justify-center bg-foreground-300">
+                                  <CiMusicNote1 className="w-4 h-4" />
+                                </div>
+                                <p className="ml-3 text-base">Audio</p>
+                              </div>
+                            }
+                          >
+                            <div className="flex flex-col gap-1">
+                              <Button
+                                variant="light"
+                                className="justify-between"
+                                isDisabled
+                              >
+                                <p>Audio with voice only</p>
+                                <div className="bg-foreground-300 rounded-lg px-2 py-1 text-xs">
+                                  WAV
+                                </div>
+                              </Button>
+                              <Button
+                                variant="light"
+                                className="justify-between"
+                                isDisabled
+                              >
+                                <p>Audio with voice and background</p>
+                                <div className="bg-foreground-300 rounded-lg px-2 py-1 text-xs">
+                                  WAV
+                                </div>
+                              </Button>
+                            </div>
+                          </AccordionItem>
+                        </Accordion>
+                      </DropdownItem>
+                      <DropdownItem key="text">
+                        <Accordion isCompact>
+                          <AccordionItem
+                            key="textitem"
+                            aria-label="Text subtitles (.srt)"
+                            title={
+                              <div className="flex flex-row items-center">
+                                <div className="p-1 rounded-full flex items-center justify-center bg-foreground-300">
+                                  <PiTextT className="w-4 h-4" />
+                                </div>
+                                <p className="ml-3 text-base">
+                                  Text subtitles (.srt)
+                                </p>
+                              </div>
+                            }
+                          >
+                            <div className="flex flex-col gap-1">
+                              <Button
+                                variant="light"
+                                className="justify-between"
+                                onPress={() =>
+                                  downloadSRT(
+                                    project.projectName + " - Original.srt",
+                                    true
+                                  )
+                                }
+                              >
+                                <p>Original subtitles with timecodes</p>
+                                <div className="bg-foreground-300 rounded-lg px-2 py-1 text-xs">
+                                  SRT
+                                </div>
+                              </Button>
+                              <Button
+                                variant="light"
+                                className="justify-between"
+                                onPress={() =>
+                                  downloadSRT(
+                                    project.projectName + " - Translated.srt",
+                                    false
+                                  )
+                                }
+                              >
+                                <p>Translated subtitles with timecodes</p>
+                                <div className="bg-foreground-300 rounded-lg px-2 py-1 text-xs">
+                                  SRT
+                                </div>
+                              </Button>
+                            </div>
+                          </AccordionItem>
+                        </Accordion>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
                 </div>
                 <div className="px-8">
                   {project.transcription.summary && (
@@ -593,6 +897,7 @@ const Page = () => {
               setIsSaving={setIsSaving}
               audioURL={project.fileURL}
               duration={project.duration}
+              projectId={project.id}
             />
           )}
         </>
