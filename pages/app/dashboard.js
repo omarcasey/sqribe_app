@@ -51,6 +51,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const uid = useSelector((state) => state.user.auth.uid);
   const projects = useSelector((state) => state.user.projects);
+  const name = useSelector((state) => state.user.auth.displayName);
   const [audioFiles, setAudioFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,7 +59,7 @@ const Dashboard = () => {
     labels: ["Used Credits", "Remaining Credits"],
     datasets: [
       {
-        data: [userData.usedCredits, userData.remainingCredits],
+        data: [userData.subscription.usage.usedSeconds, userData.subscription.usage.remainingSeconds],
         backgroundColor: ["rgb(125 211 252)", "rgb(14 165 233)"],
         borderWidth: 0,
         borderColor: "rgb(14 165 233)",
@@ -149,6 +150,7 @@ const Dashboard = () => {
         <div className="flex flex-col items-center pb-24 pt-10 text-foreground max-w-7xl mx-auto">
           <div className="flex w-full gap-4">
             <div className="w-2/3 space-y-2">
+            <h1 className="text-2xl mb-4">Welcome back, {name?.split(' ')[0]} 👋</h1>
               <h1 className="text-2xl mb-4">Recent Projects</h1>
               {projects?.slice(0, 2).map((project, index) => (
                 <Card

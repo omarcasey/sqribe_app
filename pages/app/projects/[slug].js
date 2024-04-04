@@ -226,6 +226,7 @@ const Page = () => {
       index: index,
       oldText: originalText,
       oldTranslation: originalTranslation,
+      needsUpdate: project.needsUpdate,
     };
 
     try {
@@ -252,6 +253,7 @@ const Page = () => {
       const projectRef = doc(db, "projects", project.id);
       await updateDoc(projectRef, {
         needsUpdate: false,
+        historyOfActions: [],
       });
     } catch (e) {
       console.error("Error updating project segments: ", e);
@@ -365,6 +367,7 @@ const Page = () => {
       // Update the segments in Firestore document
       await updateDoc(docRef, {
         segments: newSegments,
+        needsUpdate: lastAction.needsUpdate,
         // Remove the last action from historyOfActions array
         historyOfActions: currentData.historyOfActions.slice(0, -1),
       });
@@ -672,8 +675,9 @@ const Page = () => {
                     color="primary"
                     className="flex-1 font-semibold"
                     onPress={updateDubbing}
+                    isDisabled={!project.needsUpdate}
                   >
-                    Apply Changes
+                    Redub Video
                   </Button>
                 </div>
                 <div className="flex flex-row px-6 gap-2 mb-2">
@@ -878,14 +882,6 @@ const Page = () => {
                 >
                   Open Timeline
                 </Button>
-                {/* <Button
-                  className="flex-1"
-                  color="primary"
-                  onPress={updateDubbing}
-                  isDisabled={!project.needsUpdate}
-                >
-                  Redub
-                </Button> */}
               </div>
             </div>
           </div>
@@ -897,7 +893,7 @@ const Page = () => {
               setIsSaving={setIsSaving}
               audioURL={project.fileURL}
               duration={project.duration}
-              projectId={project.id}
+              project={project}
             />
           )}
         </>

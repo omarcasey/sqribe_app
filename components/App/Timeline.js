@@ -16,7 +16,7 @@ const Timeline = ({
   setIsSaving,
   audioURL,
   duration,
-  projectId
+  project
 }) => {
   const hideTimeline = () => {
     setTimelineVisible(false);
@@ -164,10 +164,11 @@ const Timeline = ({
       index: index,
       oldStart: originalStart,
       oldEnd: originalEnd,
+      needsUpdate: project.needsUpdate,
     };
 
     try {
-      const projectRef = doc(db, "projects", projectId);
+      const projectRef = doc(db, "projects", project.id);
       await updateDoc(projectRef, {
         historyOfActions: arrayUnion(UndoObject),
         segments: newSegments,

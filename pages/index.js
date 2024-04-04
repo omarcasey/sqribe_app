@@ -11,6 +11,8 @@ import Features2 from '@/components/Marketing/Features2'
 import VideoPreview from '@/components/Marketing/VideoPreview'
 import TranslationPreview from '@/components/Marketing/TranslationPreview'
 import ClipsPreview from '@/components/Marketing/ClipsPreview'
+import MoreFeatures from '@/components/Marketing/MoreFeatures'
+import ReviewsSlider from '@/components/Marketing/ReviewsSlider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,6 +24,8 @@ export default function Home() {
       <VideoPreview />
       <TranslationPreview />
       <ClipsPreview />
+      <MoreFeatures />
+      <ReviewsSlider />
       <CallToAction />
       <Features />
       <Features2 />

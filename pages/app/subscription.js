@@ -272,7 +272,7 @@ const Subscription = () => {
               totalSeconds: newTotalMinutes * 60,
               remainingSeconds:
                 newTotalMinutes * 60 -
-                currentData.subscription.usage.usedSeconds,
+                newUsedSeconds,
               usedSeconds: newUsedSeconds,
             },
             invoicePeriodStart: invoicePeriodStart,
