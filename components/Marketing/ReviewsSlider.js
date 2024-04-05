@@ -1,29 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 // import Swiper bundle with all modules installed
 import Swiper from "swiper/bundle";
 // import styles bundle
 import "swiper/css/bundle";
 import { FaStar } from "react-icons/fa";
 import Image from "next/image";
+import { Button } from "@nextui-org/react";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 
 const ReviewsSlider = () => {
+  const swiperRef = useRef(null);
+
   useEffect(() => {
-    const swiper = new Swiper(".swiper-container", {
+    swiperRef.current = new Swiper(".swiper-container", {
       slidesPerView: 2,
       centeredSlides: false,
       spaceBetween: 30,
       loop: false,
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
+      speed: 1000,
     });
 
     // Clean up Swiper instance on unmount
     return () => {
-      swiper.destroy();
+      if (swiperRef.current) {
+        swiperRef.current.destroy();
+      }
     };
   }, []);
+
+  const handleNext = () => {
+    if (swiperRef.current) {
+      swiperRef.current.slideNext();
+    }
+  };
+
+  const handlePrev = () => {
+    if (swiperRef.current) {
+      swiperRef.current.slidePrev();
+    }
+  };
 
   const reviews = [
     {
@@ -33,24 +48,34 @@ const ReviewsSlider = () => {
       author: "Steven R.",
       occupation: "Senior Software Engineer",
       category: "Marketing",
+      badgeColor: "bg-red-200 text-red-800",
     },
     {
-      title: "2 Highly recommended",
+      title: "A great way to reach new audiences in other countries",
       content:
-        "This is the best product I've ever used. It exceeded my expectations.",
-      author: "Jane Smith",
+        "I have been using Rask Al for a few weeks now, and I am thoroughly impressed with its capabilities. What I like best about Rask Al is its intuitive interface which makes it incredibly user-friendly. The data processing speed is phenomenal, saving me a lot of time and effort. Moreover, the support team is responsive and very helpful, which adds to the overall positive experience of using Rask AI.",
+      author: "Nadia S.",
+      occupation: "Deputy Director",
+      category: "Entertainment",
+      badgeColor: "bg-purple-200 text-purple-800",
     },
     {
-      title: "3 Highly recommended",
+      title: "Probably the best Al dubbing software on the market right now",
       content:
-        "This is the best product I've ever used. It exceeded my expectations.",
-      author: "Jane Smith",
+        "It is very easy to download your voice or video files. It doesn't give you wrong error messages about non-existing watermarks in my own podcast, like other Al tools does (without any way of correcting the error). It has an easy to use interface where both the original language and the translation can be edited. And the clone voices are quite good, although there's still some work to be done. But in totality a top tool right now in the market.",
+      author: "Bent D.",
+      occupation: "Board Member, Enterprise",
+      category: "Content Creators",
+      badgeColor: "bg-green-200 text-green-800",
     },
     {
       title: "4 Highly recommended",
       content:
         "This is the best product I've ever used. It exceeded my expectations.",
       author: "Jane Smith",
+      occupation: "Board Member, Enterprise",
+      category: "Content Creators",
+      badgeColor: "bg-orange-200 text-orange-800",
     },
     {
       title: "5 Highly recommended",
@@ -65,14 +90,32 @@ const ReviewsSlider = () => {
   return (
     <section className="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-        <h1 className="text-4xl text-foreground mb-12 font-medium tracking-tight">
-          Amazing Reviews
-        </h1>
+        <div className="flex flex-row justify-between">
+          <h1 className="text-4xl text-foreground mb-12 font-medium tracking-tight">
+            Amazing Reviews
+          </h1>
+          <div className="flex flex-row gap-1">
+            <Button
+              variant="flat"
+              onPress={handlePrev}
+              className="min-w-0 rounded-full px-3"
+            >
+              <FaArrowLeft size={18} className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="flat"
+              onPress={handleNext}
+              className="min-w-0 rounded-full px-3"
+            >
+              <FaArrowRight size={18} className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
         <div className="swiper-container text-foreground">
           <div className="swiper-wrapper">
             {reviews.map((review, index) => (
               <div key={index} className="swiper-slide">
-                <div className="review-card border border-foreground-300 rounded-3xl p-8 flex flex-col h-96 justify-between">
+                <div className="review-card border border-foreground-300 rounded-3xl p-8 flex flex-col h-[430px] justify-between">
                   <div className="flex flex-col">
                     <div className="flex flex-row mb-8 gap-2">
                       <FaStar className="w-5 h-5" />
@@ -105,7 +148,9 @@ const ReviewsSlider = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="px-2 py-1 bg-red-200 text-red-800 tracking-tighter font-semibold text-sm flex items-center justify-center rounded-full mb-1">
+                    <div
+                      className={`px-2 py-1 ${review.badgeColor} tracking-tighter font-semibold text-sm flex items-center justify-center rounded-full mb-1`}
+                    >
                       {review.category}
                     </div>
                   </div>

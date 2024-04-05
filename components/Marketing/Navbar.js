@@ -5,28 +5,25 @@ import { useRouter } from "next/router";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase";
 import ThemeSwitch from "../App/ThemeSwitch";
-import ButtonNice from "../UI/ButtonNice";
-import ButtonGradient from "../UI/ButtonGradient";
+import { motion } from "framer-motion";
+import { dropdown } from "@nextui-org/react";
 
 const Navbar = () => {
   const router = useRouter();
   const [user, setUser] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); // State to manage dropdown visibility
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // Redirect to the sign-in page if the user is not signed in
         setUser(false);
       } else {
         setUser(true);
       }
     });
-
-    // Cleanup the subscription when the component unmounts
     return () => unsubscribe();
   }, []);
 
-  // If current route is home page, scroll to top
   const handleClick = (e) => {
     e.preventDefault();
     if (router.pathname === "/") {
@@ -36,14 +33,10 @@ const Navbar = () => {
     }
   };
 
-  const [scrolling, setScrolling] = useState(false);
-
   const handleScroll = () => {
     const scrollPosition = window.scrollY;
     if (scrollPosition > 50) {
-      setScrolling(true);
-    } else {
-      setScrolling(false);
+      setShowDropdown(false); // Close dropdown when scrolling
     }
   };
 
@@ -52,12 +45,12 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleDropdownToggle = () => {
+    setShowDropdown(!showDropdown);
+  };
+
   return (
-    <header
-      className={`py-4 sm:py-3 border-b-2 border-gray-800 z-[100] sticky top-0 bg-opacity-0 backdrop-blur-md transition-all duration-300 ${
-        scrolling ? "bg-black" : ""
-      }`}
-    >
+    <header className="py-4 sm:py-3 border-b-2 border-gray-800 z-[100] sticky top-0 bg-opacity-0 backdrop-blur-md transition-all duration-300">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="shrink-0">
@@ -75,38 +68,96 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <nav className="hidden ml-10 mr-auto space-x-10 lg:ml-20 lg:space-x-12 md:flex md:items-center md:justify-start">
+          <nav className="hidden ml-10 mr-auto space-x-10 lg:ml-20 lg:space-x-12 md:flex md:items-start md:justify-start mt-3">
+            <div
+              className="relative "
+              onMouseEnter={handleDropdownToggle}
+              onMouseLeave={handleDropdownToggle}
+            >
+              <a
+                href="#"
+                title=""
+                className={`text-lg font-semibold transition-all duration-200 hover:text-foreground ${showDropdown && "gradient-underline"}`}
+              >
+                {" "}
+                Use Cases{" "}
+              </a>
+              <div className=" pb-2"></div>
+              {showDropdown && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }} // Add exit animation for fade-out
+                  transition={{ duration: 0.2 }} // Set duration for fade-out
+                  className="absolute top-full left-0 w-80 bg-white dark:bg-black border border-blue-500 shadow-md z-10"
+                >
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Education Videos
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Marketing
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Content Creation & Distribution
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Employee & Customer Training
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Explainers
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Sales Videos
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Youtube Multilingual Content
+                  </a>
+                </motion.div>
+              )}
+            </div>
+
             <a
               href="#"
               title=""
-              className={`text-lg font-semibold ${
-                scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-foreground hover-underline`}
+              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
-              Products{" "}
+              Features{" "}
             </a>
 
             <a
               href="#"
               title=""
-              className={`text-lg font-semibold ${
-                scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-foreground hover-underline`}
+              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
-              Use Cases{" "}
+              Roles{" "}
             </a>
 
             <Link
               href="/pricing"
-              className={`text-lg font-semibold ${
-                scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-foreground ${
-                router.pathname === "/pricing"
-                  ? "gradient-underline"
-                  : "hover-underline"
-              }`}
+              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
               Pricing{" "}
@@ -115,9 +166,7 @@ const Navbar = () => {
             <a
               href="#"
               title=""
-              className={`text-lg font-semibold ${
-                scrolling ? "text-foreground" : "text-foreground-500"
-              } transition-all duration-200 hover:text-foreground hover-underline`}
+              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
             >
               {" "}
               Blog{" "}

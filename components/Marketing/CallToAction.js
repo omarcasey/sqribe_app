@@ -11,15 +11,15 @@ const CallToAction = () => {
           </h1>
           <div className="grid grid-cols-3 items-center text-center relative">
             <div className='flex items-center justify-center border-r border-gray-400 border-opacity-20'>
-              <Image src='/voice.png' width={512} height={512} className='h-12 w-12 mr-4' />
+              <Image src='/voice.png' width={512} height={512} className='h-12 w-12 mr-4 filter -hue-rotate-30' alt='' />
               <h1 className="text-2xl text-white">Instant Dubbing</h1>
             </div>
             <div className='flex items-center justify-center border-r border-gray-400 border-opacity-20'>
-              <Image src='/trending.png' width={512} height={512} className='h-12 w-12 mr-4' />
+              <Image src='/trending.png' width={512} height={512} className='h-12 w-12 mr-4 filter -hue-rotate-30' alt='' />
               <h1 className="text-2xl text-white">Scalable & Affordable</h1>
             </div>
             <div className='flex items-center justify-center'>
-              <Image src='/speed.png' width={512} height={512} className='h-12 w-12 mr-4' />
+              <Image src='/speed.png' width={512} height={512} className='h-12 w-12 mr-4 filter -hue-rotate-30' alt='' />
               <h1 className="text-2xl text-white">Quick Turnaround Time</h1>
             </div>
             <div className="absolute -bottom-10 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 to-purple-500"></div>
