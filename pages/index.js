@@ -13,6 +13,7 @@ import TranslationPreview from '@/components/Marketing/TranslationPreview'
 import ClipsPreview from '@/components/Marketing/ClipsPreview'
 import MoreFeatures from '@/components/Marketing/MoreFeatures'
 import ReviewsSlider from '@/components/Marketing/ReviewsSlider'
+import ScrollingCompanies from '@/components/Marketing/ScrollingCompanies'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,6 +23,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <VideoPreview />
+      <ScrollingCompanies />
       <TranslationPreview />
       <ClipsPreview />
       <MoreFeatures />

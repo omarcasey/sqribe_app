@@ -6,20 +6,17 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase";
 import ThemeSwitch from "../App/ThemeSwitch";
 import { motion } from "framer-motion";
-import { dropdown } from "@nextui-org/react";
+import { IoIosArrowDown } from "react-icons/io";
 
 const Navbar = () => {
   const router = useRouter();
   const [user, setUser] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false); // State to manage dropdown visibility
+  const [showDropdown, setShowDropdown] = useState(""); // State to manage dropdown visibility
+  const [dropdownRotation, setDropdownRotation] = useState({}); // State to manage dropdown rotation
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        setUser(false);
-      } else {
-        setUser(true);
-      }
+      setUser(!!user);
     });
     return () => unsubscribe();
   }, []);
@@ -36,7 +33,7 @@ const Navbar = () => {
   const handleScroll = () => {
     const scrollPosition = window.scrollY;
     if (scrollPosition > 50) {
-      setShowDropdown(false); // Close dropdown when scrolling
+      // setShowDropdown(""); // Close dropdown when scrolling
     }
   };
 
@@ -45,8 +42,12 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleDropdownToggle = () => {
-    setShowDropdown(!showDropdown);
+  const handleDropdownToggle = (dropdownName) => {
+    setShowDropdown(showDropdown === dropdownName ? "" : dropdownName);
+    setDropdownRotation({
+      ...dropdownRotation,
+      [dropdownName]: showDropdown === dropdownName ? "" : "rotate-180",
+    });
   };
 
   return (
@@ -70,20 +71,24 @@ const Navbar = () => {
 
           <nav className="hidden ml-10 mr-auto space-x-10 lg:ml-20 lg:space-x-12 md:flex md:items-start md:justify-start mt-3">
             <div
-              className="relative "
-              onMouseEnter={handleDropdownToggle}
-              onMouseLeave={handleDropdownToggle}
+              className="relative"
+              onMouseEnter={() => handleDropdownToggle("useCases")}
+              onMouseLeave={() => handleDropdownToggle("useCases")}
             >
               <a
                 href="#"
                 title=""
-                className={`text-lg font-semibold transition-all duration-200 hover:text-foreground ${showDropdown && "gradient-underline"}`}
+                className={`text-lg text-foreground hover:text-foreground-800 hover-underline font-semibold transition-all duration-200 group`}
               >
-                {" "}
-                Use Cases{" "}
+                Use Cases
+                <IoIosArrowDown
+                  className={`inline-block ml-1 text-blue-600 group-hover:rotate-180 transition-transform ${
+                    dropdownRotation["useCases"] || "" // Apply rotation class based on state
+                  }`}
+                />
               </a>
               <div className=" pb-2"></div>
-              {showDropdown && (
+              {showDropdown === "useCases" && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -137,27 +142,153 @@ const Navbar = () => {
               )}
             </div>
 
-            <a
-              href="#"
-              title=""
-              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
+            <div
+              className="relative"
+              onMouseEnter={() => handleDropdownToggle("features")}
+              onMouseLeave={() => handleDropdownToggle("features")}
             >
-              {" "}
-              Features{" "}
-            </a>
+              <a
+                href="#"
+                title=""
+                className={`text-lg text-foreground hover:text-foreground-800 hover-underline group font-semibold transition-all duration-200`}
+              >
+                Features
+                <IoIosArrowDown
+                  className={`inline-block ml-1 text-blue-600 group-hover:rotate-180 transition-transform ${
+                    dropdownRotation["features"] || "" // Apply rotation class based on state
+                  }`}
+                />
+              </a>
+              <div className=" pb-2"></div>
+              {showDropdown === "features" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }} // Add exit animation for fade-out
+                  transition={{ duration: 0.2 }} // Set duration for fade-out
+                  className="absolute top-full left-0 w-80 bg-white dark:bg-black border border-blue-500 shadow-md z-10"
+                >
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Transcription
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Translation
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Text to Speech
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Speech to Text
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Subtitles & Captions
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Add SRT to MP4
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Add Subtitles to Video
+                  </a>
+                </motion.div>
+              )}
+            </div>
 
-            <a
-              href="#"
-              title=""
-              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
+            <div
+              className="relative"
+              onMouseEnter={() => handleDropdownToggle("roles")}
+              onMouseLeave={() => handleDropdownToggle("roles")}
             >
-              {" "}
-              Roles{" "}
-            </a>
+              <a
+                href="#"
+                title=""
+                className={`text-lg text-foreground hover:text-foreground-800 hover-underline group font-semibold transition-all duration-200`}
+              >
+                Roles
+                <IoIosArrowDown
+                  className={`inline-block ml-1 text-blue-600 group-hover:rotate-180 transition-transform ${
+                    dropdownRotation["roles"] || "" // Apply rotation class based on state
+                  }`}
+                />
+              </a>
+              <div className=" pb-2"></div>
+              {showDropdown === "roles" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }} // Add exit animation for fade-out
+                  transition={{ duration: 0.2 }} // Set duration for fade-out
+                  className="absolute top-full left-0 w-80 bg-white dark:bg-black border border-blue-500 shadow-md z-10"
+                >
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Educators & Teachers
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Marketers
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Content Creators
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Podcasters
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Businesses
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Human Resources
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Film Dubbing
+                  </a>
+                </motion.div>
+              )}
+            </div>
 
             <Link
               href="/pricing"
-              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
+              className={`text-lg text-foreground font-semibold transition-all duration-200 hover:text-foreground-800 hover-underline`}
             >
               {" "}
               Pricing{" "}
@@ -166,7 +297,7 @@ const Navbar = () => {
             <a
               href="#"
               title=""
-              className={`text-lg font-semibold transition-all duration-200 hover:text-foreground hover-underline`}
+              className={`text-lg text-foreground font-semibold transition-all duration-200 hover:text-foreground-800 hover-underline`}
             >
               {" "}
               Blog{" "}
