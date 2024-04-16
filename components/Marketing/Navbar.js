@@ -168,6 +168,12 @@ const Navbar = () => {
                   transition={{ duration: 0.2 }} // Set duration for fade-out
                   className="absolute top-full left-0 w-80 bg-white dark:bg-black border border-blue-500 shadow-md z-10"
                 >
+                  <Link
+                    href="/features/transcribe-youtube-video"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Transcribe Youtube Videos
+                  </Link>
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
