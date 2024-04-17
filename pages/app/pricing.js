@@ -1,8 +1,6 @@
-import AppShell from "@/components/App/AppShell";
 import React from "react";
 import withAuth from "@/components/App/withAuth";
-import PricingOptions from "@/components/Marketing/PricingOptions";
-import { Badge, Button, Card, Chip, Switch } from "@nextui-org/react";
+import { Button, Card, Switch } from "@nextui-org/react";
 import { FaCheck } from "react-icons/fa";
 import { useState } from "react";
 import { useSelector } from "react-redux";

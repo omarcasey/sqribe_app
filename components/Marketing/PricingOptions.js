@@ -7,7 +7,7 @@ const PricingOptions = () => {
   const [selected, setSelected] = useState(true);
 
   return (
-    <div className="mx-auto max-w-7xl text-foreground">
+    <div className="mx-auto max-w-7xl text-foreground pb-36">
       <div className="flex justify-center pt-24 pb-10">
         <h1 className="text-4xl text-center max-w-3xl">
           Universal tool with a simple and transparent{" "}

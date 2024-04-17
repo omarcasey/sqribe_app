@@ -9,18 +9,18 @@ import Scrollbar from "smooth-scrollbar";
 export default function Home() {
   useEffect(() => {
     console.log("CustomScrollbar component mounted");
-
+  
     let scrollbar;
-
+  
     try {
-      scrollbar = Scrollbar.init(document.querySelector("#my-scrollbar"), {
+      scrollbar = Scrollbar.init(document.querySelector('#my-scrollbar'), {
         damping: 0.06, // Set damping to 0.05
       });
       console.log("Smooth scrollbar initialized:", scrollbar);
     } catch (error) {
       console.error("Error initializing smooth scrollbar:", error);
     }
-
+  
     return () => {
       console.log("Destroying smooth scrollbar");
       if (scrollbar) {
