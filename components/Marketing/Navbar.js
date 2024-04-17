@@ -174,12 +174,12 @@ const Navbar = () => {
                   >
                     Transcribe Youtube Videos
                   </Link>
-                  <a
-                    href="#"
+                  <Link
+                    href="/features/video-to-text"
                     className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
                   >
-                    Transcription
-                  </a>
+                    Video to text
+                  </Link>
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"

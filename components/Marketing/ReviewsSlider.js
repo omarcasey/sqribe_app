@@ -53,7 +53,7 @@ const ReviewsSlider = () => {
     {
       title: "A great way to reach new audiences in other countries",
       content:
-        "I have been using Rask Al for a few weeks now, and I am thoroughly impressed with its capabilities. What I like best about Rask Al is its intuitive interface which makes it incredibly user-friendly. The data processing speed is phenomenal, saving me a lot of time and effort. Moreover, the support team is responsive and very helpful, which adds to the overall positive experience of using Rask AI.",
+        "I have been using Sqribe for a few weeks now, and I am thoroughly impressed with its capabilities. What I like best about Sqribe is its intuitive interface which makes it incredibly user-friendly. The data processing speed is phenomenal, saving me a lot of time and effort. Moreover, the support team is responsive and very helpful, which adds to the overall positive experience of using Sqribe.",
       author: "Nadia S.",
       occupation: "Deputy Director",
       category: "Entertainment",

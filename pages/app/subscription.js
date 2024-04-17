@@ -964,7 +964,7 @@ const Subscription = () => {
                 title="How many languages do you support?"
               >
                 <p className="text-foreground-500">
-                  With Rask AI, you can translate from nearly any language to
+                  With Sqribe, you can translate from nearly any language to
                   over 130 languages. Our Voice Cloning feature offers a
                   human-like experience and is currently available when dubbing
                   from any source language to the following 29 languages:

@@ -14,12 +14,36 @@ import ClipsPreview from '@/components/Marketing/ClipsPreview'
 import MoreFeatures from '@/components/Marketing/MoreFeatures'
 import ReviewsSlider from '@/components/Marketing/ReviewsSlider'
 import ScrollingCompanies from '@/components/Marketing/ScrollingCompanies'
+import Scrollbar from "smooth-scrollbar";
+import { useEffect } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  useEffect(() => {
+    console.log("CustomScrollbar component mounted");
+  
+    let scrollbar;
+  
+    try {
+      scrollbar = Scrollbar.init(document.querySelector('#home'), {
+        damping: 0.06, // Set damping to 0.05
+      });
+      console.log("Smooth scrollbar initialized:", scrollbar);
+    } catch (error) {
+      console.error("Error initializing smooth scrollbar:", error);
+    }
+  
+    return () => {
+      console.log("Destroying smooth scrollbar");
+      if (scrollbar) {
+        scrollbar.destroy();
+      }
+    };
+  }, []);
+
   return (
-    <main className="min-h-screen" id='home'>
+    <main className="h-screen overflow-auto" id='home'>
       <Navbar />
       <Hero />
       <VideoPreview />

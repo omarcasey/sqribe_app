@@ -37,19 +37,18 @@ export default function Home() {
           <div className="flex flex-row">
             <div className="w-1/2 pr-12">
               <h1 className="text-7xl font-semibold mb-8 tracking-tight text-foreground">
-                Transcribe YouTube Video
+                Transcribe Video to Text
               </h1>
               <p className="text-xl mb-12 text-foreground">
-                Fast and accurate transcription and translation of YouTube
-                videos using AI in over 130 languages. Supports videos up to 5
-                hours long.
+                Fast and accurate transcription and translation of videos using
+                AI in over 130 languages. Supports videos up to 5 hours long.
               </p>
               <Button
                 size="lg"
                 color="primary"
                 className="text-xl font-semibold py-8"
               >
-                Transcribe Youtube Video
+                Transcribe Video
               </Button>
             </div>
             <div className="w-1/2">
@@ -73,7 +72,7 @@ export default function Home() {
             <div className="border border-foreground-300 w-full rounded-3xl h-96">
               <div className="flex flex-col p-8">
                 <h2 className="text-foreground text-2xl mb-2">
-                  Upload your full-length video
+                  Upload Your Video
                 </h2>
                 <p className="text-foreground-500 text-sm">
                   Upload your video or provide a Youtube link
@@ -93,22 +92,21 @@ export default function Home() {
             <div className="border border-foreground-300 w-full rounded-3xl h-96">
               <div className="flex flex-col p-8">
                 <h2 className="text-foreground text-2xl mb-2">
-                  Edit and Export Transcription
+                  Download Your Transcribed Video
                 </h2>
                 <p className="text-foreground-500 text-sm">
-                  Once you&apos;re satisfied with the adjustments, simply save
-                  the changes
+                  After the transcription process is over, just download your
+                  text. Enjoy accurate transcription and reach a wider audience
+                  – it&apos;s that easy!
                 </p>
               </div>
             </div>
             <div className="col-span-3 border border-foreground-300 rounded-3xl p-8">
               <p className="text-foreground-500 text-xl">
-                Within the service, you may request to show transcript and edit
-                its parts as you want. If automatic transcription goes wrong,
-                feel free to fix it. Meanwhile, we offer the highest possible
-                accuracy rate, so you can save time on a text-based transcript.
-                And, of course, feel free to translate your subs or generate
-                automatic translation.
+                No matter what your record, your video content needs subtitles –
+                text video is much more efficient than just a voiceover. Not
+                sure? Try transcribing video in Sqribe and see the results.
+                It&apos;s easier than you think.
               </p>
             </div>
           </div>
@@ -116,51 +114,54 @@ export default function Home() {
       </section>
       <section className="pt-24 sm:pb-16 lg:pb-20 xl:pb-24">
         <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-          <h1 className="text-5xl text-center mb-10 leading-[1.1] text-foreground">
-            Why do you need to{" "}
-            <span className="italic font-playfair">
-              Transcribe
-              <br /> YouTube Videos
-            </span>
-            ?
-          </h1>
+          <div className="flex items-center justify-center">
+            <h1 className="text-5xl text-center mb-10 tracking-tight max-w-2xl text-foreground leading-[1.1]">
+              Why Do You Need This AI{" "}
+              <span className="italic font-playfair">Video to Text</span> Tool?
+            </h1>
+          </div>
           <div className="w-full grid grid-cols-3 gap-6 mb-12">
             <div className="border border-foreground-300 w-full rounded-3xl h-96">
               <div className="flex flex-col p-8">
                 <h2 className="text-foreground text-2xl mb-2">
-                  Reach More People
+                  Convert Video into an International Product
                 </h2>
                 <p className="text-foreground-500 text-sm">
-                  That&rsquo;s the sad truth for any vlogger – people open a
-                  YouTube video with no sound. Transcribe YouTube video to make
-                  sure your audience understands it. Voilà, the number of
-                  viewers is rising.
+                  Whether you work in a small business or a large corporation,
+                  transcribe video to text to make it available all over the
+                  world. Transcribe YouTube videos, ads, or social media content
+                  in a few clicks. And our artificial intelligence will adapt
+                  subtitles to various platforms and cultures.
                 </p>
               </div>
             </div>
             <div className="border border-foreground-300 w-full rounded-3xl h-96">
               <div className="flex flex-col p-8">
                 <h2 className="text-foreground text-2xl mb-2">
-                  Edit YouTube Video Subs
+                  Transcribe Video to text with Adaptivity
                 </h2>
                 <p className="text-foreground-500 text-sm">
-                  AI is not perfect, and it is understandable. In our service,
-                  you can transcribe videos automatically and then change the
-                  text on your own. Leave only the necessary parts and fix
-                  typos.
+                  No AI is perfect, and we accept it. When you transcribe video
+                  to text automatically, some mistakes can appear. Also,
+                  don&apos;t forget about cultural features – sometimes, you
+                  know better what your video transcription needs. Feel free to
+                  edit your video to text after AI does its job. Adapt words and
+                  headings, or even delete unnecessary parts.
                 </p>
               </div>
             </div>
             <div className="border border-foreground-300 w-full rounded-3xl h-96">
               <div className="flex flex-col p-8">
                 <h2 className="text-foreground text-2xl mb-2">
-                  Transcribe Audio of any Quality
+                  Embrace Quick Turnaround
                 </h2>
                 <p className="text-foreground-500 text-sm">
-                  Audio quality can influence how AI is interpreting it. Our
-                  tool works with audio of any quality and volume to ensure
-                  smooth use. And once again, feel free to edit text if
-                  necessary.
+                  No more waiting. Sqribe can transcribe video to text in a few
+                  moments. Choose the video-to-text tool and enjoy the perfect
+                  performance. No matter what your video file formats or size
+                  are, the app will process your video content and transcribe
+                  video to text as quickly as possible. Just download ready-made
+                  captions.
                 </p>
               </div>
             </div>
@@ -176,7 +177,7 @@ export default function Home() {
         <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-center">
             <h1 className="text-5xl text-center mb-10 tracking-tight max-w-3xl text-foreground">
-              Options for Using Our Service for YouTube Video Transcripts
+              Options for Using Our Video to Text Service
             </h1>
           </div>
           <div className="w-full grid grid-cols-3 gap-6 mb-12">
@@ -189,13 +190,14 @@ export default function Home() {
                   alt=""
                   className="rounded-3xl h-44 mb-8"
                 />
-                <h2 className="text-foreground text-2xl mb-4">
-                  Make Your YouTube Blogging Accessible
-                </h2>
+                <h2 className="text-foreground text-2xl mb-4">Businesses</h2>
                 <p className="text-foreground-500 text-sm">
-                  Not everybody has time to watch a YouTube video with sounds.
-                  Add YouTube transcripts, and the viewer can watch it from
-                  work, school, or public transport.
+                  Convert video into text in different languages, and you will
+                  reach an international audience. Or do you only work in a
+                  local market? No worries. The video-to-text option will boost
+                  engagement and viewing time. Allow your customers to watch
+                  your videos even when they are on a run and save time for you
+                  and them.
                 </p>
               </div>
             </div>
@@ -209,14 +211,18 @@ export default function Home() {
                   className="rounded-3xl h-44 mb-8"
                 />
                 <h2 className="text-foreground text-2xl mb-4">
-                  Boost Business Via YouTube
+                  Boost Your Blog
                 </h2>
                 <p className="text-foreground-500 text-sm">
-                  YouTube videos are a new television. Promote your services,
-                  make a YouTube video about your brand, or even host a
-                  corporate channel. One successful YouTube video can replace a
-                  marketing campaign. And to attract more people, make sure to
-                  add a YouTube transcript.
+                  Make your YouTube video easier to watch and remember with
+                  video transcription. It&apos;s easy – upload video files, opt
+                  for the video-to-text option, and get automatic subs of the
+                  best quality. And that&apos;s not all. For accurate video
+                  transcriptions, open the subs editor and make changes if
+                  needed. For blog content, leave only the necessary subtitles –
+                  captions and headings, and delete other details. Video to text
+                  converter is not only about accuracy. That&apos;s all about
+                  engagement with your audience and perfect free video delivery.
                 </p>
               </div>
             </div>
@@ -230,14 +236,14 @@ export default function Home() {
                   className="rounded-3xl h-44 mb-8"
                 />
                 <h2 className="text-foreground text-2xl mb-4">
-                  Educate and Share Materials
+                  Educational Institutions
                 </h2>
                 <p className="text-foreground-500 text-sm">
-                  Books are outdated. Make sure to use a YouTube video to
-                  promote educational materials. Then, transcribe YouTube videos
-                  to ensure your students can read the information. By uploading
-                  your study materials on YouTube, you make the educational
-                  process much easier.
+                  Transform your speech into a written text and help students
+                  learn more efficiently. Annotate your video content by adding
+                  subtitles or transcribing the video. With the help of it, your
+                  students can make notes, understand foreign languages, and
+                  even copy/paste your subtitles to make more efficient notes.
                 </p>
               </div>
             </div>
@@ -249,12 +255,14 @@ export default function Home() {
         <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex flex-col items-start justify-start max-w-4xl">
             <h1 className="text-5xl mb-10 tracking-tight text-foreground">
-              Why Do You Need a YouTube Video Transcript: Some Unexpected
-              Features
+              Make Videos For a Worldwide Audience: Pros of Multilingual Content
             </h1>
             <p className="text-xl mb-16 text-foreground">
-              Yes, you can access more people via transcription tools. But there
-              are some more perks of turning your speech into text.
+              Even if you created your account for local access, reaching a
+              worldwide audience can be surprisingly profitable. Don&apos;t
+              believe it? Just try to convert video to text once and see how
+              your view rate rises. And that&apos;s not all. See the full suite
+              of advantages you receive with a video-to-text tool.
             </p>
           </div>
           <div className="w-full grid grid-cols-2 gap-6 mb-12">
@@ -269,17 +277,15 @@ export default function Home() {
                 />
                 <div className="p-6 flex flex-col">
                   <h2 className="text-foreground text-2xl mb-4">
-                    Optimization Through Search Engines
+                    Enhance Your Videos With a Universal Script
                   </h2>
                   <p className="text-foreground-500 text-sm">
-                    Google checks all the Internet materials, searching for
-                    keywords and useful information in real-time. And here is
-                    the good news – it has access to YouTube as well. The text
-                    used for your subtitles serves as indexation material. You
-                    will appear in Google and other search engines. Create subs
-                    even if they seem unessential. Accurate text with an
-                    optimized length and accuracy will boost computer
-                    optimization.
+                    Convert video to text, and you get text files to use
+                    everywhere and for all possible goals. Use your audio to
+                    text as notes, download subs and use them for SEO
+                    optimization, or utilize captions as a video scenario. All
+                    this is easier when you create a text transcript, available
+                    on any screen and device.
                   </p>
                 </div>
               </div>
@@ -295,15 +301,15 @@ export default function Home() {
                 />
                 <div className="p-6 flex flex-col">
                   <h2 className="text-foreground text-2xl mb-4">
-                    Boost Your Podcasts View Rate
+                    Boost SEO Optimization
                   </h2>
                   <p className="text-foreground-500 text-sm">
-                    Language learners often use podcasts and other YouTube
-                    videos to study languages. Use automatic transcription as
-                    your secret weapon. Even automatic transcription can help
-                    learners to understand your voice better. Use real-time
-                    transcription and help viewers from different countries and
-                    regions understand you.
+                    Video-to-text is not only about users. Subtitles are
+                    accessible for search engines like Google, Bing, and others.
+                    And since your captions are accessible, they are indexed. It
+                    means that you can create keywords within your video-to-text
+                    transcription and let SEO tools boost your video products in
+                    search output.
                   </p>
                 </div>
               </div>
@@ -319,16 +325,16 @@ export default function Home() {
                 />
                 <div className="p-6 flex flex-col">
                   <h2 className="text-foreground text-2xl mb-4">
-                    Make Educational Materials Easier
+                    Enhance Your Status
                   </h2>
                   <p className="text-foreground-500 text-sm">
-                    If you are a teacher, paste your YouTube video URL into
-                    educational materials. Be sure that students love videos.
-                    And especially tutorials that are easy to read and remember.
-                    Using your URL, you can also convert YouTube video to text
-                    and use it as a note for students. A &quot;win-win&quot;
-                    situation – you film a talking video, and students receive
-                    valuable notes.
+                    Simple captions can create a whole new status or a company,
+                    can you believe that? By transcribing video to text, you
+                    show your company&apos;s intention and access to the world
+                    market. Also, such videos emphasize your inclusivity. Upload
+                    your video-to-text content on different platforms and use a
+                    foreign language. Also, video-to-text tools help people with
+                    impairment or foreigners understand you and your language.
                   </p>
                 </div>
               </div>
@@ -343,64 +349,40 @@ export default function Home() {
                   className="rounded-t-3xl h-60 w-full"
                 />
                 <div className="p-6 flex flex-col">
-                  <h2 className="text-foreground text-2xl mb-4">
-                    Repurpose Your Videos
-                  </h2>
+                  <h2 className="text-foreground text-2xl mb-4">Easy to Use</h2>
                   <p className="text-foreground-500 text-sm">
-                    Take note that when using a link to your video or subs, you
-                    can generate accurate texts for your blog posts, social
-                    media texts, scripts, and so on.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="border border-foreground-300 w-full rounded-3xl">
-              <div className="flex flex-col">
-                <Image
-                  src="/talking.jpg"
-                  width={500}
-                  height={500}
-                  alt=""
-                  className="rounded-t-3xl h-60 w-full"
-                />
-                <div className="p-6 flex flex-col">
-                  <h2 className="text-foreground text-2xl mb-4">
-                    Explore Inclusivity
-                  </h2>
-                  <p className="text-foreground-500 text-sm">
-                    Speech transcript can also serve as an analog of sign
-                    language. Link subs to your speed, and people with hearing
-                    impairments will be able to perceive them. First, you do a
-                    good thing. Secondly, it enhances your brand&apos;s status
-                    and accessibility.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="border border-foreground-300 w-full rounded-3xl">
-              <div className="flex flex-col">
-                <Image
-                  src="/talking.jpg"
-                  width={500}
-                  height={500}
-                  alt=""
-                  className="rounded-t-3xl h-60 w-full"
-                />
-                <div className="p-6 flex flex-col">
-                  <h2 className="text-foreground text-2xl mb-4">Add Style</h2>
-                  <p className="text-foreground-500 text-sm">
-                    Finally, have fun adding a transcript to your video and
-                    making it stylish. Within our tool, you can generate titles
-                    with different fonts and create your personal style. Create
-                    subtitles and paste them only to the necessary parts of your
-                    video. Feel free to add subtitles to your speech right in
-                    the editor. Alternatively, download your transcripts and
-                    paste them into YouTube editor.
+                    Create and edit your transcription, translate the
+                    transcription language if necessary, and upload the
+                    transcript to YouTube. With the help of AI, you can do it
+                    all in a few clicks. Feel free to craft a transcript
+                    automatically or customize it – you are free do to
+                    everything you need within Sqribe.
                   </p>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+      <section className="pt-24 sm:pb-16 lg:pb-20 xl:pb-24 border-b border-foreground-200">
+        <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
+          <h1 className="text-5xl mb-10 tracking-tight text-foreground">
+            Add Subtitles to Your YouTube Video
+          </h1>
+          <p className="text-foreground-700 text-xl mb-6 max-w-4xl">
+            But as you may guessed, we have another surprise. Do you want to
+            insert your subs within a YouTube editor? Or, do you need some text
+            convert options? Our tool allows you to do so. Select among the
+            subtitle formats (including a plain TXT format, of course), and just
+            download it. You can now add your text files to the YouTube subtitle
+            editor and boost your video within search engines. Add your
+            subtitles local file into Google Drive, a Word document, or any
+            other text editor, and you get ready-made notes or a scenario.
+          </p>
+          <p className="text-foreground-800 text-xl max-w-4xl">
+            All in all, text transcription offers a huge range of options – just
+            know how to use them and where to get high-quality transcripts.
+          </p>
         </div>
       </section>
       <section className="pt-24 sm:pb-16 lg:pb-20 xl:pb-24">
