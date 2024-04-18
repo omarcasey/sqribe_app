@@ -88,7 +88,7 @@ const ReviewsSlider = () => {
   ];
 
   return (
-    <section className="py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
+    <section className="pt-24 py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex flex-row justify-between">
           <h1 className="text-4xl text-foreground mb-12 font-medium tracking-tight">

@@ -34,7 +34,7 @@ const Features2 = () => {
                         </div>
                     </div>
                     <div className="w-3/5 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-3xl p-12">
-                        <Image className="h-full max-w-none rounded-xl shadow-xl contrast-150" src='/drakedont.png' width={1240} height={701} alt="" />
+                        <Image className="h-full max-w-none rounded-xl shadow-xl contrast-150" src='/drakedont.png' width={1000} height={1000} alt="" />
                     </div>
                 </div>
             </div>
