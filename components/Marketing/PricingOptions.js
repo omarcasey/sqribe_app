@@ -47,7 +47,7 @@ const PricingOptions = () => {
         </div>
       </div>
       <div className="gap-8 justify-center grid grid-cols-1 grid-rows-3 md:grid-cols-3 md:grid-rows-1 px-12 md:px-4">
-        <Card className="p-4 px-6">
+        <Card className="p-4 px-6 rounded-none border border-foreground-300">
           <h1 className="font-semibold text-xl mb-2">Basic</h1>
           <p className="text-foreground-500 text-sm mb-6">
             For small to medium sized buisness that have a smaller target
@@ -89,7 +89,7 @@ const PricingOptions = () => {
           </ul>
           <Button color="default">Try for free</Button>
         </Card>
-        <Card className="p-4 px-6 border border-indigo-700">
+        <Card className="p-4 px-6 border border-indigo-700 rounded-none">
           <div className="flex flex-row justify-between items-center mb-2">
             <h1 className="font-semibold text-xl">Creator</h1>
             <div className="rounded-md py-0 px-2 border text-sm text-blue-500 border-blue-500">
@@ -146,7 +146,7 @@ const PricingOptions = () => {
           </ul>
           <Button color="primary">Try for free</Button>
         </Card>
-        <Card className="p-4 px-6">
+        <Card className="p-4 px-6 rounded-none border border-foreground-300">
           <h1 className="font-semibold text-xl mb-2">Business</h1>
           <p className="text-foreground-500 text-sm mb-6">
             For small to medium sized buisness that have a smaller target
