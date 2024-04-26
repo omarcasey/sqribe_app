@@ -28,12 +28,16 @@ const ClipsPreview = () => {
             </Button>
           </div>
           <div className="w-1/2 flex flex-col items-center m-12">
-            <Image
-              src="/shorts.png"
+            <video
+              src="/viralshorts.mp4"
               width={1000}
               height={1000}
-              alt="Drake Don't"
-              className="rounded-3xl"
+              alt="Viral Shorts"
+              className="rounded-xl flex"
+              autoPlay
+              // controls
+              loop
+              preload="auto"
             />
           </div>
         </div>

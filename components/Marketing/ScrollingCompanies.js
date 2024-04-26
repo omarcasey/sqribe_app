@@ -28,8 +28,8 @@ const ScrollingCompanies = () => {
   };
 
   return (
-    <section className="pt-12 pb-24">
-      <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl relative">
+    <section className="pt-6 md:pt-12 pb-12 md:pb-24">
+      <div className="md:px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl relative">
         <h1 className="text-center text-xl mb-8 text-foreground">
           Over 50,000 Happy Users
         </h1>

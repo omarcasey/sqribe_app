@@ -47,7 +47,7 @@ const MoreFeatures = () => {
               </p>
             </div>
           </div>
-          <div className="border border-foreground-300 w-full rounded-3xl h-96">
+          <div className="border border-foreground-300 w-full rounded-3xl h-96 bg-[url('/overlay.png')] bg-cover bg-center bg-no-repeat">
             <div className="flex flex-col p-8">
               <h2 className="text-foreground text-2xl mb-2">
                 Take your localized audio and video quality to the next level
@@ -56,6 +56,7 @@ const MoreFeatures = () => {
               {/* <p className="text-foreground-500 text-sm">Communicate with your audience in your own voice in 30 languages</p> */}
             </div>
           </div>
+
           <div className="border border-foreground-300 w-full rounded-3xl h-96">
             <div className="flex flex-col p-8">
               <h2 className="text-foreground text-2xl mb-2">
@@ -67,7 +68,9 @@ const MoreFeatures = () => {
           </div>
         </div>
         <div className="w-full flex items-center justify-center">
-          <Button size="lg" color="primary" className="w-44 text-xl">Try it free</Button>
+          <Button size="lg" color="primary" className="w-44 text-xl">
+            Try it free
+          </Button>
         </div>
       </div>
     </section>

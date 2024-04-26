@@ -180,6 +180,18 @@ const Navbar = () => {
                   >
                     Video to text
                   </Link>
+                  <Link
+                    href="/features/audio-translator"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Audio Translator
+                  </Link>
+                  <Link
+                    href="/features/convert-audio-to-text"
+                    className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
+                  >
+                    Convert Audio To Text
+                  </Link>
                   <a
                     href="#"
                     className="block px-4 py-2 text-sm text-foreground-700 hover:bg-foreground-100"
