@@ -24,13 +24,21 @@ const ScrollingCompanies = () => {
     autoplaySpeed: 0,
     cssEase: "linear",
     rtl: true,
-    responsive: [], // Make it non-responsive
+    responsive: [
+      {
+        breakpoint: 768, // When the screen width is less than 1024px
+        settings: {
+          slidesToShow: 3, // Show 3 slides
+          slidesToScroll: 1,
+        },
+      }
+    ],
   };
 
   return (
     <section className="pt-6 md:pt-12 pb-12 md:pb-24">
       <div className="md:px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl relative">
-        <h1 className="text-center text-xl mb-8 text-foreground">
+        <h1 className="text-center text-sm tracking-widest md:text-xl mb-2 md:mb-8 text-foreground">
           Over 50,000 Happy Users
         </h1>
         <div className="relative">
@@ -39,7 +47,7 @@ const ScrollingCompanies = () => {
           <Slider {...settings}>
             {companyImages.map((image, index) => (
               <div key={index} className="flex items-center justify-center">
-                <div className="h-44 flex items-center px-4">
+                <div className="h-24 md:h-44 flex items-center px-4">
                   <Image
                     src={image}
                     width={1000}
@@ -51,16 +59,16 @@ const ScrollingCompanies = () => {
               </div>
             ))}
             <div className="flex items-center justify-center">
-                <div className="h-44 flex items-center px-4">
-                  <Image
-                    src={'/nvidia-logo.png'}
-                    width={1000}
-                    height={1000}
-                    alt=""
-                    className="h-auto w-auto object-contain  filter invert hover:invert-0 transition duration-300 ease-in-out"
-                  />
-                </div>
+              <div className="h-24 md:h-44 flex items-center px-4">
+                <Image
+                  src={"/nvidia-logo.png"}
+                  width={1000}
+                  height={1000}
+                  alt=""
+                  className="h-auto w-auto object-contain  filter invert hover:invert-0 transition duration-300 ease-in-out"
+                />
               </div>
+            </div>
           </Slider>
         </div>
       </div>

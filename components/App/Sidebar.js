@@ -90,6 +90,30 @@ const Sidebar = () => {
             </p>
           </Link>
           <Link
+            href="/app/voices"
+            className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
+              router.pathname === "/app/voices" ? "bg-foreground-100" : ""
+            }`}
+          >
+            <SiAudiomack
+              size={20}
+              className={`w-5 mr-2 ${
+                router.pathname === "/app/voices"
+                  ? "text-cyan-500 dark:text-cyan-300"
+                  : ""
+              }`}
+            />
+            <p
+              className={`${
+                router.pathname === "/app/voices"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 dark:to-purple-300 font-bold"
+                  : ""
+              }`}
+            >
+              Voice Clone Library
+            </p>
+          </Link>
+          <Link
             href="/app/makespeech"
             className={`flex items-center text-default-500 hover:text-foreground transition-all font-medium hover:bg-foreground-100 rounded-lg py-2 px-2 text-sm ${
               router.pathname === "/app/makespeech" ? "bg-foreground-100" : ""

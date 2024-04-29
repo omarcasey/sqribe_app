@@ -18,6 +18,14 @@ const ReviewsSlider = () => {
       spaceBetween: 30,
       loop: false,
       speed: 1000,
+      breakpoints: {
+        0: {
+          slidesPerView: 1, // Show 1 slide for very small screens
+        },
+        768: {
+          slidesPerView: 2, // Show 2 slides from 768px upwards
+        },
+      },
     });
 
     // Clean up Swiper instance on unmount
@@ -91,7 +99,7 @@ const ReviewsSlider = () => {
     <section className="pt-24 py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex flex-row justify-between">
-          <h1 className="text-4xl text-foreground mb-12 font-medium tracking-tight">
+          <h1 className="text-2xl md:text-4xl text-foreground mb-12 font-medium tracking-tight">
             Amazing Reviews
           </h1>
           <div className="flex flex-row gap-1">
@@ -100,14 +108,14 @@ const ReviewsSlider = () => {
               onPress={handlePrev}
               className="min-w-0 rounded-full px-3"
             >
-              <FaArrowLeft size={18} className="w-5 h-5" />
+              <FaArrowLeft size={18} className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
             <Button
               variant="flat"
               onPress={handleNext}
               className="min-w-0 rounded-full px-3"
             >
-              <FaArrowRight size={18} className="w-5 h-5" />
+              <FaArrowRight size={18} className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
           </div>
         </div>
@@ -115,17 +123,17 @@ const ReviewsSlider = () => {
           <div className="swiper-wrapper">
             {reviews.map((review, index) => (
               <div key={index} className="swiper-slide">
-                <div className="review-card border border-foreground-300 rounded-3xl p-8 flex flex-col h-[430px] justify-between">
+                <div className="review-card border border-foreground-300 rounded-3xl p-6 md:p-8 flex flex-col h-[502px] md:h-[430px] justify-between">
                   <div className="flex flex-col">
-                    <div className="flex flex-row mb-8 gap-2">
-                      <FaStar className="w-5 h-5" />
-                      <FaStar className="w-5 h-5" />
-                      <FaStar className="w-5 h-5" />
-                      <FaStar className="w-5 h-5" />
-                      <FaStar className="w-5 h-5" />
+                    <div className="flex flex-row mb-6 md:mb-8 gap-2">
+                      <FaStar className="w-4 h-4 md:w-5 md:h-5" />
+                      <FaStar className="w-4 h-4 md:w-5 md:h-5" />
+                      <FaStar className="w-4 h-4 md:w-5 md:h-5" />
+                      <FaStar className="w-4 h-4 md:w-5 md:h-5" />
+                      <FaStar className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
 
-                    <h3 className="text-2xl font-medium mb-4">
+                    <h3 className="text-xl tracking-tighter md:tracking-normal md:text-2xl font-medium mb-4">
                       {review.title}
                     </h3>
                     <p className="text-foreground-500 text-sm font-medium">
@@ -138,18 +146,18 @@ const ReviewsSlider = () => {
                         src="/png avatar.png"
                         width={500}
                         height={500}
-                        className="w-14 h-14 rounded-full"
+                        className="w-11 h-11 md:w-14 md:h-14 rounded-full"
                         alt=""
                       />
                       <div className="flex flex-col ml-4">
-                        <p className="font-bold">{review.author}</p>
-                        <p className="text-foreground-500 text-sm">
+                        <p className="font-bold text-sm md:text-base">{review.author}</p>
+                        <p className="text-foreground-500 text-tiny md:text-sm">
                           {review.occupation}
                         </p>
                       </div>
                     </div>
                     <div
-                      className={`px-2 py-1 ${review.badgeColor} tracking-tighter font-semibold text-sm flex items-center justify-center rounded-full mb-1`}
+                      className={`px-2 py-1 ${review.badgeColor} tracking-tighter font-semibold text-tiny md:text-sm flex items-center justify-center rounded-full mb-1 text-center`}
                     >
                       {review.category}
                     </div>

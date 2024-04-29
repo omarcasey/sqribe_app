@@ -12,67 +12,67 @@ const Features = () => {
             Revolutionize your videos with AI-generated captions, voice
             overs, translations, and dubbing in multiple languages.
           </p> */}
-          <div className="grid grid-cols-3 items-center text-center relative gap-x-10">
-            <div className=" border border-foreground-300 transition-all ease-in-out duration-300 rounded-3xl p-12 h-full flex flex-col items-center justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center text-center relative gap-4 md:gap-10">
+            <div className="border border-foreground-300 transition-all ease-in-out duration-300 rounded-xl md:rounded-3xl p-4 md:p-12 h-full flex flex-col items-center justify-between">
               <div className="flex flex-col">
-                <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-4 text-xl">
+                <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-2 md:mb-4 text-lg md:text-xl">
                   Unlimited Resources
                 </p>
-                <h1 className="text-3xl text-foreground font-light xl:text-4xl mb-7 tracking-tight">
+                <h1 className="text-2xl md:text-3xl text-foreground font-light xl:text-4xl mb-4 md:mb-7 tracking-tight">
                   Captions & Subtitles
                 </h1>
-                <p className="text-foreground-500 text-base">
+                <p className="text-foreground-500 text-sm md:text-base">
                   Lorem ipsum dolor sit amet, meliore mediocritatem ad ius. Cu
                   mel fabellas philosophia, eu labitur sensibus sit, ea clita
                   numquam probatus vis.
                 </p>
               </div>
               <Image
-                className="h-60 w-auto rounded-3xl"
+                className="md:h-60 w-auto rounded-xl md:rounded-3xl mt-10"
                 src="/drakedont.png"
                 width={1024}
                 height={1024}
                 alt=""
               />
             </div>
-            <div className=" border border-foreground-300 transition-all ease-in-out duration-300 rounded-3xl p-12 h-full flex flex-col items-center justify-between">
+            <div className=" border border-foreground-300 transition-all ease-in-out duration-300 rounded-xl md:rounded-3xl p-4 md:p-12 h-full flex flex-col items-center justify-between">
               <div className="flex flex-col">
-                <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-4 text-xl">
+                <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-2 md:mb-4 text-lg md:text-xl">
                   Unlimited Growth
                 </p>
-                <h1 className="text-3xl text-foreground font-light xl:text-4xl tracking-tight mb-7">
+                <h1 className="text-2xl md:text-3xl text-foreground font-light xl:text-4xl mb-4 md:mb-7 tracking-tight">
                   Translating & Dubbing
                 </h1>
-                <p className="text-foreground-500 text-base">
+                <p className="text-foreground-500 text-sm md:text-base">
                   Lorem ipsum dolor sit amet, meliore mediocritatem ad ius. Cu
                   mel fabellas philosophia, eu labitur sensibus sit, ea clita
                   numquam probatus vis.
                 </p>
               </div>
               <Image
-                className="h-60 w-auto rounded-3xl mt-10"
+                className="md:h-60 w-auto rounded-xl md:rounded-3xl mt-10"
                 src="/drakedont.png"
                 width={1024}
                 height={1024}
                 alt=""
               />
             </div>
-            <div className=" border border-foreground-300 transition-all ease-in-out duration-300 rounded-3xl p-12 h-full flex flex-col items-center justify-between">
+            <div className=" border border-foreground-300 transition-all ease-in-out duration-300 rounded-xl md:rounded-3xl p-4 md:p-12 h-full flex flex-col items-center justify-between">
               <div className="flex flex-col">
-                <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-4 text-xl">
+                <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 uppercase mb-2 md:mb-4 text-lg md:text-xl">
                   Unlimited Content
                 </p>
-                <h1 className="text-3xl text-foreground font-light xl:text-4xl tracking-tight mb-7">
+                <h1 className="text-2xl md:text-3xl text-foreground font-light xl:text-4xl mb-4 md:mb-7 tracking-tight">
                   Voice Overs
                 </h1>
-                <p className="text-foreground-500 text-base">
+                <p className="text-foreground-500 text-sm md:text-base">
                   Lorem ipsum dolor sit amet, meliore mediocritatem ad ius. Cu
                   mel fabellas philosophia, eu labitur sensibus sit, ea clita
                   numquam probatus vis.
                 </p>
               </div>
               <Image
-                className="h-60 w-auto rounded-3xl mt-10"
+                className="md:h-60 w-auto rounded-xl md:rounded-3xl mt-10"
                 src="/drakedont.png"
                 width={1024}
                 height={1024}

@@ -37,6 +37,12 @@ const Navbar = () => {
     }
   };
 
+  const toggleTheme = async () => {
+    const newMode = !isDarkMode;
+    dispatch(setDarkMode(newMode));
+    localStorage.setItem("userDarkModePreference", newMode.toString());
+  };
+
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -321,7 +327,7 @@ const Navbar = () => {
               Blog{" "}
             </a>
           </nav>
-          <div className="mr-6 mt-1 hidden">
+          <div className="mr-6 mt-1">
             <ThemeSwitch />
           </div>
           <Link
