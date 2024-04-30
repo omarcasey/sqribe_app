@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <section className="pt-20 pb-12 sm:pb-16 lg:pb-20 xl:pb-24" id="hero">
+    <section className="pt-12 lg:pt-20 pb-12 sm:pb-16 lg:pb-20 xl:pb-24" id="hero">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex flex-col items-center">
           <p className="text-sm font-normal tracking-widest text-foreground-700 uppercase text-center">

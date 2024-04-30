@@ -7,12 +7,15 @@ import { auth } from "@/firebase";
 import ThemeSwitch from "../App/ThemeSwitch";
 import { motion } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
+import { IoMenu, IoClose } from "react-icons/io5";
+import { Accordion, AccordionItem, Divider } from "@nextui-org/react";
 
 const Navbar = () => {
   const router = useRouter();
   const [user, setUser] = useState(false);
   const [showDropdown, setShowDropdown] = useState(""); // State to manage dropdown visibility
   const [dropdownRotation, setDropdownRotation] = useState({}); // State to manage dropdown rotation
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to track menu visibility
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -37,12 +40,6 @@ const Navbar = () => {
     }
   };
 
-  const toggleTheme = async () => {
-    const newMode = !isDarkMode;
-    dispatch(setDarkMode(newMode));
-    localStorage.setItem("userDarkModePreference", newMode.toString());
-  };
-
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -56,20 +53,25 @@ const Navbar = () => {
     });
   };
 
+  // Function to toggle the mobile menu
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <header className="py-4 sm:py-3 border-b-2 border-gray-800 z-[100] sticky top-0 bg-opacity-0 backdrop-blur-md transition-all duration-300">
+    <header className="py-2 sm:py-3 border-b-2 border-gray-800 z-[100] sticky top-0 bg-opacity-0 backdrop-blur-md transition-all duration-300">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="shrink-0">
             <Link href="/" onClick={handleClick} className="flex items-center">
               <Image
-                className="w-auto h-16 mr-4"
+                className="w-auto h-10 sm:h-16 mr-2 sm:mr-4"
                 src="/new logo transparent.png"
                 alt=""
                 width={1024}
                 height={1024}
               />
-              <h1 className="text-foreground font-extrabold text-3xl tracking-tight">
+              <h1 className="text-foreground font-extrabold text-lg sm:text-3xl tracking-tight mt-1">
                 Sqribe
               </h1>
             </Link>
@@ -327,21 +329,73 @@ const Navbar = () => {
               Blog{" "}
             </a>
           </nav>
-          <div className="mr-6 mt-1">
-            <ThemeSwitch />
-          </div>
-          <Link
-            href={user ? "/app/dashboard" : "/signin"}
-            className="relative md:items-center md:justify-center md:inline-flex group"
-          >
-            <div className="absolute transition-all duration-200 rounded-full -inset-[2px] bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
-            <div className="relative inline-flex items-center justify-center px-6 py-2 text-base font-normal text-foreground bg-foreground-50 border border-transparent rounded-full">
-              {" "}
-              Sign In{" "}
+          <div className="flex items-center">
+            <div className="mr-6 mt-1 hidden sm:block">
+              <ThemeSwitch />
             </div>
-          </Link>
+            <Link
+              href={user ? "/app/dashboard" : "/signin"}
+              className="relative md:items-center md:justify-center md:inline-flex group"
+            >
+              <div className="absolute transition-all duration-200 rounded-none sm:rounded-full -inset-[2px] bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
+              <div className="relative inline-flex items-center justify-center px-2 sm:px-6 py-1 sm:py-2 text-tiny sm:text-base font-normal text-foreground bg-foreground-50 border border-transparent rounded-none sm:rounded-full">
+                {" "}
+                Sign In{" "}
+              </div>
+            </Link>
+            <button
+              onClick={toggleMenu}
+              className="ml-4 border-2 border-purple-700 flex items-center justify-center p-0.5 px-1 h-[30px] rounded-none sm:hidden"
+            >
+              {isMenuOpen ? <IoClose size={20} /> : <IoMenu size={20} />}
+            </button>
+          </div>
         </div>
       </div>
+      {/* Fullscreen menu for mobile */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 top-14 z-[200] bg-black flex flex-col px-3 items-start justify-start text-white h-screen border-t border-blue-600">
+          <nav className="space-y-4 mt-4 mb-0 text-base w-full">
+            <Accordion fullWidth>
+              <AccordionItem
+                key="1"
+                aria-label="Accordion 1"
+                title={<p className="text-lg">Use Cases</p>}
+              >
+                1
+              </AccordionItem>
+              <AccordionItem
+                key="2"
+                aria-label="Accordion 2"
+                title="Features"
+              >
+                2
+              </AccordionItem>
+              <AccordionItem
+                key="3"
+                aria-label="Accordion 3"
+                title="Roles"
+              >
+                3
+              </AccordionItem>
+            </Accordion>
+            <div className="flex flex-col px-2 text-foreground-700">
+            <Divider className="mb-4 mt-0" />
+            <Link href="/pricing" className="block text-lg">
+              Pricing
+            </Link>
+            <Divider />
+            <Link href="/blog" className="block text-lg">
+              Blog
+            </Link>
+            <Divider />
+            <Link href={user ? "/app/dashboard" : "/signin"} className="block text-lg">
+              Sign In
+            </Link>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
