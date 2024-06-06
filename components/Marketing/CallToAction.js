@@ -9,12 +9,12 @@ const CallToAction = () => {
           {/* <h1 className="text-center text-4xl font-light text-foreground sm:text-5xl lg:text-6xl xl:text-6xl mb-6">
             Localize Your Videos
           </h1> */}
-          <div className="grid grid-cols-3 items-center text-center relative">
-            <div className='flex items-center justify-center border-r border-gray-400 border-opacity-20'>
+          <div className="grid grid-cols-1 gap-3 md:gap-0 md:grid-cols-3 items-center text-center relative">
+            <div className='flex items-center justify-center md:border-r border-gray-400 border-opacity-20'>
               <Image src='/voice.png' width={512} height={512} className='h-12 w-12 mr-4 filter -hue-rotate-30' alt='' />
               <h1 className="text-2xl text-foreground">Instant Dubbing</h1>
             </div>
-            <div className='flex items-center justify-center border-r border-gray-400 border-opacity-20'>
+            <div className='flex items-center justify-center md:border-r border-gray-400 border-opacity-20'>
               <Image src='/trending.png' width={512} height={512} className='h-12 w-12 mr-4 filter -hue-rotate-30' alt='' />
               <h1 className="text-2xl text-foreground">Scalable & Affordable</h1>
             </div>

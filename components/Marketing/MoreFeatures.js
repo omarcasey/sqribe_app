@@ -68,7 +68,7 @@ const MoreFeatures = () => {
           </div>
         </div>
         <div className="w-full flex items-center justify-center">
-          <Button size="lg" color="primary" className="md:w-44 text-xl bg-blue-700 saturate-200 w-full py-[1.8rem] md:py-0 font-medium md:font-normal">
+          <Button size="lg" color="primary" className=" text-xl bg-blue-700 saturate-200 w-52 py-[1.8rem] md:py-0 font-medium md:font-normal">
             Try it free
           </Button>
         </div>

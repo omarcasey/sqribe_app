@@ -18,6 +18,14 @@ const SuccessStories = () => {
       spaceBetween: 30,
       loop: false,
       speed: 1000,
+      breakpoints: {
+        0: {
+          slidesPerView: 1, // Show 1 slide for very small screens
+        },
+        768: {
+          slidesPerView: 2, // Show 2 slides from 768px upwards
+        },
+      },
     });
 
     // Clean up Swiper instance on unmount
@@ -158,11 +166,11 @@ const SuccessStories = () => {
   ];
 
   return (
-    <section className="pt-32 py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
+    <section className="pt-24 py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex flex-row justify-between">
-          <h1 className="text-4xl text-foreground mb-12 font-medium tracking-tight">
-            Inspiring <span className="italic font-playfair">success </span>
+        <div className="flex flex-row justify-between items-end mb-6 md:mb-12">
+          <h1 className="text-3xl md:text-4xl text-foreground font-medium tracking-tight">
+            Inspiring <br/><span className="italic font-playfair">success </span>
             &nbsp;stories
           </h1>
           <div className="flex flex-row gap-1">
@@ -186,9 +194,9 @@ const SuccessStories = () => {
           <div className="swiper-wrapper">
             {reviews.map((review, index) => (
               <div key={index} className="swiper-slide">
-                <div className="review-card border border-foreground-300 rounded-3xl p-8 flex flex-col justify-between h-[700px]">
+                <div className="review-card border border-foreground-300 rounded-3xl p-6 md:p-8 flex flex-col h-[650px] md:h-[700px] justify-between">
                   <div className="flex flex-col">
-                    <h3 className="text-2xl font-medium mb-4">
+                    <h3 className="text-xl tracking-tighter md:tracking-normal md:text-2xl font-medium mb-4">
                       {review.title}
                     </h3>
                     <p className="text-foreground-500 text-sm font-medium">

@@ -98,9 +98,9 @@ const ReviewsSlider = () => {
   return (
     <section className="pt-24 py-12 sm:pb-16 lg:pb-20 xl:pb-24 overflow-x-hidden">
       <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex flex-row justify-between">
-          <h1 className="text-2xl md:text-4xl text-foreground mb-12 font-medium tracking-tight">
-            Amazing Reviews
+        <div className="flex flex-row justify-between items-end mb-6 md:mb-12">
+          <h1 className="text-3xl md:text-4xl text-foreground font-medium tracking-tight">
+          <span className="italic font-playfair">Amazing</span> <br/>Testimonials
           </h1>
           <div className="flex flex-row gap-1">
             <Button

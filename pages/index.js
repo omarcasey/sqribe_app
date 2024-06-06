@@ -56,7 +56,7 @@ export default function Home() {
   return (
     <main className="h-screen relative flex flex-col">
       <Navbar />
-      <div id="home" className="h-full overflow-auto">
+      <div id="home" className="h-full overflow-y-auto w-screen overflow-x-hidden">
         <Hero />
         <VideoPreview />
         <ScrollingCompanies />
