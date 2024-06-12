@@ -43,7 +43,7 @@ const ScrollingCompanies = () => {
         </h1>
         <div className="relative">
           <div className="absolute z-10 top-0 bottom-0 -left-6 w-16 bg-default-100 dark:bg-black blur-md -my-7" />
-          <div className="absolute z-10 top-0 bottom-0 -right-6 w-16 bg-default-100 dark:bg-black blur-md -my-7" />
+          <div className="absolute z-10 top-0 bottom-0 w-16 bg-default-100 dark:bg-black blur-md -my-7" />
           <Slider {...settings}>
             {companyImages.map((image, index) => (
               <div key={index} className="flex items-center justify-center">
