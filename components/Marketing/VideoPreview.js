@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { MdTranslate, MdPlayCircle } from "react-icons/md";

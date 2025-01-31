@@ -1,6 +1,4 @@
 import { Button } from "@nextui-org/react";
-import Image from "next/image";
-import { MdTranslate } from "react-icons/md";
 import { RiScissorsCutLine } from "react-icons/ri";
 import { HiPlay, HiSparkles } from "react-icons/hi2";
 import { motion } from "framer-motion";

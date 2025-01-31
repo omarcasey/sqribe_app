@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { db } from "@/firebase";
 import { Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
+import { addSampleProject } from "@/helpers/addSampleProject";
 const Stripe = require("stripe");
 const stripe = Stripe(
   "sk_test_51OjOT0LgT8zvXr8nEojzCeUNTPJgP89CQv0v95gOLoJwUDOpYP1JolBc40aGl7h9y4VT3pKOtclFd55PJK9M8eJ200AdnmMHrM"
@@ -57,6 +58,7 @@ const SignUp = () => {
         surveyCompleted: false,
         stripeId: customer.id,
       });
+      await addSampleProject(user.uid);
       console.log("Signed up and add");
 
       router.push("/app/dashboard");
@@ -109,6 +111,7 @@ const SignUp = () => {
           surveyCompleted: false,
           stripeId: customer.id,
         });
+        await addSampleProject(user.uid);
         console.log("Signed up and signed in successfully!");
         toast.success("Signed up and signed in successfully!");
         router.push("/app/dashboard");

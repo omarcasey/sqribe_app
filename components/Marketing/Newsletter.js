@@ -26,13 +26,13 @@ const Newsletter = () => {
                 <div className="flex">
                     <div className="w-1/2 pr-1">
                         <p className="text-sm font-normal tracking-widest text-gray-300 uppercase">Unlock the Future of YouTube Content Creation</p>
-                        <h1 className="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Join the waitlist for early access!</h1>
+                        <h1 className="mt-6 text-4xl font-light text-white sm:mt-10 sm:text-5xl lg:text-6xl pr-8">Start translating videos now</h1>
                         <form onSubmit={handleSubmit} className="relative mt-8 rounded-full sm:mt-12">
                             <div className="relative">
                                 <div className="absolute rounded-full -inset-px bg-white"></div>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 flex items-center pl-6">
-                                        <Image className='w-5 h-5 invert opacity-30' src='/email-icon.svg' width={20} height={20} />
+                                        <Image className='w-5 h-5 invert opacity-30' src='/email-icon.svg' width={20} height={20} alt='' />
                                     </div>
                                     <input type="email" name="" id="" placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} className="block w-full py-4 pr-6 text-white placeholder-gray-500 bg-black border border-transparent rounded-full pl-14 sm:py-5 focus:border-transparent focus:ring-0" />
                                 </div>

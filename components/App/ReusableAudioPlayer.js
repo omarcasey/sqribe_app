@@ -59,7 +59,7 @@ const ReusableAudioPlayer = ({ audioUrl, name, filename }) => {
         setCurrentTime(0);
       });
     }
-  }, [audioUrl]);
+  }, [audioUrl, duration]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);

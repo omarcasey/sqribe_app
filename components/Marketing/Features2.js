@@ -10,18 +10,18 @@ const Features2 = () => {
                             Level up with
                         </p>
                         <h1 className="mt-6 mb-14 text-4xl text-white sm:mt-10 sm:text-5xl lg:text-6xl xl:text-8xl text-center lg:text-left">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 relative z-10">Connect apps</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 relative z-10">Maximize reach</span>
                             with Sqribe
                         </h1>
                         <div className="flex">
-                            <Image className="h-12 w-12 mr-4 bg-[#18181b] rounded-full p-2" src='/new logo transparent.png' width={1024} height={1024} />
+                            <Image className="h-12 w-12 mr-4 bg-[#18181b] rounded-full p-2" src='/new logo transparent.png' width={1024} height={1024} alt="" />
                             <div className="flex flex-col">
                                 <p className="text-xl text-white mb-4 mt-1">1200+ Premium Apps</p>
                                 <p className="text-gray-400">Small description description description description description description description description description description</p>
                             </div>
                         </div>
                         <div className="flex mt-10">
-                            <Image className="h-12 w-12 mr-4 bg-[#18181b] rounded-full p-2" src='/new logo transparent.png' width={1024} height={1024} />
+                            <Image className="h-12 w-12 mr-4 bg-[#18181b] rounded-full p-2" src='/new logo transparent.png' width={1024} height={1024} alt="" />
                             <div className="flex flex-col">
                                 <p className="text-xl text-white mb-4 mt-1">Integration with YouTube</p>
                                 <p className="text-gray-400">Small description description description description description description description description description description</p>
@@ -34,7 +34,7 @@ const Features2 = () => {
                         </div>
                     </div>
                     <div className="w-3/5 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-3xl p-12">
-                        <Image className="h-full max-w-none rounded-xl shadow-xl contrast-150" src='/drakedont.png' width={1240} height={701} />
+                        <Image className="h-full max-w-none rounded-xl shadow-xl contrast-150" src='/drakedont.png' width={1000} height={1000} alt="" />
                     </div>
                 </div>
             </div>

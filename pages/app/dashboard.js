@@ -30,6 +30,9 @@ import {
   orderBy,
   where,
   query,
+  doc,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
 import { MdDownloadForOffline } from "react-icons/md";
@@ -48,6 +51,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const uid = useSelector((state) => state.user.auth.uid);
   const projects = useSelector((state) => state.user.projects);
+  const name = useSelector((state) => state.user.auth.displayName);
   const [audioFiles, setAudioFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +59,7 @@ const Dashboard = () => {
     labels: ["Used Credits", "Remaining Credits"],
     datasets: [
       {
-        data: [userData.usedCredits, userData.remainingCredits],
+        data: [userData.subscription.usage.usedSeconds, userData.subscription.usage.remainingSeconds],
         backgroundColor: ["rgb(125 211 252)", "rgb(14 165 233)"],
         borderWidth: 0,
         borderColor: "rgb(14 165 233)",
@@ -114,20 +118,30 @@ const Dashboard = () => {
     };
   }, []);
 
-  async function fetchDataFromCloudFunction() {
-    async function uploadVideo() {
-      try {
-        const response = await fetch("/api/process-video", {
-          method: "POST",
-        });
-        const data = await response.json();
-        console.log(data);
-      } catch (error) {
-        console.error("Error uploading video:", error);
-      }
-    }
+  async function duplicateDocument() {
+    // Example usage:
+    const sourcePath = "projects/sZN5qfvG5dFMIrqhcbN2";
+    const destinationPath = "projects/sampleProject";
+    try {
+      // Get the source document
+      const sourceDocRef = doc(db, sourcePath);
+      const sourceDocSnapshot = await getDoc(sourceDocRef);
 
-    uploadVideo();
+      if (sourceDocSnapshot.exists()) {
+        // Extract data from the source document
+        const sourceData = sourceDocSnapshot.data();
+
+        // Set the data to the destination document
+        const destinationDocRef = doc(db, destinationPath);
+        await setDoc(destinationDocRef, sourceData);
+
+        console.log("Document duplicated successfully.");
+      } else {
+        console.log("Source document does not exist.");
+      }
+    } catch (error) {
+      console.error("Error duplicating document:", error);
+    }
   }
 
   return (
@@ -136,6 +150,7 @@ const Dashboard = () => {
         <div className="flex flex-col items-center pb-24 pt-10 text-foreground max-w-7xl mx-auto">
           <div className="flex w-full gap-4">
             <div className="w-2/3 space-y-2">
+            <h1 className="text-2xl mb-4">Welcome back, {name?.split(' ')[0]} 👋</h1>
               <h1 className="text-2xl mb-4">Recent Projects</h1>
               {projects?.slice(0, 2).map((project, index) => (
                 <Card
@@ -178,7 +193,7 @@ const Dashboard = () => {
                 AI Text To Speech
               </Button>
               <Button
-                onPress={fetchDataFromCloudFunction}
+                onPress={duplicateDocument}
                 className="bg-gradient-to-r from-blue-400 to-emerald-400 w-full h-unit-18 mb-2 text-lg text-white"
               >
                 <IoSparkles />

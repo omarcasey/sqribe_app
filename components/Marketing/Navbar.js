@@ -59,15 +59,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        // Redirect to the sign-in page if the user is not signed in
-        setUser(false);
-      } else {
-        setUser(true);
-      }
+      setUser(!!user);
     });
-
-    // Cleanup the subscription when the component unmounts
     return () => unsubscribe();
   }, []);
 
