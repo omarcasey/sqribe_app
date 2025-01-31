@@ -126,7 +126,7 @@ const CallToAction = () => {
 
         <motion.div variants={itemVariants} className="text-center">
           <h3 className="text-3xl md:text-4xl font-bold mb-8 max-w-3xl mx-auto">
-            There's <span className="font-playfair italic">no need</span> for translation
+            There&apos;s <span className="font-playfair italic">no need</span> for translation
             agencies or other products anymore
           </h3>
           

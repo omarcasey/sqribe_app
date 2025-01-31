@@ -133,7 +133,7 @@ const ReviewsSlider = () => {
         <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-full blur-[100px]" />
       </div>
 
-      <motion.div 
+      <motion.div
         className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl"
         variants={containerVariants}
         initial="hidden"
@@ -151,11 +151,11 @@ const ReviewsSlider = () => {
                 Worldwide
               </span>
               <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0 15 Q 75 0 150 15 Q 225 30 300 15" stroke="url(#gradient)" strokeWidth="3" fill="none"/>
+                <path d="M 0 15 Q 75 0 150 15 Q 225 30 300 15" stroke="url(#gradient)" strokeWidth="3" fill="none" />
                 <defs>
                   <linearGradient id="gradient">
-                    <stop offset="0%" stopColor="#8B5CF6"/>
-                    <stop offset="100%" stopColor="#EC4899"/>
+                    <stop offset="0%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#EC4899" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -172,7 +172,7 @@ const ReviewsSlider = () => {
             <div className="swiper-wrapper">
               {reviews.map((review, index) => (
                 <div key={index} className="swiper-slide">
-                  <motion.div 
+                  <motion.div
                     className="group relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 h-full"
                     whileHover={{ y: -5 }}
                     transition={{ duration: 0.2 }}
@@ -193,7 +193,7 @@ const ReviewsSlider = () => {
                         {review.title}
                       </h3>
                       <p className="text-gray-400 mb-6 flex-grow">
-                        "{review.content}"
+                        &quot;{review.content}&quot;
                       </p>
 
                       {/* Stats */}
