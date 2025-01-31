@@ -21,6 +21,7 @@ import {
   ListboxSection,
   Kbd,
   Progress,
+  Tooltip,
 } from "@nextui-org/react";
 import Image from "next/image";
 import { RiLayoutMasonryFill } from "react-icons/ri";
@@ -127,181 +128,220 @@ const AppShell = ({ children }) => {
   };
 
   return (
-    <div
-      className={`flex flex-row h-screen ${
-        isDarkMode ? "dark" : "light"
-      } bg-default-100`}
-    >
+    <div className={`flex flex-row h-screen ${isDarkMode ? "dark" : "light"} bg-default-100`}>
       <Sidebar />
       <div className="flex flex-col flex-1">
-        <nav className="dark:bg-neutral-900 bg-white px-6 py-3 border-b border-foreground-300">
-          <div className="flex justify-between items-center">
-            <Button
-              startContent={<SearchIcon />}
-              endContent={
-                <div className="ml-2 border border-foreground-400 dark:border-foreground-300 bg-white dark:bg-foreground-100 text-xs flex items-center justify-center px-1 text-foreground-500 rounded-lg pt-[3px] pb-[2px]">
-                  <span className="text-[10px]">⌘</span>K
-                </div>
-              }
-              className="text-foreground-500 bg-foreground-200 dark:bg-foreground-200 hidden lg:flex"
-              size="md"
-              onPress={() => dispatch(setOpenCommandCenter(true))}
-            >
-              Command Center...
-            </Button>
-            <Button className="flex lg:hidden min-w-0 px-2" variant="flat">
-              <IoMenu size={30} />
-            </Button>
-            <div className="flex space-x-3 items-center">
-              <div className="w-32 mr-2">
-                <p className="text-tiny mb-1 text-center text-foreground-600">
-                  {(subscription?.usage.usedSeconds / 60).toFixed(
-                    subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
-                  )}{" "}
-                  / {(subscription?.usage.totalSeconds / 60).toFixed(0)} mins
-                  used
-                </p>
-                <Progress
-                  disableAnimation
-                  color="danger"
-                  value={
-                    (subscription?.usage.usedSeconds /
-                      subscription?.usage.totalSeconds) *
-                    100
+        {/* Enhanced Navigation Bar */}
+        <nav className="dark:bg-neutral-900/90 bg-white/90 backdrop-blur-md px-6 py-3 border-b border-default-200 sticky top-0 z-40">
+          <div className="flex justify-between items-center max-w-[1920px] mx-auto">
+            <div className="flex items-center gap-4">
+              <Button
+                className="flex lg:hidden min-w-0 px-2"
+                variant="light"
+                isIconOnly
+              >
+                <IoMenu size={24} />
+              </Button>
+              <Tooltip content="Press ⌘K to open command center" delay={500}>
+                <Button
+                  startContent={<SearchIcon />}
+                  endContent={
+                    <div className="ml-2 border border-default-300 bg-default-100 dark:bg-default-50 text-xs flex items-center justify-center px-1.5 rounded-md py-px">
+                      <span className="text-[10px]">⌘</span>K
+                    </div>
                   }
+                  className="text-default-700 bg-default-100 dark:bg-default-50 hidden lg:flex hover:bg-default-200 dark:hover:bg-default-100"
+                  variant="flat"
+                  size="md"
+                  onPress={() => dispatch(setOpenCommandCenter(true))}
+                >
+                  Search anything...
+                </Button>
+              </Tooltip>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Usage Progress */}
+              <div className="w-40 bg-default-50 dark:bg-default-100 rounded-lg px-3 py-2">
+                <div className="flex justify-between items-center mb-1">
+                  <p className="text-tiny text-default-600">Usage</p>
+                  <p className="text-tiny text-default-600">
+                    {(subscription?.usage.usedSeconds / 60).toFixed(
+                      subscription?.usage.usedSeconds % 60 === 0 ? 0 : 1
+                    )}/{(subscription?.usage.totalSeconds / 60).toFixed(0)} mins
+                  </p>
+                </div>
+                <Progress
+                  size="sm"
+                  radius="full"
+                  classNames={{
+                    base: "max-w-full",
+                    track: "drop-shadow-md border border-default-200",
+                    indicator: "bg-gradient-to-r from-pink-500 to-violet-500",
+                  }}
+                  value={(subscription?.usage.usedSeconds / subscription?.usage.totalSeconds) * 100}
                 />
               </div>
+
               <DropdownMenuIdk router={router} />
-              <Button
-                className="px-3 min-w-0 hidden lg:flex"
-                startContent={<IoIosHelpCircleOutline size={25} />}
-              ></Button>
+              
+              <Tooltip content="Get help" delay={500}>
+                <Button
+                  isIconOnly
+                  className="hidden lg:flex"
+                  variant="flat"
+                  startContent={<IoIosHelpCircleOutline size={22} />}
+                />
+              </Tooltip>
             </div>
           </div>
         </nav>
-        <main className="flex flex-1 bg-default-100 overflow-y-auto">
+
+        {/* Main Content */}
+        <main className="flex flex-1 bg-default-50 dark:bg-default-100 overflow-y-auto">
           {children}
         </main>
       </div>
 
-      {/* <main className="flex flex-1 bg-default-100">{children}</main> */}
+      {/* Enhanced Audio Player */}
       {audioFile && (
-        <div
-          className={`fixed bottom-0 right-0 z-50 w-10 h-10 mr-6 mb-4 rounded-full ${
-            isDarkMode ? "bg-white" : "bg-black"
-          } bg-opacity-80 backdrop-filter backdrop-blur-sm hover:cursor-pointer hover:bg-opacity-100 ${
-            audioPlayerVisible ? "hidden" : "visible"
-          } transition-all}`}
-        >
-          <div className="w-full h-full flex items-center justify-center">
-            <BsChevronDown
-              className="text-foreground-50 hover:cursor-pointer rotate-180"
-              size={20}
-              onClick={() => {
-                dispatch(setAudioPlayerVisible(true));
-              }}
-            />
+        <>
+          {/* Minimized Player Button */}
+          <div
+            className={`fixed bottom-0 right-0 z-50 mr-6 mb-4 ${
+              audioPlayerVisible ? "hidden" : "visible"
+            }`}
+          >
+            <Button
+              isIconOnly
+              className="w-12 h-12 bg-foreground text-background rounded-full shadow-lg hover:scale-105 transition-transform"
+              onClick={() => dispatch(setAudioPlayerVisible(true))}
+            >
+              <BsChevronDown className="rotate-180" size={20} />
+            </Button>
           </div>
-        </div>
-      )}
-      {audioFile && (
-        <div
-          className={`fixed bottom-0 left-0 z-50 w-full ${
-            isDarkMode ? "bg-black" : "bg-white"
-          } bg-opacity-50 h-[6.7rem] backdrop-filter backdrop-blur-sm ${
-            audioPlayerVisible ? "visible" : "hidden"
-          } transition-all}`}
-        >
-          <div className="w-full h-full flex items-center px-6">
-            {isPlaying ? (
-              <IoPauseCircleSharp
-                size={70}
-                className={`text-foreground-700 hover:cursor-pointer hover:text-foreground`}
-                onClick={handlePlayPause}
-              />
-            ) : (
-              <IoPlayCircleSharp
-                size={70}
-                className={`text-foreground-700 hover:cursor-pointer hover:text-foreground`}
-                onClick={handlePlayPause}
-              />
-            )}
 
-            <div className="flex flex-col ml-5 flex-1 h-full justify-between py-5 pb-6">
-              <p className="text-foreground-800 text-sm text-[13px] font-bold tracking-wider">
-                <span className=" tracking-tight">{audioFile.voice}</span>,{" "}
-                {audioFile.date.toDate().toLocaleString()}
-              </p>
-              <div className="flex flex-row">
-                <TbRewindBackward10
-                  className="text-foreground-500 mr-5 hover:cursor-pointer hover:text-foreground"
-                  size={22}
-                  onClick={() => {
-                    const newTime = audioElement.currentTime - 10;
-                    if (newTime >= 0) {
-                      setCurrentTime(newTime);
-                      audioElement.currentTime = newTime;
-                    } else {
-                      setCurrentTime(0);
-                      audioElement.currentTime = 0;
-                    }
-                  }}
-                />
-                <TbRewindForward10
-                  className="text-foreground-500 mr-4 hover:cursor-pointer hover:text-foreground"
-                  size={22}
-                  onClick={() => {
-                    const newTime = audioElement.currentTime + 10;
-                    if (newTime <= duration) {
-                      setCurrentTime(newTime);
-                      audioElement.currentTime = newTime;
-                    } else {
-                      setCurrentTime(duration);
-                      audioElement.currentTime = duration;
-                    }
-                  }}
-                />
-                <Slider
-                  size="sm"
-                  color="foreground"
-                  step={0.001}
-                  maxValue={1}
-                  minValue={0}
-                  formatOptions={{ style: "percent" }}
-                  aria-label="Clarity + Similarity Enhancement"
-                  className="flex flex-1 px-3"
-                  value={currentTime / duration}
-                  onChange={(value) => {
-                    setCurrentTime(value * duration);
-                    audioElement.currentTime = value * duration;
-                  }}
-                />
-                <p className="text-foreground-500 text-sm mr-6">
-                  {formatTime(currentTime)}&nbsp;&nbsp; /&nbsp;&nbsp;{" "}
-                  {formatTime(duration)}
-                </p>
-                <GoThumbsup
-                  className="mr-1 text-foreground-500 hover:cursor-pointer hover:text-foreground-400"
-                  size={20}
-                />
-                <GoThumbsdown
-                  className="mr-5 scale-x-[-1] text-foreground-500 hover:cursor-pointer hover:text-foreground-400"
-                  size={20}
-                />
-                <BsDownload
-                  className="mr-6 text-foreground-500 hover:cursor-pointer hover:text-foreground"
-                  size={20}
-                />
-                <BsChevronDown
-                  className="mr-2 text-foreground-500 hover:cursor-pointer hover:text-foreground-400"
-                  size={20}
-                  onClick={() => {
-                    dispatch(setAudioPlayerVisible(false));
-                    dispatch(setAutoPlay(false));
-                  }}
-                />
+          {/* Full Audio Player */}
+          <div
+            className={`fixed bottom-0 left-0 z-50 w-full backdrop-blur-md ${
+              isDarkMode ? "bg-background/80" : "bg-background/80"
+            } ${audioPlayerVisible ? "visible" : "hidden"} transition-all duration-300 border-t border-default-200 shadow-lg`}
+          >
+            <div className="max-w-[1920px] mx-auto px-6 py-4">
+              <div className="flex items-center gap-6">
+                {/* Play/Pause Button */}
+                <Button
+                  isIconOnly
+                  className="w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:scale-105 transition-transform"
+                  onClick={handlePlayPause}
+                >
+                  {isPlaying ? (
+                    <IoPauseCircleSharp size={40} />
+                  ) : (
+                    <IoPlayCircleSharp size={40} />
+                  )}
+                </Button>
+
+                <div className="flex-1 space-y-2">
+                  {/* Audio Info */}
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">
+                      {audioFile.voice}, {audioFile.date.toDate().toLocaleString()}
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <p className="text-sm text-default-600">
+                        {formatTime(currentTime)} / {formatTime(duration)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Controls */}
+                  <div className="flex items-center gap-4">
+                    <Button
+                      isIconOnly
+                      variant="light"
+                      className="text-default-600 hover:text-primary"
+                      onClick={() => {
+                        const newTime = audioElement.currentTime - 10;
+                        audioElement.currentTime = Math.max(0, newTime);
+                        setCurrentTime(Math.max(0, newTime));
+                      }}
+                    >
+                      <TbRewindBackward10 size={22} />
+                    </Button>
+
+                    <Button
+                      isIconOnly
+                      variant="light"
+                      className="text-default-600 hover:text-primary"
+                      onClick={() => {
+                        const newTime = audioElement.currentTime + 10;
+                        audioElement.currentTime = Math.min(duration, newTime);
+                        setCurrentTime(Math.min(duration, newTime));
+                      }}
+                    >
+                      <TbRewindForward10 size={22} />
+                    </Button>
+
+                    <Slider
+                      size="sm"
+                      color="primary"
+                      step={0.001}
+                      maxValue={1}
+                      minValue={0}
+                      value={currentTime / duration}
+                      onChange={(value) => {
+                        setCurrentTime(value * duration);
+                        audioElement.currentTime = value * duration;
+                      }}
+                      classNames={{
+                        base: "flex-1",
+                        track: "bg-default-300",
+                        filledTrack: "bg-primary",
+                        thumb: "bg-primary shadow-lg",
+                      }}
+                    />
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        className="text-default-600 hover:text-success"
+                      >
+                        <GoThumbsup size={18} />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        className="text-default-600 hover:text-danger"
+                      >
+                        <GoThumbsdown size={18} className="scale-x-[-1]" />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        className="text-default-600 hover:text-primary"
+                      >
+                        <BsDownload size={18} />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        className="text-default-600 hover:text-primary"
+                        onClick={() => {
+                          dispatch(setAudioPlayerVisible(false));
+                          dispatch(setAutoPlay(false));
+                        }}
+                      >
+                        <BsChevronDown size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Hidden Audio Element */}
             <audio
               id="audio-element"
               src={audioFile.fileURL}
@@ -310,9 +350,10 @@ const AppShell = ({ children }) => {
               autoPlay={autoPlay}
             />
           </div>
-          {/* Content for the semi-transparent bar */}
-        </div>
+        </>
       )}
+
+      {/* Search Components */}
       <SearchBox />
       <ProjectSearch />
       <ThemeSearch />

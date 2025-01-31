@@ -17,6 +17,7 @@ import {
   Button,
   Chip,
   Avatar,
+  Progress,
 } from "@nextui-org/react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
@@ -34,8 +35,9 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import { FaCircleInfo, FaCirclePlay } from "react-icons/fa6";
-import { MdDownloadForOffline } from "react-icons/md";
+import { FaCircleInfo, FaCirclePlay, FaRegClock, FaChartLine } from "react-icons/fa6";
+import { MdDownloadForOffline, MdWorkspaces } from "react-icons/md";
+import { RiVipCrownFill } from "react-icons/ri";
 import { db } from "@/firebase";
 import {
   fetchAudioFile,
@@ -60,33 +62,31 @@ const Dashboard = () => {
     datasets: [
       {
         data: [userData.subscription.usage.usedSeconds, userData.subscription.usage.remainingSeconds],
-        backgroundColor: ["rgb(125 211 252)", "rgb(14 165 233)"],
+        backgroundColor: ["rgba(99, 102, 241, 0.8)", "rgba(129, 140, 248, 0.3)"],
         borderWidth: 0,
-        borderColor: "rgb(14 165 233)",
-        hoverOffset: 20,
-        borderDash: [2, 2],
+        hoverOffset: 4,
       },
     ],
   };
 
   const options = {
-    cutout: "50%", // Adjust the cutout percentage for a solid doughnut
+    cutout: "75%",
     plugins: {
       legend: {
         display: false,
-        position: "bottom",
       },
       tooltip: {
-        enabled: false, // Disable tooltips on hover
+        enabled: true,
+        callbacks: {
+          label: (context) => {
+            const value = context.raw;
+            return `${value} seconds`;
+          }
+        }
       },
     },
     layout: {
-      padding: {
-        top: 10, // Adjust as needed
-        right: 10,
-        bottom: 10,
-        left: 10,
-      },
+      padding: 20,
     },
   };
 
@@ -146,204 +146,268 @@ const Dashboard = () => {
 
   return (
     <AppShell>
-      <div className="w-full px-4 sm:px-10">
-        <div className="flex flex-col items-center pb-24 pt-10 text-foreground max-w-7xl mx-auto">
-          <div className="flex w-full gap-4">
-            <div className="w-2/3 space-y-2">
-            <h1 className="text-2xl mb-4">Welcome back, {name?.split(' ')[0]} 👋</h1>
-              <h1 className="text-2xl mb-4">Recent Projects</h1>
-              {projects?.slice(0, 2).map((project, index) => (
-                <Card
-                  key={project.id}
-                  className="p-4 w-full flex flex-row items-center justify-start hover:bg-default-200"
-                  isPressable
-                  onPress={() => router.push(`/app/projects/${project.id}`)}
-                >
-                  <Image
-                    src={project.thumbnailURL || "/drakedont.png"}
-                    alt="thumbnail"
-                    width={1000}
-                    height={1000}
-                    className="w-auto h-10 mr-3 rounded-lg"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-foreground font-medium text-start">
-                      {project.projectName}
-                    </p>
-                    <p className="text-default-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis max-w-xs">
-                      {project.fileName}
-                    </p>
-                  </div>
-                  <div className="flex flex-row items-center justify-end ml-auto">
-                    <FaCircleInfo
-                      className="text-foreground-700 ml-2"
-                      size={12}
-                    />
-                  </div>
-                </Card>
-              ))}
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center pb-24 pt-6 max-w-[1400px] mx-auto">
+            {/* Welcome Section */}
+            <div className="w-full mb-8">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+                    Welcome back, {name?.split(' ')[0]} 👋
+                  </h1>
+                  <p className="text-default-500">Here&apos;s what&apos;s happening with your projects today.</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Button
+                    className="bg-gradient-to-r from-pink-500 to-violet-500 text-white font-medium"
+                    size="lg"
+                    startContent={<IoSparkles />}
+                  >
+                    New Project
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="w-1/3">
-              <h1 className="text-2xl mb-[18px]">New Features</h1>
-              <Button
-                onPress={() => router.push("/app/makespeech")}
-                className="bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500 w-full h-unit-18 mb-3 text-lg text-white"
-              >
-                <IoSparkles />
-                AI Text To Speech
-              </Button>
-              <Button
-                onPress={duplicateDocument}
-                className="bg-gradient-to-r from-blue-400 to-emerald-400 w-full h-unit-18 mb-2 text-lg text-white"
-              >
-                <IoSparkles />
-                Test Button
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-col mt-4 w-full">
-            <h1 className="text-2xl mb-4">Recent Samples</h1>
-            <Table aria-label="Example static collection table">
-              <TableHeader>
-                <TableColumn className="font-bold">Voice</TableColumn>
-                <TableColumn className="font-bold">Date</TableColumn>
-                <TableColumn className="font-bold">Status</TableColumn>
-                <TableColumn className="font-bold">Text</TableColumn>
-                <TableColumn className="font-bold">Actions</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {audioFiles.map((audioFile, index) => (
-                  <TableRow key={audioFile.id}>
-                    <TableCell>
-                      <div className="flex flex-row items-center justify-between">
-                        <p className="mr-2 w-28">{audioFile.voice}</p>
-                        <FaCircleInfo
-                          className="text-foreground-700 ml-2"
-                          size={12}
-                          onClick={() => console.log(audioFiles)}
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell>{audioFile.date}</TableCell>
-                    <TableCell>
-                      <Chip color="success" className="bg-green-200 text-tiny">
-                        Generated
-                      </Chip>
-                    </TableCell>
-                    <TableCell>{audioFile.text}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-row gap-2 items-center justify-center">
-                        <Button
-                          className="px-unit-0 h-auto min-w-0 rounded-full"
-                          variant="light"
-                          onClick={async () => (
-                            await dispatch(setAutoPlay(true)),
-                            dispatch(fetchAudioFile(audioFile.id)),
-                            dispatch(setAudioPlayerVisible(true))
-                          )}
-                        >
-                          <FaCirclePlay className="text-blue-500" size={27} />
-                        </Button>
-                        <Button
-                          className="px-unit-0 h-auto min-w-0 rounded-full"
-                          variant="light"
-                          onClick={() => handleDownload(audioFile.fileURL)}
-                        >
-                          <MdDownloadForOffline
-                            className="text-blue-900 dark:text-foreground-800 -m-[2px]"
-                            size={33}
-                          />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-col mt-8 w-full">
-            <div className="flex gap-4">
-              <Card className="p-4 w-full flex items-center">
-                <p className="text-2xl mb-6 mt-2">Usage Statistics</p>
-                <div className="flex flex-row mb-3 gap-4">
-                  <div className="w-52 h-52">
-                    <Doughnut data={data} options={options} />
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-8">
+              <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-default-500">Total Projects</p>
+                    <p className="text-2xl font-bold">{projects?.length || 0}</p>
                   </div>
-                  <div className="flex flex-col justify-center gap-8">
-                    <div className="flex flex-col items-center justify-center text-sm">
-                      <div className="bg-sky-300 w-6 h-3 mb-1"></div>
-                      <p>Used Credits:</p>
-                      <p className="font-bold text-base text-warning">
-                        {userData.usedCredits}
-                      </p>
+                  <div className="p-3 bg-blue-500/10 rounded-full">
+                    <MdWorkspaces className="w-6 h-6 text-blue-500" />
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-default-500">Used Credits</p>
+                    <p className="text-2xl font-bold">{userData.usedCredits}</p>
+                  </div>
+                  <div className="p-3 bg-purple-500/10 rounded-full">
+                    <FaChartLine className="w-6 h-6 text-purple-500" />
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-default-500">Remaining Credits</p>
+                    <p className="text-2xl font-bold">{userData.remainingCredits}</p>
+                  </div>
+                  <div className="p-3 bg-rose-500/10 rounded-full">
+                    <RiVipCrownFill className="w-6 h-6 text-rose-500" />
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-default-500">Recent Samples</p>
+                    <p className="text-2xl font-bold">{audioFiles.length}</p>
+                  </div>
+                  <div className="p-3 bg-emerald-500/10 rounded-full">
+                    <FaRegClock className="w-6 h-6 text-emerald-500" />
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-12 gap-6 w-full">
+              {/* Recent Projects Section */}
+              <div className="col-span-12 lg:col-span-8">
+                <Card className="p-6">
+                  <CardHeader className="flex justify-between px-0">
+                    <div>
+                      <h2 className="text-2xl font-bold">Recent Projects</h2>
+                      <p className="text-default-500">Your latest work in progress</p>
                     </div>
-                    <div className="flex flex-col items-center justify-center text-sm">
-                      <div className="bg-sky-500 w-6 h-3 mb-1"></div>
-                      <p>Remaining Credits:</p>
-                      <p className="font-bold text-base text-success">
-                        {userData.remainingCredits}
-                      </p>
+                    <Button color="primary" variant="flat" size="sm">
+                      View All
+                    </Button>
+                  </CardHeader>
+                  <CardBody className="px-0 py-4">
+                    <div className="space-y-4">
+                      {projects?.slice(0, 3).map((project) => (
+                        <Card
+                          key={project.id}
+                          className="w-full hover:bg-default-100 transition-colors cursor-pointer"
+                          isPressable
+                          onPress={() => router.push(`/app/projects/${project.id}`)}
+                        >
+                          <CardBody className="flex flex-row items-center p-4">
+                            <Image
+                              src={project.thumbnailURL || "/drakedont.png"}
+                              alt="thumbnail"
+                              width={80}
+                              height={80}
+                              className="rounded-lg object-cover"
+                            />
+                            <div className="ml-4 flex-grow">
+                              <h3 className="font-semibold text-lg">{project.projectName}</h3>
+                              <p className="text-default-500 text-sm">{project.fileName}</p>
+                              <div className="flex items-center mt-2">
+                                <Progress 
+                                  size="sm" 
+                                  value={40} 
+                                  className="max-w-md"
+                                  classNames={{
+                                    indicator: "bg-gradient-to-r from-pink-500 to-violet-500",
+                                  }}
+                                />
+                                <span className="ml-2 text-small text-default-500">40%</span>
+                              </div>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      ))}
                     </div>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4 w-full flex items-center justify-around">
-                <p className="">Current Plan:</p>
-                <p className="text-2xl font-bold">Standard Plan</p>
-                <p className="text-xl font-semibold">$10 / month</p>
-                <Button color="danger" size="lg">
-                  Upgrade
-                </Button>
-                <p>Next Billing Cycle:</p>
-                <p className="font-semibold">December 28</p>
-              </Card>
-              <Card className="p-4 w-full flex items-center">
-                <p className="text-2xl mb-6 mt-2">Billing Cycle</p>
-                <div className="w-44 h-44">
-                  <Doughnut data={data} options={options} />
-                </div>
-              </Card>
-            </div>
-          </div>
-          <div className="flex w-full mt-8 gap-4">
-            <div className="w-[25%]">
-              <Card className="p-4 w-full h-full">
-                <h1 className="text-2xl mb-4">User Profile</h1>
-                <div className="flex items-center">
-                  <Avatar size="lg" />
-                  <p className="text-lg ml-3">{userData.email}</p>
-                </div>
-              </Card>
-            </div>
-            <div className="w-[12.5%]">
-              <Button
-                className="h-full w-full px-0 rounded-2xl"
-                onPress={() => router.push("/app/settings")}
-              >
-                <Card className="p-4 w-full flex items-center justify-center">
-                  <h1 className="text-xl mb-3">Settings</h1>
-                  <IoMdSettings className="w-16 h-16 mb-3" />
-                </Card>
-              </Button>
-            </div>
-            <div className="w-[62.5%]">
-              <div className="w-full h-full space-y-2 flex flex-col justify-around">
-                <Card className="px-4 py-2 rounded-lg text-center">
-                  <p className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-rose-400 to-lime-400 text-lg font-medium">
-                    Enhance Videos with AI Captions
-                  </p>
-                </Card>
-                <Card className="px-4 py-2 rounded-lg text-center">
-                  <p className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600 text-lg font-medium">
-                    Multilingual Voice Overs in Seconds
-                  </p>
-                </Card>
-                <Card className="px-4 py-2 rounded-lg text-center">
-                  <p className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-400 text-lg font-medium">
-                    Streamline Dubbing Across Languages
-                  </p>
+                  </CardBody>
                 </Card>
               </div>
+
+              {/* Usage Stats Section */}
+              <div className="col-span-12 lg:col-span-4">
+                <Card className="p-6">
+                  <CardHeader className="px-0">
+                    <div>
+                      <h2 className="text-2xl font-bold">Usage Stats</h2>
+                      <p className="text-default-500">Your current billing cycle</p>
+                    </div>
+                  </CardHeader>
+                  <CardBody className="flex flex-col items-center px-0">
+                    <div className="relative w-48 h-48">
+                      <Doughnut data={data} options={options} />
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <span className="text-3xl font-bold">{Math.round((userData.subscription.usage.usedSeconds / (userData.subscription.usage.usedSeconds + userData.subscription.usage.remainingSeconds)) * 100)}%</span>
+                        <span className="text-default-500 text-sm">Used</span>
+                      </div>
+                    </div>
+                    <div className="w-full mt-6 space-y-3">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
+                          <span className="text-sm">Used Credits</span>
+                        </div>
+                        <span className="font-semibold">{userData.usedCredits}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 rounded-full bg-indigo-200 mr-2"></div>
+                          <span className="text-sm">Remaining</span>
+                        </div>
+                        <span className="font-semibold">{userData.remainingCredits}</span>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card className="p-6 mt-6">
+                  <CardHeader className="px-0">
+                    <h2 className="text-2xl font-bold">Quick Actions</h2>
+                  </CardHeader>
+                  <CardBody className="px-0 space-y-4">
+                    <Button
+                      onPress={() => router.push("/app/makespeech")}
+                      className="w-full bg-gradient-to-r from-pink-500 to-violet-500 text-white"
+                      size="lg"
+                      startContent={<IoSparkles />}
+                    >
+                      New AI Speech
+                    </Button>
+                    <Button
+                      className="w-full"
+                      color="primary"
+                      variant="bordered"
+                      size="lg"
+                      startContent={<IoMdSettings />}
+                      onPress={() => router.push("/app/settings")}
+                    >
+                      Settings
+                    </Button>
+                  </CardBody>
+                </Card>
+              </div>
+
+              {/* Recent Samples Table */}
+              <Card className="col-span-12 p-6">
+                <CardHeader className="px-0">
+                  <div>
+                    <h2 className="text-2xl font-bold">Recent Samples</h2>
+                    <p className="text-default-500">Your latest generated audio files</p>
+                  </div>
+                </CardHeader>
+                <CardBody className="px-0">
+                  <Table aria-label="Recent audio samples">
+                    <TableHeader>
+                      <TableColumn className="text-md">Voice</TableColumn>
+                      <TableColumn className="text-md">Date</TableColumn>
+                      <TableColumn className="text-md">Status</TableColumn>
+                      <TableColumn className="text-md">Text</TableColumn>
+                      <TableColumn className="text-md text-center">Actions</TableColumn>
+                    </TableHeader>
+                    <TableBody>
+                      {audioFiles.map((audioFile) => (
+                        <TableRow key={audioFile.id} className="hover:bg-default-100">
+                          <TableCell>
+                            <div className="flex items-center">
+                              <span className="font-medium">{audioFile.voice}</span>
+                              <FaCircleInfo className="text-default-400 ml-2" size={12} />
+                            </div>
+                          </TableCell>
+                          <TableCell>{audioFile.date}</TableCell>
+                          <TableCell>
+                            <Chip
+                              className="bg-success/10 text-success border-success/30"
+                              size="sm"
+                              variant="bordered"
+                            >
+                              Generated
+                            </Chip>
+                          </TableCell>
+                          <TableCell>
+                            <p className="truncate max-w-xs">{audioFile.text}</p>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-center gap-2">
+                              <Button
+                                isIconOnly
+                                className="text-primary"
+                                variant="light"
+                                onClick={async () => {
+                                  await dispatch(setAutoPlay(true));
+                                  dispatch(fetchAudioFile(audioFile.id));
+                                  dispatch(setAudioPlayerVisible(true));
+                                }}
+                              >
+                                <FaCirclePlay size={24} />
+                              </Button>
+                              <Button
+                                isIconOnly
+                                className="text-primary"
+                                variant="light"
+                                onClick={() => handleDownload(audioFile.fileURL)}
+                              >
+                                <MdDownloadForOffline size={24} />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardBody>
+              </Card>
             </div>
           </div>
         </div>
