@@ -1027,6 +1027,7 @@ const Projects = ({ openModal }) => {
                           value={selectedFile ? "" : pasteLink}
                           onChange={handlePasteLinkChange}
                           isDisabled={isUploading}
+                          aria-label="YouTube Video URL" // Add this line
                         />
 
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
@@ -1040,6 +1041,7 @@ const Projects = ({ openModal }) => {
                           value={projectName}
                           onChange={handleProjectNameChange}
                           isDisabled={isUploading}
+                          aria-label="Project Name" // Add this line
                         />
 
                         <p className="w-full text-left text-foreground font-semibold text-sm pb-2">
@@ -1099,6 +1101,7 @@ const Projects = ({ openModal }) => {
                           onSelectionChange={handleOriginalLanguage}
                           isDisabled={isUploading}
                           defaultSelectedKey={originalLanguage}
+                          aria-label="Original Language" // Add this line
                           startContent={
                             originalLanguage === "autodetect" ? (
                               <HiSparkles className="text-foreground w-5" />
@@ -1157,6 +1160,7 @@ const Projects = ({ openModal }) => {
                           selectedKeys={[translationLanguage]}
                           onSelectionChange={handleTranslationLanguage}
                           defaultSelectedKey={translationLanguage}
+                          aria-label="Translation Language" // Add this line
                           isDisabled={isUploading}
                           startContent={
                             <Avatar

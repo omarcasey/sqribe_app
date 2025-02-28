@@ -146,9 +146,9 @@ const Dashboard = () => {
 
   return (
     <AppShell>
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center pb-24 pt-6 max-w-[1400px] mx-auto">
+      <div className="min-h-screen w-full bg-gradient-to-b from-background to-background/80">
+        <div className="w-full px-2 sm:px-4 lg:px-6">
+          <div className="flex flex-col items-center pb-24 pt-6 w-full mx-auto">
             {/* Welcome Section */}
             <div className="w-full mb-8">
               <div className="flex items-center justify-between">
@@ -171,7 +171,7 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full mb-8">
               <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
@@ -222,10 +222,10 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Grid */}
-            <div className="grid grid-cols-12 gap-6 w-full">
+            <div className="grid grid-cols-12 gap-4 sm:gap-6 w-full">
               {/* Recent Projects Section */}
               <div className="col-span-12 lg:col-span-8">
-                <Card className="p-6">
+                <Card className="p-4 sm:p-6">
                   <CardHeader className="flex justify-between px-0">
                     <div>
                       <h2 className="text-2xl font-bold">Recent Projects</h2>
@@ -277,7 +277,7 @@ const Dashboard = () => {
 
               {/* Usage Stats Section */}
               <div className="col-span-12 lg:col-span-4">
-                <Card className="p-6">
+                <Card className="p-4 sm:p-6">
                   <CardHeader className="px-0">
                     <div>
                       <h2 className="text-2xl font-bold">Usage Stats</h2>
@@ -312,7 +312,7 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Quick Actions */}
-                <Card className="p-6 mt-6">
+                <Card className="p-4 sm:p-6 mt-6">
                   <CardHeader className="px-0">
                     <h2 className="text-2xl font-bold">Quick Actions</h2>
                   </CardHeader>
@@ -340,14 +340,14 @@ const Dashboard = () => {
               </div>
 
               {/* Recent Samples Table */}
-              <Card className="col-span-12 p-6">
+              <Card className="col-span-12 p-4 sm:p-6">
                 <CardHeader className="px-0">
                   <div>
                     <h2 className="text-2xl font-bold">Recent Samples</h2>
                     <p className="text-default-500">Your latest generated audio files</p>
                   </div>
                 </CardHeader>
-                <CardBody className="px-0">
+                <CardBody className="px-0 overflow-x-auto">
                   <Table aria-label="Recent audio samples">
                     <TableHeader>
                       <TableColumn className="text-md">Voice</TableColumn>
